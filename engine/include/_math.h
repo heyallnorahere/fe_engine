@@ -56,4 +56,7 @@ namespace fe_engine {
 	};
 	using u8vec2 = vec2t<unsigned char>;
 	using s8vec2 = vec2t<char>;
+	using u32vec2 = vec2t<unsigned int>;
+	using s32vec2 = vec2t<int>;
+	using vec2 = vec2t<double>;
 }
