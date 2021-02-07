@@ -55,4 +55,10 @@ namespace fe_engine {
 		}
 		return reference<unit>();
 	}
+	size_t map::get_width() const {
+		return this->m_width;
+	}
+	size_t map::get_height() const {
+		return this->m_height;
+	}
 }

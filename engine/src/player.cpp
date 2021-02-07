@@ -8,10 +8,10 @@ namespace fe_engine {
 	void player::update() {
 		this->m_controller->update();
 		controller::buttons buttons = this->m_controller->get_state();
-		if (buttons.right.down) this->m_cursor_pos.x++;
-		if (buttons.left.down) this->m_cursor_pos.x--;
-		if (buttons.up.down) this->m_cursor_pos.y++;
-		if (buttons.down.down) this->m_cursor_pos.y--;
+		if (buttons.right.down && (size_t)this->m_cursor_pos.x < this->m_map->get_width() - 1) this->m_cursor_pos.x++;
+		if (buttons.left.down && this->m_cursor_pos.x > 0) this->m_cursor_pos.x--;
+		if (buttons.up.down && (size_t)this->m_cursor_pos.y < this->m_map->get_height() - 1) this->m_cursor_pos.y++;
+		if (buttons.down.down && this->m_cursor_pos.y > 0) this->m_cursor_pos.y--;
 		if (buttons.a.down) {
 			if (this->m_selected) {
 				this->m_selected->move(this->m_cursor_pos - this->m_selected->get_pos());

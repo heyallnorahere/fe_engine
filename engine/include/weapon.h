@@ -13,9 +13,17 @@ namespace fe_engine {
 			darkmagic = 'X',
 			whitemagic = 'W',
 		};
-		weapon(type weapon_type);
+		struct weapon_stats {
+			using stat_type = unsigned char;
+			stat_type attack;
+			stat_type hit_rate;
+			stat_type critical_rate;
+			stat_type durability;
+		};
+		weapon(type weapon_type, weapon_stats stats = { 1, 100, 0, 50 });
 		type get_type() const;
 	private:
 		type m_type;
+		weapon_stats m_stats;
 	};
 }

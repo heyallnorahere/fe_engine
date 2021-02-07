@@ -14,6 +14,8 @@ namespace fe_engine {
 		size_t get_unit_count() const;
 		reference<unit> get_unit(size_t index) const;
 		reference<unit> get_unit_at(s8vec2 pos) const;
+		size_t get_width() const;
+		size_t get_height() const;
 	private:
 		std::list<reference<unit>> m_units;
 		size_t m_width, m_height;
