@@ -79,4 +79,9 @@ namespace fe_engine {
 	size_t renderer::get_index_for_pos(size_t x, size_t y) const {
 		return (y * this->m_width) + x;
 	}
+	void renderer::render_string_at(size_t x, size_t y, const std::string& text, color c) const {
+		for (char _c : text) {
+			this->render_char_at(x++, y, _c, c);
+		}
+	}
 }
