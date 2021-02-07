@@ -31,7 +31,7 @@ namespace fe_engine {
 		size_t width, height;
 		r->get_buffer_size(width, height);
 		if (this->m_cursor_pos.y < height - 1) {
-			r->render_char_at(this->m_cursor_pos.x, this->m_cursor_pos.y + 1, 'v');
+			r->render_char_at(this->m_cursor_pos.x, this->m_cursor_pos.y + 1, 'v', renderer::color::white);
 		}
 	}
 }

@@ -11,29 +11,43 @@ static void set_cursor_pos(int x, int y) {
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)x, (short)y });
 #endif
 }
-static void print(const std::string& text) {
+static void print_char(char c, fe_engine::renderer::color _c) {
 #ifdef _WIN32
-	WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), text.c_str(), text.length(), NULL, NULL);
+	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(console, (WORD)_c);
+	WriteConsole(console, &c, 1, NULL, NULL);
+#endif
+}
+static void disable_console_cursor() {
+#ifdef _WIN32
+	CONSOLE_CURSOR_INFO info;
+	info.dwSize = 20;
+	info.bVisible = false;
+	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info);
 #endif
 }
 namespace fe_engine {
 	renderer::renderer() {
 		this->m_buffer = new util::buffer(sizeof(char));
+		this->m_color_buffer = new util::buffer(sizeof(color));
 		this->m_width = this->m_height = 1;
+		disable_console_cursor();
 	}
 	renderer::~renderer() {
+		delete this->m_color_buffer;
 		delete this->m_buffer;
 	}
 	void renderer::clear() {
 		for (size_t y = 0; y < this->m_height; y++) {
 			for (size_t x = 0; x < this->m_width; x++) {
-				this->render_char_at(x, y, ' ');
+				this->render_char_at(x, y, ' ', color::white);
 			}
 		}
 		set_cursor_pos(0, 0);
 	}
 	void renderer::set_buffer_size(size_t width, size_t height) {
 		this->m_buffer->resize(width * height * sizeof(char));
+		this->m_color_buffer->resize(width * height * sizeof(color));
 		this->m_width = width;
 		this->m_height = height;
 	}
@@ -42,22 +56,25 @@ namespace fe_engine {
 		height = this->m_height;
 	}
 	void renderer::present() {
-		std::stringstream ss;
 		for (int y = (int)this->m_height - 1; y >= 0; y--) {
 			for (size_t x = 0; x < this->m_width; x++) {
 				char* buffer = util::buffer_cast<char>(this->m_buffer);
 				// this is assuming that the buffers size is m_width * m_height * sizeof(char)
 				char c = buffer[this->get_index_for_pos(x, (size_t)y)];
-				ss << c;
+				color* color_buffer = util::buffer_cast<color>(this->m_color_buffer);
+				color _c = color_buffer[this->get_index_for_pos(x, (size_t)y)];
+				print_char(c, _c);
 			}
-			ss << '\n';
+			print_char('\n', color::white);
 		}
-		print(ss.str());
 	}
-	void renderer::render_char_at(size_t x, size_t y, char c) const {
+	void renderer::render_char_at(size_t x, size_t y, char c, color _c) const {
 		char* buffer = util::buffer_cast<char>(this->m_buffer);
 		char& ref = buffer[this->get_index_for_pos(x, y)];
 		ref = c;
+		color* color_buffer = util::buffer_cast<color>(this->m_color_buffer);
+		color& color_ref = color_buffer[this->get_index_for_pos(x, y)];
+		color_ref = _c;
 	}
 	size_t renderer::get_index_for_pos(size_t x, size_t y) const {
 		return (y * this->m_width) + x;

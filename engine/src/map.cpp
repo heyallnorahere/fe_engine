@@ -17,7 +17,22 @@ namespace fe_engine {
 	}
 	void map::render(const reference<renderer>& r) {
 		for (const auto& u : this->m_units) {
-			r->render_char_at(u->get_pos().x, u->get_pos().y, 'u');
+			renderer::color color = renderer::color::white;
+			switch (u->get_affiliation()) {
+			case unit_affiliation::enemy:
+				color = renderer::color::red;
+				break;
+			case unit_affiliation::ally:
+				color = renderer::color::green;
+				break;
+			case unit_affiliation::player:
+				color = renderer::color::blue;
+				break;
+			case unit_affiliation::separate_enemy:
+				color = renderer::color::yellow;
+				break;
+			}
+			r->render_char_at(u->get_pos().x, u->get_pos().y, 'u', color);
 		}
 	}
 	size_t map::get_unit_count() const {
