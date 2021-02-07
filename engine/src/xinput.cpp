@@ -27,6 +27,8 @@ fe_engine::controller::buttons get_controller_state(size_t index) {
 	b.down.held = state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN;
 	b.left.held = state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT;
 	b.right.held = state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT;
+	b.start.held = state.Gamepad.wButtons & XINPUT_GAMEPAD_START;
+	b.select.held = state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK;
 	return b;
 }
 #endif

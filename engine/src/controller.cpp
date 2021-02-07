@@ -31,6 +31,8 @@ namespace fe_engine {
 		calculate_difference(current.down, last.down);
 		calculate_difference(current.left, last.left);
 		calculate_difference(current.right, last.right);
+		calculate_difference(current.start, last.start);
+		calculate_difference(current.select, last.select);
 	}
 	void controller::update() {
 		this->m_last = this->m_current;

@@ -31,4 +31,10 @@ namespace fe_engine {
 		}
 		this->m_pos += to_move;
 	}
+	reference<weapon> unit::get_equipped_weapon() const {
+		return this->m_equipped_weapon;
+	}
+	void unit::set_equipped_weapon(const reference<weapon>& w) {
+		this->m_equipped_weapon = w;
+	}
 }

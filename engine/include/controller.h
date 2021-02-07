@@ -7,7 +7,7 @@ namespace fe_engine {
 			bool held, down, up;
 		};
 		struct buttons {
-			button a, b, x, y, lb, rb, ls, rs, up, down, left, right;
+			button a, b, x, y, lb, rb, ls, rs, up, down, left, right, start, select;
 		};
 		controller(size_t index);
 		void update();

@@ -2,6 +2,7 @@
 #include "reference.h"
 #include "_math.h"
 #include "controller.h"
+#include "weapon.h"
 namespace fe_engine {
 	enum class unit_affiliation {
 		player,
@@ -33,10 +34,13 @@ namespace fe_engine {
 		unit_affiliation get_affiliation() const;
 		void update();
 		void move(s8vec2 offset);
+		reference<weapon> get_equipped_weapon() const;
+		void set_equipped_weapon(const reference<weapon>& w);
 	private:
 		unit_stats m_stats;
 		s8vec2 m_pos;
 		unit_stats::stat_type m_hp;
 		unit_affiliation m_affiliation;
+		reference<weapon> m_equipped_weapon;
 	};
 }

@@ -6,3 +6,4 @@
 #include "_math.h"
 #include "controller.h"
 #include "player.h"
+#include "weapon.h"
