@@ -11,6 +11,11 @@ static void set_cursor_pos(int x, int y) {
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)x, (short)y });
 #endif
 }
+static void print(const std::string& text) {
+#ifdef _WIN32
+	WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), text.c_str(), text.length(), NULL, NULL);
+#endif
+}
 namespace fe_engine {
 	renderer::renderer() {
 		this->m_buffer = new util::buffer(sizeof(char));
@@ -47,7 +52,7 @@ namespace fe_engine {
 			}
 			ss << '\n';
 		}
-		std::cout << ss.str() << std::flush;
+		print(ss.str());
 	}
 	void renderer::render_char_at(size_t x, size_t y, char c) const {
 		char* buffer = util::buffer_cast<char>(this->m_buffer);

@@ -23,16 +23,19 @@ namespace fe_engine {
 			stat_type defense;
 			stat_type resilience;
 			stat_type charm;
+			stat_type move;
 		};
-		unit(const unit_stats& stats, u8vec2 pos, unit_affiliation affiliation);
+		unit(const unit_stats& stats, s8vec2 pos, unit_affiliation affiliation);
 		~unit();
 		const unit_stats& get_stats() const;
-		u8vec2 get_pos() const;
+		s8vec2 get_pos() const;
 		unit_stats::stat_type get_current_hp() const;
+		unit_affiliation get_affiliation() const;
 		void update();
+		void move(s8vec2 offset);
 	private:
 		unit_stats m_stats;
-		u8vec2 m_pos;
+		s8vec2 m_pos;
 		unit_stats::stat_type m_hp;
 		unit_affiliation m_affiliation;
 	};

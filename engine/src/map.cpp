@@ -28,4 +28,12 @@ namespace fe_engine {
 		std::advance(it, index);
 		return *it;
 	}
+	reference<unit> map::get_unit_at(s8vec2 pos) const {
+		for (const auto& u : this->m_units) {
+			if (u->get_pos() == pos) {
+				return u;
+			}
+		}
+		return reference<unit>();
+	}
 }

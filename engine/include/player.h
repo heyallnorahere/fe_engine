@@ -15,6 +15,6 @@ namespace fe_engine {
 		reference<controller> m_controller;
 		reference<map> m_map;
 		reference<unit> m_selected;
-		u8vec2 m_cursor_pos;
+		s8vec2 m_cursor_pos;
 	};
 }
