@@ -10,6 +10,7 @@ namespace fe_engine {
 		~renderer();
 		void clear();
 		void set_buffer_size(size_t width, size_t height);
+		void get_buffer_size(size_t& width, size_t& height) const;
 		void present();
 		void render_char_at(size_t x, size_t y, char c) const;
 	private:

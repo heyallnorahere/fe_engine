@@ -14,11 +14,18 @@ namespace fe_engine {
 			u->update();
 		}
 		this->m_units.remove_if([](const reference<unit>& u) { return u->get_current_hp() == 0; });
-		// todo: update
 	}
 	void map::render(const reference<renderer>& r) {
 		for (const auto& u : this->m_units) {
 			r->render_char_at(u->get_pos().x, u->get_pos().y, 'u');
 		}
+	}
+	size_t map::get_unit_count() const {
+		return this->m_units.size();
+	}
+	reference<unit> map::get_unit(size_t index) const {
+		auto it = this->m_units.begin();
+		std::advance(it, index);
+		return *it;
 	}
 }

@@ -32,9 +32,13 @@ namespace fe_engine {
 		this->m_width = width;
 		this->m_height = height;
 	}
+	void renderer::get_buffer_size(size_t& width, size_t& height) const {
+		width = this->m_width;
+		height = this->m_height;
+	}
 	void renderer::present() {
 		std::stringstream ss;
-		for (int y = this->m_height - 1; y >= 0; y--) {
+		for (int y = (int)this->m_height - 1; y >= 0; y--) {
 			for (size_t x = 0; x < this->m_width; x++) {
 				char* buffer = util::buffer_cast<char>(this->m_buffer);
 				// this is assuming that the buffers size is m_width * m_height * sizeof(char)

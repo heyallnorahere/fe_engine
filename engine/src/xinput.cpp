@@ -1,4 +1,5 @@
-#ifdef _WIN32
+#include "config.h"
+#if defined(_WIN32) && USE_XINPUT
 #include "controller.h"
 #define _AMD64_
 #include <Xinput.h>
@@ -6,14 +7,14 @@
 bool is_controller_connected(size_t index) {
 	XINPUT_STATE state;
 	ZeroMemory(&state, sizeof(XINPUT_STATE));
-	DWORD r = XInputGetState(index, &state);
+	DWORD r = XInputGetState((DWORD)index, &state);
 	return (r == ERROR_SUCCESS);
 }
 fe_engine::controller::buttons get_controller_state(size_t index) {
 	fe_engine::controller::buttons b;
 	XINPUT_STATE state;
 	ZeroMemory(&state, sizeof(XINPUT_STATE));
-	XInputGetState(index, &state);
+	XInputGetState((DWORD)index, &state);
 	b.a.held = state.Gamepad.wButtons & XINPUT_GAMEPAD_A;
 	b.b.held = state.Gamepad.wButtons & XINPUT_GAMEPAD_B;
 	b.x.held = state.Gamepad.wButtons & XINPUT_GAMEPAD_X;
