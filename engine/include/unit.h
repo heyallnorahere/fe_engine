@@ -1,6 +1,7 @@
 #pragma once
 #include "reference.h"
 #include "_math.h"
+#include "controller.h"
 namespace fe_engine {
 	class unit : public ref_counted {
 	public:
@@ -17,7 +18,7 @@ namespace fe_engine {
 			stat_type resilience;
 			stat_type charm;
 		};
-		unit(const unit_stats& stats, u8vec2 pos);
+		unit(const unit_stats& stats, u8vec2 pos, reference<controller> c = reference<controller>());
 		~unit();
 		const unit_stats& get_stats() const;
 		u8vec2 get_pos() const;
@@ -27,5 +28,6 @@ namespace fe_engine {
 		unit_stats m_stats;
 		u8vec2 m_pos;
 		unit_stats::stat_type m_hp;
+		reference<controller> m_controller;
 	};
 }

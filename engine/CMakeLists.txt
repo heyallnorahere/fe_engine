@@ -1,4 +1,7 @@
 cmake_minimum_required (VERSION 3.8)
 include_directories ("include")
-file (GLOB sourcefiles "src/*.cpp" "src/*.h")
+file (GLOB sourcefiles "src/*.cpp")
 add_library (engine STATIC ${sourcefiles})
+if(WIN32)
+target_link_libraries(engine "xinput.lib")
+endif(WIN32)
