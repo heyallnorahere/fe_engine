@@ -12,10 +12,22 @@ namespace fe_engine {
 	void ui_controller::set_unit_menu_target(reference<unit> u) {
 		this->m_unit_menu_target = u;
 		this->m_unit_menu_index = 0;
+		this->m_menu_items.clear();
+		this->m_menu_items.push_back({ "Wait", [](reference<ui_controller> controller) {} });
 	}
 	void ui_controller::update() {
 		if (this->m_unit_menu_target) {
-			// todo: update
+			controller::buttons buttons = this->m_controller->get_state();
+			if (buttons.down.down && this->m_unit_menu_index < this->m_menu_items.size() - 1) {
+				this->m_unit_menu_index++;
+			}
+			if (buttons.up.down && this->m_unit_menu_index > 0) {
+				this->m_unit_menu_index--;
+			}
+			if (buttons.a.down && this->m_can_close) {
+				this->m_menu_items[this->m_unit_menu_index].on_select(reference<ui_controller>(this));
+				this->close_unit_menu();
+			}
 		}
 	}
 	void ui_controller::render() {
@@ -31,6 +43,9 @@ namespace fe_engine {
 	}
 	reference<unit> ui_controller::get_unit_menu_target() const {
 		return this->m_unit_menu_target;
+	}
+	void ui_controller::set_can_close(bool c) {
+		this->m_can_close = c;
 	}
 	void ui_controller::close_unit_menu() {
 		this->m_unit_menu_target.reset();
@@ -73,6 +88,15 @@ namespace fe_engine {
 		}
 	}
 	void ui_controller::render_unit_menu(size_t origin_x, size_t origin_y, size_t width, size_t height) {
-		// todo: ui stuff
+		if (this->m_unit_menu_target) {
+			for (size_t i = 0; i < this->m_menu_items.size(); i++) {
+				bool selected = (this->m_unit_menu_index == i);
+				size_t y = origin_y + height - (1 + (i * 2));
+				if (selected) {
+					this->m_renderer->render_char_at(origin_x, y, '>', renderer::color::red);
+				}
+				this->m_renderer->render_string_at(origin_x + 2, y, this->m_menu_items[i].text, selected ? renderer::color::red : renderer::color::white);
+			}
+		}
 	}
 }

@@ -8,6 +8,7 @@ namespace fe_engine {
 	}
 	void player::update() {
 		this->m_controller->update();
+		this->m_ui_controller->set_can_close(true);
 		if (!this->m_ui_controller->get_unit_menu_target()) {
 			controller::buttons buttons = this->m_controller->get_state();
 			bool update_tile_selection = false;
@@ -33,6 +34,8 @@ namespace fe_engine {
 			if (buttons.a.down) {
 				if (this->m_selected) {
 					this->m_selected->move(this->m_cursor_pos - this->m_selected->get_pos());
+					this->m_ui_controller->set_unit_menu_target(this->m_selected);
+					this->m_ui_controller->set_can_close(false);
 					this->m_selected.reset();
 				}
 				else {
