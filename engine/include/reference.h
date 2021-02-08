@@ -114,5 +114,6 @@ namespace fe_engine {
 			}
 		}
 		T* m_instance;
+		template<typename U> friend class reference;
 	};
 }

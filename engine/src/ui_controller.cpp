@@ -187,6 +187,17 @@ namespace fe_engine {
 				controller->close_unit_menu();
 			} });
 		}
+		if (i->get_item_flags() & item::equipable) {
+			items.push_back({ "Equip", [](reference<ui_controller> controller) {
+				reference<item> equipped = controller->m_unit_menu_target->get_equipped_weapon();
+				controller->m_unit_menu_target->get_inventory().remove_if([&](reference<item> i) { return controller->m_unit_menu_state.selected_item.get() == i.get(); });
+				controller->m_unit_menu_target->set_equipped_weapon(controller->m_unit_menu_state.selected_item);
+				controller->m_unit_menu_target->get_inventory().push_back(equipped);
+				controller->m_unit_menu_state.page = menu_page::item;
+				controller->m_unit_menu_index = 0;
+				controller->m_unit_menu_state.selected_item.reset();
+			} });
+		}
 		// todo: add more
 		items.push_back({ "Cancel", [](reference<ui_controller> controller) { controller->m_unit_menu_state.page = menu_page::item; controller->m_unit_menu_state.selected_item.reset(); controller->m_unit_menu_index = 0; } });
 		return items;

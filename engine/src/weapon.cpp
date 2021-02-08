@@ -32,7 +32,7 @@ namespace fe_engine {
 			break;
 		}
 	}
-	weapon::weapon(type weapon_type, weapon_stats stats) : item(weapon_type_to_string(weapon_type)) {
+	weapon::weapon(type weapon_type, weapon_stats stats) : item(weapon_type_to_string(weapon_type), item::equipable) {
 		this->m_type = weapon_type;
 		this->m_stats = stats;
 	}

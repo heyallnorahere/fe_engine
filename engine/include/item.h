@@ -12,7 +12,7 @@ namespace fe_engine {
 		std::string get_name() const;
 		unsigned int get_item_flags() const;
 		on_use_proc get_on_use_proc() const;
-	private:
+	protected:
 		std::string m_name;
 		unsigned int m_flags;
 		on_use_proc m_on_use;
