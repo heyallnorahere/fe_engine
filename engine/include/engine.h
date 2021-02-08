@@ -8,3 +8,4 @@
 #include "player.h"
 #include "weapon.h"
 #include "ui_controller.h"
+#include "_random.h"

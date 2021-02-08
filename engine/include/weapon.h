@@ -22,6 +22,7 @@ namespace fe_engine {
 		};
 		weapon(type weapon_type, weapon_stats stats = { 1, 100, 0, 50 });
 		type get_type() const;
+		weapon_stats get_stats() const;
 	private:
 		type m_type;
 		weapon_stats m_stats;

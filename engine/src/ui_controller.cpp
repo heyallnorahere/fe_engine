@@ -183,7 +183,7 @@ namespace fe_engine {
 				item::on_use_proc proc = controller->m_unit_menu_state.selected_item->get_on_use_proc();
 				assert(proc);
 				proc(controller->m_unit_menu_target.get());
-				controller->m_unit_menu_target->get_inventory().remove(controller->m_unit_menu_state.selected_item);
+				controller->m_unit_menu_target->get_inventory().remove_if([&](reference<item> i) { return controller->m_unit_menu_state.selected_item.get() == i.get(); });
 				controller->close_unit_menu();
 			} });
 		}

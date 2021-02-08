@@ -39,4 +39,7 @@ namespace fe_engine {
 	weapon::type weapon::get_type() const {
 		return this->m_type;
 	}
+	weapon::weapon_stats weapon::get_stats() const {
+		return this->m_stats;
+	}
 }

@@ -7,6 +7,9 @@ namespace fe_engine {
 		bool operator==(const vec2t<T>& other) {
 			return (this->x == other.x) && (this->y == other.y);
 		}
+		template<typename U> bool operator==(const vec2t<U>& other) {
+			return (this->x == (T)other.x) && (this->y == (T)other.y);
+		}
 		vec2t<T> operator+(const vec2t<T>& other) {
 			T x = this->x + other.x;
 			T y = this->y + other.y;
