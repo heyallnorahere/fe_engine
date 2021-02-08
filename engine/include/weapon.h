@@ -1,7 +1,7 @@
 #pragma once
-#include "reference.h"
+#include "item.h"
 namespace fe_engine {
-	class weapon : public ref_counted {
+	class weapon : public item {
 	public:
 		enum class type {
 			fists = 'F',

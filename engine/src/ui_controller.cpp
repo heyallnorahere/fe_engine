@@ -13,20 +13,61 @@ namespace fe_engine {
 		this->m_unit_menu_target = u;
 		this->m_unit_menu_index = 0;
 		this->m_menu_items.clear();
-		this->m_menu_items.push_back({ "Wait", [](reference<ui_controller> controller) {} });
+		this->m_menu_items.push_back({ "Item", [](reference<ui_controller> controller) { controller->m_unit_menu_state.page = menu_page::item; controller->m_unit_menu_index = 0; } });
+		this->m_menu_items.push_back({ "Wait", [](reference<ui_controller> controller) { controller->close_unit_menu(); } });
+		this->m_unit_menu_state.page = menu_page::base;
+		this->m_unit_menu_state.selected_item.reset();
 	}
 	void ui_controller::update() {
 		if (this->m_unit_menu_target) {
 			controller::buttons buttons = this->m_controller->get_state();
-			if (buttons.down.down && this->m_unit_menu_index < this->m_menu_items.size() - 1) {
-				this->m_unit_menu_index++;
-			}
 			if (buttons.up.down && this->m_unit_menu_index > 0) {
 				this->m_unit_menu_index--;
 			}
-			if (buttons.a.down && this->m_can_close) {
-				this->m_menu_items[this->m_unit_menu_index].on_select(reference<ui_controller>(this));
-				this->close_unit_menu();
+			switch (this->m_unit_menu_state.page) {
+			case menu_page::base:
+				if (buttons.down.down && this->m_unit_menu_index < this->m_menu_items.size() - 1) {
+					this->m_unit_menu_index++;
+				}
+				if (buttons.a.down && this->m_can_close) {
+					this->m_menu_items[this->m_unit_menu_index].on_select(reference<ui_controller>(this));
+				}
+				break;
+			case menu_page::item:
+			{
+				std::list<reference<item>> inventory = this->m_unit_menu_target->get_inventory();
+				if (buttons.down.down && this->m_unit_menu_index < inventory.size() - 1) {
+					this->m_unit_menu_index++;
+				}
+				if (buttons.a.down && this->m_can_close) {
+					auto it = inventory.begin();
+					std::advance(it, this->m_unit_menu_index);
+					this->m_unit_menu_state.selected_item = *it;
+					this->m_unit_menu_state.page = menu_page::select;
+					this->m_unit_menu_index = 0;
+				}
+				if (buttons.b.down && this->m_can_close) {
+					this->m_unit_menu_state.page = menu_page::base;
+					this->m_unit_menu_index = 0;
+				}
+			}
+				break;
+			case menu_page::select:
+			{
+				std::vector<unit_menu_item> menu_items = this->generate_menu_items(this->m_unit_menu_state.selected_item);
+				if (buttons.down.down && this->m_unit_menu_index < menu_items.size() - 1) {
+					this->m_unit_menu_index++;
+				}
+				if (buttons.a.down && this->m_can_close) {
+					menu_items[this->m_unit_menu_index].on_select(reference<ui_controller>(this));
+				}
+				if (buttons.b.down && this->m_can_close) {
+					this->m_unit_menu_state.page = menu_page::item;
+					this->m_unit_menu_state.selected_item.reset();
+					this->m_unit_menu_index = 0;
+				}
+			}
+				break;
 			}
 		}
 	}
@@ -89,14 +130,52 @@ namespace fe_engine {
 	}
 	void ui_controller::render_unit_menu(size_t origin_x, size_t origin_y, size_t width, size_t height) {
 		if (this->m_unit_menu_target) {
-			for (size_t i = 0; i < this->m_menu_items.size(); i++) {
-				bool selected = (this->m_unit_menu_index == i);
-				size_t y = origin_y + height - (1 + (i * 2));
-				if (selected) {
-					this->m_renderer->render_char_at(origin_x, y, '>', renderer::color::red);
+			switch (this->m_unit_menu_state.page) {
+			case menu_page::base:
+				for (size_t i = 0; i < this->m_menu_items.size(); i++) {
+					bool selected = (this->m_unit_menu_index == i);
+					size_t y = origin_y + height - (1 + (i * 2));
+					if (selected) {
+						this->m_renderer->render_char_at(origin_x, y, '>', renderer::color::red);
+					}
+					this->m_renderer->render_string_at(origin_x + 2, y, this->m_menu_items[i].text, selected ? renderer::color::red : renderer::color::white);
 				}
-				this->m_renderer->render_string_at(origin_x + 2, y, this->m_menu_items[i].text, selected ? renderer::color::red : renderer::color::white);
+				break;
+			case menu_page::item:
+			{
+				std::list<reference<item>> inventory = this->m_unit_menu_target->get_inventory();
+				for (size_t i = 0; i < inventory.size(); i++) {
+					bool selected = (this->m_unit_menu_index == i);
+					size_t y = origin_y + height - (1 + (i * 2));
+					if (selected) {
+						this->m_renderer->render_char_at(origin_x, y, '>', renderer::color::red);
+					}
+					auto it = inventory.begin();
+					std::advance(it, i);
+					this->m_renderer->render_string_at(origin_x + 2, y, (*it)->get_name(), selected ? renderer::color::red : renderer::color::white);
+				}
+			}
+				break;
+			case menu_page::select:
+			{
+				std::vector<unit_menu_item> menu_items = this->generate_menu_items(this->m_unit_menu_state.selected_item);
+				for (size_t i = 0; i < menu_items.size(); i++) {
+					bool selected = (this->m_unit_menu_index == i);
+					size_t y = origin_y + height - (1 + (i * 2));
+					if (selected) {
+						this->m_renderer->render_char_at(origin_x, y, '>', renderer::color::red);
+					}
+					this->m_renderer->render_string_at(origin_x + 2, y, menu_items[i].text, selected ? renderer::color::red : renderer::color::white);
+				}
+			}
+			break;
 			}
 		}
+	}
+	std::vector<ui_controller::unit_menu_item> ui_controller::generate_menu_items(reference<item> i) {
+		std::vector<unit_menu_item> items;
+		// todo: add more
+		items.push_back({ "Cancel", [](reference<ui_controller> controller) { controller->m_unit_menu_state.page = menu_page::item; controller->m_unit_menu_state.selected_item.reset(); controller->m_unit_menu_index = 0; } });
+		return items;
 	}
 }

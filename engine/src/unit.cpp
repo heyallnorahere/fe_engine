@@ -37,4 +37,10 @@ namespace fe_engine {
 	void unit::set_equipped_weapon(const reference<weapon>& w) {
 		this->m_equipped_weapon = w;
 	}
+	const std::list<reference<item>>& unit::get_inventory() const {
+		return this->m_inventory;
+	}
+	std::list<reference<item>>& unit::get_inventory() {
+		return this->m_inventory;
+	}
 }
