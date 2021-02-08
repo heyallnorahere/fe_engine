@@ -5,15 +5,17 @@
 #include "map.h"
 #include "renderer.h"
 #include "unit.h"
+#include "ui_controller.h"
 namespace fe_engine {
 	class player : public ref_counted {
 	public:
-		player(reference<controller> c, reference<map> m);
+		player(reference<controller> c, reference<map> m, reference<ui_controller> uc);
 		void update();
 		void render_cursor(const reference<renderer>& r);
 	private:
 		reference<controller> m_controller;
 		reference<map> m_map;
+		reference<ui_controller> m_ui_controller;
 		reference<unit> m_selected;
 		s8vec2 m_cursor_pos;
 	};

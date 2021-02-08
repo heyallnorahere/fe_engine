@@ -7,3 +7,4 @@
 #include "controller.h"
 #include "player.h"
 #include "weapon.h"
+#include "ui_controller.h"

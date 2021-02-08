@@ -36,7 +36,9 @@ namespace fe_engine {
 			if (u->get_equipped_weapon()) {
 				unit_char = (char)u->get_equipped_weapon()->get_type();
 			}
-			r->render_char_at(u->get_pos().x, u->get_pos().y, unit_char, color);
+			size_t width, height;
+			r->get_buffer_size(width, height);
+			r->render_char_at(u->get_pos().x, u->get_pos().y + (height - this->m_height), unit_char, color);
 		}
 	}
 	size_t map::get_unit_count() const {
