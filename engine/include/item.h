@@ -2,12 +2,20 @@
 #include "reference.h"
 #include <string>
 namespace fe_engine {
+	class unit;
 	class item : public ref_counted {
 	public:
-		item(const std::string& name);
+		static constexpr unsigned int usable = 0b01;
+		static constexpr unsigned int equipable = 0b10;
+		using on_use_proc = void(*)(unit* u);
+		item(const std::string& name, unsigned int flags = 0, on_use_proc on_use = NULL);
 		std::string get_name() const;
+		unsigned int get_item_flags() const;
+		on_use_proc get_on_use_proc() const;
 	private:
 		std::string m_name;
+		unsigned int m_flags;
+		on_use_proc m_on_use;
 		// todo: add global item behavior
 	};
 }

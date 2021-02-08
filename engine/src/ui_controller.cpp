@@ -1,5 +1,6 @@
 #include "ui_controller.h"
 #include <sstream>
+#include <cassert>
 namespace fe_engine {
 	ui_controller::ui_controller(reference<renderer> r, reference<map> m, reference<controller> c) {
 		this->m_renderer = r;
@@ -39,7 +40,7 @@ namespace fe_engine {
 				if (buttons.down.down && this->m_unit_menu_index < inventory.size() - 1) {
 					this->m_unit_menu_index++;
 				}
-				if (buttons.a.down && this->m_can_close) {
+				if (buttons.a.down && this->m_can_close && inventory.size() > 0) {
 					auto it = inventory.begin();
 					std::advance(it, this->m_unit_menu_index);
 					this->m_unit_menu_state.selected_item = *it;
@@ -154,6 +155,9 @@ namespace fe_engine {
 					std::advance(it, i);
 					this->m_renderer->render_string_at(origin_x + 2, y, (*it)->get_name(), selected ? renderer::color::red : renderer::color::white);
 				}
+				if (inventory.size() == 0) {
+					this->m_renderer->render_string_at(origin_x, origin_y + height - 1, "No items available", renderer::color::white);
+				}
 			}
 				break;
 			case menu_page::select:
@@ -168,12 +172,21 @@ namespace fe_engine {
 					this->m_renderer->render_string_at(origin_x + 2, y, menu_items[i].text, selected ? renderer::color::red : renderer::color::white);
 				}
 			}
-			break;
+				break;
 			}
 		}
 	}
 	std::vector<ui_controller::unit_menu_item> ui_controller::generate_menu_items(reference<item> i) {
 		std::vector<unit_menu_item> items;
+		if (i->get_item_flags() & item::usable) {
+			items.push_back({ "Use", [](reference<ui_controller> controller) {
+				item::on_use_proc proc = controller->m_unit_menu_state.selected_item->get_on_use_proc();
+				assert(proc);
+				proc(controller->m_unit_menu_target.get());
+				controller->m_unit_menu_target->get_inventory().remove(controller->m_unit_menu_state.selected_item);
+				controller->close_unit_menu();
+			} });
+		}
 		// todo: add more
 		items.push_back({ "Cancel", [](reference<ui_controller> controller) { controller->m_unit_menu_state.page = menu_page::item; controller->m_unit_menu_state.selected_item.reset(); controller->m_unit_menu_index = 0; } });
 		return items;
