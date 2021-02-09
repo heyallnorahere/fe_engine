@@ -5,7 +5,7 @@ int main() {
 	constexpr size_t height = 10;
 	fe_engine::reference<fe_engine::map> map = fe_engine::reference<fe_engine::map>::create(width, height);
 	fe_engine::reference<fe_engine::renderer> renderer = fe_engine::reference<fe_engine::renderer>::create();
-	renderer->set_buffer_size(width * 4, height + 1);
+	renderer->set_buffer_size((size_t)((double)width * 4.5), height + 1);
 	fe_engine::unit::unit_stats stats;
 	memset(&stats, 0, sizeof(fe_engine::unit::unit_stats));
 	stats.level = 1;
@@ -19,7 +19,7 @@ int main() {
 		u->get_inventory().push_back(fe_engine::reference<fe_engine::item>::create("reserve", fe_engine::item::usable, [](fe_engine::unit* unit) {
 			unit->move({ 0, 1 });
 		}));
-		u->set_equipped_weapon(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::sword));
+		u->set_equipped_weapon(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::sword, fe_engine::weapon::weapon_stats{ 5, 100, 50, 100 }));
 		u->get_inventory().push_back(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::axe));
 		map->add_unit(u);
 		u = fe_engine::reference<fe_engine::unit>::create(stats, fe_engine::u8vec2{ 18, 8 }, fe_engine::unit_affiliation::enemy);

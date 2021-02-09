@@ -14,6 +14,15 @@ namespace fe_engine {
 		this->m_unit_menu_target = u;
 		this->m_unit_menu_index = 0;
 		this->m_menu_items.clear();
+		{
+			std::vector<reference<unit>> units = this->get_attackable_units(u);
+			if (units.size() > 0) {
+				this->m_menu_items.push_back({ "Attack", [](reference<ui_controller> controller) {
+					controller->m_unit_menu_state.page = menu_page::enemy_select;
+					controller->m_unit_menu_index = 0;
+				} });
+			}
+		}
 		this->m_menu_items.push_back({ "Item", [](reference<ui_controller> controller) { controller->m_unit_menu_state.page = menu_page::item; controller->m_unit_menu_index = 0; } });
 		this->m_menu_items.push_back({ "Wait", [](reference<ui_controller> controller) { controller->close_unit_menu(); } });
 		this->m_unit_menu_state.page = menu_page::base;
@@ -44,7 +53,7 @@ namespace fe_engine {
 					auto it = inventory.begin();
 					std::advance(it, this->m_unit_menu_index);
 					this->m_unit_menu_state.selected_item = *it;
-					this->m_unit_menu_state.page = menu_page::select;
+					this->m_unit_menu_state.page = menu_page::item_select;
 					this->m_unit_menu_index = 0;
 				}
 				if (buttons.b.down && this->m_can_close) {
@@ -53,7 +62,7 @@ namespace fe_engine {
 				}
 			}
 				break;
-			case menu_page::select:
+			case menu_page::item_select:
 			{
 				std::vector<unit_menu_item> menu_items = this->generate_menu_items(this->m_unit_menu_state.selected_item);
 				if (buttons.down.down && this->m_unit_menu_index < menu_items.size() - 1) {
@@ -69,6 +78,22 @@ namespace fe_engine {
 				}
 			}
 				break;
+			case menu_page::enemy_select:
+			{
+				std::vector<reference<unit>> units = this->get_attackable_units(this->m_unit_menu_target);
+				if (buttons.down.down && this->m_unit_menu_index < units.size() - 1) {
+					this->m_unit_menu_index++;
+				}
+				if (buttons.a.down && this->m_can_close) {
+					this->m_unit_menu_target->attack(units[this->m_unit_menu_index]);
+					this->close_unit_menu();
+				}
+				if (buttons.b.down && this->m_can_close) {
+					this->m_unit_menu_state.page = menu_page::base;
+					this->m_unit_menu_index = 0;
+				}
+			}
+				break;
 			}
 		}
 	}
@@ -77,7 +102,7 @@ namespace fe_engine {
 		size_t map_height = this->m_map->get_height();
 		size_t viewport_width, viewport_height;
 		this->m_renderer->get_buffer_size(viewport_width, viewport_height);
-		size_t unit_menu_width = 20;
+		size_t unit_menu_width = 30;
 		size_t info_panel_width = viewport_width - (map_width + unit_menu_width + 3);
 		this->render_frame(info_panel_width, unit_menu_width, map_width, map_height);
 		this->render_info_panel(map_width + 1, viewport_height - map_height, info_panel_width, map_height);
@@ -160,7 +185,7 @@ namespace fe_engine {
 				}
 			}
 				break;
-			case menu_page::select:
+			case menu_page::item_select:
 			{
 				std::vector<unit_menu_item> menu_items = this->generate_menu_items(this->m_unit_menu_state.selected_item);
 				for (size_t i = 0; i < menu_items.size(); i++) {
@@ -170,6 +195,35 @@ namespace fe_engine {
 						this->m_renderer->render_char_at(origin_x, y, '>', renderer::color::red);
 					}
 					this->m_renderer->render_string_at(origin_x + 2, y, menu_items[i].text, selected ? renderer::color::red : renderer::color::white);
+				}
+			}
+				break;
+			case menu_page::enemy_select:
+			{
+				std::vector<reference<unit>> units = this->get_attackable_units(this->m_unit_menu_target);
+				for (size_t i = 0; i < units.size(); i++) {
+					bool selected = (this->m_unit_menu_index == i);
+					size_t y = origin_y + height - (1 + (i * 2));
+					if (selected) {
+						this->m_renderer->render_char_at(origin_x, y, '>', renderer::color::red);
+					}
+					std::string affiliation = "Unknown";
+					switch (units[i]->get_affiliation()) {
+					case unit_affiliation::player:
+						affiliation = "Player";
+						break;
+					case unit_affiliation::ally:
+						affiliation = "Ally";
+						break;
+					case unit_affiliation::enemy:
+						affiliation = "Enemy";
+						break;
+					case unit_affiliation::separate_enemy:
+						affiliation = "Third Army";
+						break;
+					}
+					std::string text = affiliation + " unit (" + std::to_string((unsigned int)units[i]->get_current_hp()) + "/" + std::to_string((unsigned int)units[i]->get_stats().max_hp) + ")";
+					this->m_renderer->render_string_at(origin_x + 2, y, text, selected ? renderer::color::red : renderer::color::white);
 				}
 			}
 				break;
@@ -201,5 +255,19 @@ namespace fe_engine {
 		// todo: add more
 		items.push_back({ "Cancel", [](reference<ui_controller> controller) { controller->m_unit_menu_state.page = menu_page::item; controller->m_unit_menu_state.selected_item.reset(); controller->m_unit_menu_index = 0; } });
 		return items;
+	}
+	std::vector<reference<unit>> ui_controller::get_attackable_units(reference<unit> u) {
+		std::vector<s8vec2> tiles = u->calculate_attackable_tiles();
+		std::vector<reference<unit>> units;
+		for (s8vec2 tile : tiles) {
+			reference<unit> _u = this->m_map->get_unit_at(tile);
+			if (_u) {
+				if (_u->get_affiliation() == unit_affiliation::enemy || _u->get_affiliation() == unit_affiliation::separate_enemy) {
+					units.push_back(_u);
+					break;
+				}
+			}
+		}
+		return units;
 	}
 }

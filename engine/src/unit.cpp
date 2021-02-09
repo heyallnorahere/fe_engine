@@ -56,6 +56,7 @@ namespace fe_engine {
 	}
 	std::vector<s8vec2> unit::calculate_attackable_tiles() {
 		std::vector<s8vec2> tiles;
+		tiles.push_back({ 18, 8 });
 		return tiles;
 	}
 	unit::attack_packet unit::generate_attack_packet(reference<unit> other) {
@@ -85,7 +86,7 @@ namespace fe_engine {
 			if (crit <= packet.crit) {
 				packet.might *= 3;
 			}
-			this->m_hp -= packet.crit;
+			this->m_hp -= packet.might;
 		}
 	}
 }
