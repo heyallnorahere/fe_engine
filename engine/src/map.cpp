@@ -32,7 +32,7 @@ namespace fe_engine {
 				color = renderer::color::yellow;
 				break;
 			}
-			char unit_char = 'f';
+			char unit_char = (char)weapon::type::fists;
 			if (u->get_equipped_weapon()) {
 				unit_char = (char)u->get_equipped_weapon()->get_type();
 			}

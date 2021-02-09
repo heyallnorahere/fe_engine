@@ -23,7 +23,17 @@ namespace fe_engine {
 		return this->m_affiliation;
 	}
 	void unit::update() {
-		// todo: update
+		this->m_inventory.remove_if([](reference<item> i) {
+			if (i->get_item_flags() & item::weapon) {
+				return reference<weapon>(i)->get_current_durability() <= 0;
+			}
+			return false;
+		});
+		if (this->m_equipped_weapon) {
+			if (this->m_equipped_weapon->get_current_durability() <= 0) {
+				this->m_equipped_weapon.reset();
+			}
+		}
 	}
 	void unit::move(s8vec2 offset) {
 		s8vec2 to_move = offset;
@@ -56,6 +66,8 @@ namespace fe_engine {
 	}
 	std::vector<s8vec2> unit::calculate_attackable_tiles() {
 		std::vector<s8vec2> tiles;
+		vec2t<weapon::weapon_stats::stat_type> range = this->m_equipped_weapon->get_stats().range;
+		// todo: calculate (x is min, y is max)
 		tiles.push_back({ 18, 8 });
 		return tiles;
 	}
@@ -76,6 +88,7 @@ namespace fe_engine {
 		packet.might = weapon_stats.attack + (magic ? this->m_stats.magic : this->m_stats.strength) - defense;
 		packet.hit = weapon_stats.hit_rate + this->m_stats.dexterity - other->m_stats.dexterity;
 		packet.crit = weapon_stats.critical_rate + this->m_stats.resilience - other->m_stats.resilience;
+		this->m_equipped_weapon->consume_durability();
 		return packet;
 	}
 	void unit::receive_attack_packet(attack_packet packet, reference<unit> sender) {

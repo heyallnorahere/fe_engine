@@ -32,14 +32,21 @@ namespace fe_engine {
 			break;
 		}
 	}
-	weapon::weapon(type weapon_type, weapon_stats stats) : item(weapon_type_to_string(weapon_type), item::equipable) {
+	weapon::weapon(type weapon_type, weapon_stats stats) : item(weapon_type_to_string(weapon_type), item::equipable | item::weapon) {
 		this->m_type = weapon_type;
 		this->m_stats = stats;
+		this->m_durability = this->m_stats.durability;
 	}
 	weapon::type weapon::get_type() const {
 		return this->m_type;
 	}
 	weapon::weapon_stats weapon::get_stats() const {
 		return this->m_stats;
+	}
+	weapon::weapon_stats::stat_type weapon::get_current_durability() const {
+		return this->m_durability;
+	}
+	void weapon::consume_durability(weapon_stats::stat_type uses) {
+		this->m_durability -= uses;
 	}
 }

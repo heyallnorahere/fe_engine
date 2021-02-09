@@ -241,7 +241,7 @@ namespace fe_engine {
 				controller->close_unit_menu();
 			} });
 		}
-		if (i->get_item_flags() & item::equipable) {
+		if ((i->get_item_flags() & item::equipable) && (i->get_item_flags() & item::weapon)) {
 			items.push_back({ "Equip", [](reference<ui_controller> controller) {
 				reference<item> equipped = controller->m_unit_menu_target->get_equipped_weapon();
 				controller->m_unit_menu_target->get_inventory().remove_if([&](reference<item> i) { return controller->m_unit_menu_state.selected_item.get() == i.get(); });

@@ -5,8 +5,9 @@ namespace fe_engine {
 	class unit;
 	class item : public ref_counted {
 	public:
-		static constexpr unsigned int usable = 0b01;
-		static constexpr unsigned int equipable = 0b10;
+		static constexpr unsigned int usable = 0b001;
+		static constexpr unsigned int equipable = 0b010;
+		static constexpr unsigned int weapon = 0b100;
 		using on_use_proc = void(*)(unit* u);
 		item(const std::string& name, unsigned int flags = 0, on_use_proc on_use = NULL);
 		std::string get_name() const;
