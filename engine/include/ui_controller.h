@@ -46,5 +46,6 @@ namespace fe_engine {
 		void render_unit_menu(size_t origin_x, size_t origin_y, size_t width, size_t height);
 		std::vector<unit_menu_item> generate_menu_items(reference<item> i);
 		std::vector<reference<unit>> get_attackable_units(reference<unit> u);
+		void refresh_base_menu_items();
 	};
 }

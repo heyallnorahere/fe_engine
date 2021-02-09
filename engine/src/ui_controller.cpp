@@ -13,18 +13,7 @@ namespace fe_engine {
 	void ui_controller::set_unit_menu_target(reference<unit> u) {
 		this->m_unit_menu_target = u;
 		this->m_unit_menu_index = 0;
-		this->m_menu_items.clear();
-		{
-			std::vector<reference<unit>> units = this->get_attackable_units(u);
-			if (units.size() > 0) {
-				this->m_menu_items.push_back({ "Attack", [](reference<ui_controller> controller) {
-					controller->m_unit_menu_state.page = menu_page::enemy_select;
-					controller->m_unit_menu_index = 0;
-				} });
-			}
-		}
-		this->m_menu_items.push_back({ "Item", [](reference<ui_controller> controller) { controller->m_unit_menu_state.page = menu_page::item; controller->m_unit_menu_index = 0; } });
-		this->m_menu_items.push_back({ "Wait", [](reference<ui_controller> controller) { controller->close_unit_menu(); } });
+		this->refresh_base_menu_items();
 		this->m_unit_menu_state.page = menu_page::base;
 		this->m_unit_menu_state.selected_item.reset();
 	}
@@ -250,6 +239,7 @@ namespace fe_engine {
 				controller->m_unit_menu_state.page = menu_page::item;
 				controller->m_unit_menu_index = 0;
 				controller->m_unit_menu_state.selected_item.reset();
+				controller->refresh_base_menu_items();
 			} });
 		}
 		// todo: add more
@@ -273,5 +263,19 @@ namespace fe_engine {
 			}
 		}
 		return units;
+	}
+	void ui_controller::refresh_base_menu_items() {
+		this->m_menu_items.clear();
+		{
+			std::vector<reference<unit>> units = this->get_attackable_units(this->m_unit_menu_target);
+			if (units.size() > 0) {
+				this->m_menu_items.push_back({ "Attack", [](reference<ui_controller> controller) {
+					controller->m_unit_menu_state.page = menu_page::enemy_select;
+					controller->m_unit_menu_index = 0;
+				} });
+			}
+		}
+		this->m_menu_items.push_back({ "Item", [](reference<ui_controller> controller) { controller->m_unit_menu_state.page = menu_page::item; controller->m_unit_menu_index = 0; } });
+		this->m_menu_items.push_back({ "Wait", [](reference<ui_controller> controller) { controller->close_unit_menu(); } });
 	}
 }
