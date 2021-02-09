@@ -41,8 +41,6 @@ namespace fe_engine {
 		const std::list<reference<item>>& get_inventory() const;
 		std::list<reference<item>>& get_inventory();
 		void attack(reference<unit> to_attack);
-		bool can_attack(s8vec2 tile);
-		std::vector<s8vec2> calculate_attackable_tiles();
 	private:
 		struct attack_packet {
 			unsigned char might, hit, crit;

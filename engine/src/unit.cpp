@@ -36,11 +36,7 @@ namespace fe_engine {
 		}
 	}
 	void unit::move(s8vec2 offset) {
-		s8vec2 to_move = offset;
-		if ((unit_stats::stat_type)to_move.length() > this->m_stats.move) {
-			to_move = to_move.normalize() * this->m_stats.move;
-		}
-		this->m_pos += to_move;
+		this->m_pos += offset;
 	}
 	reference<weapon> unit::get_equipped_weapon() const {
 		return this->m_equipped_weapon;
@@ -56,20 +52,6 @@ namespace fe_engine {
 	}
 	void unit::attack(reference<unit> to_attack) {
 		to_attack->receive_attack_packet(this->generate_attack_packet(to_attack), reference<unit>(this));
-	}
-	bool unit::can_attack(s8vec2 tile) {
-		std::vector<s8vec2> tiles = this->calculate_attackable_tiles();
-		for (s8vec2 t : tiles) {
-			if (tile == t) return true;
-		}
-		return false;
-	}
-	std::vector<s8vec2> unit::calculate_attackable_tiles() {
-		std::vector<s8vec2> tiles;
-		vec2t<weapon::weapon_stats::stat_type> range = this->m_equipped_weapon->get_stats().range;
-		// todo: calculate (x is min, y is max)
-		tiles.push_back({ 18, 8 });
-		return tiles;
 	}
 	unit::attack_packet unit::generate_attack_packet(reference<unit> other) {
 		weapon::weapon_stats weapon_stats = this->m_equipped_weapon->get_stats();

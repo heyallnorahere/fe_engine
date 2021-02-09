@@ -246,7 +246,7 @@ namespace fe_engine {
 				reference<item> equipped = controller->m_unit_menu_target->get_equipped_weapon();
 				controller->m_unit_menu_target->get_inventory().remove_if([&](reference<item> i) { return controller->m_unit_menu_state.selected_item.get() == i.get(); });
 				controller->m_unit_menu_target->set_equipped_weapon(controller->m_unit_menu_state.selected_item);
-				controller->m_unit_menu_target->get_inventory().push_back(equipped);
+				if (equipped) controller->m_unit_menu_target->get_inventory().push_back(equipped);
 				controller->m_unit_menu_state.page = menu_page::item;
 				controller->m_unit_menu_index = 0;
 				controller->m_unit_menu_state.selected_item.reset();
@@ -257,14 +257,18 @@ namespace fe_engine {
 		return items;
 	}
 	std::vector<reference<unit>> ui_controller::get_attackable_units(reference<unit> u) {
-		std::vector<s8vec2> tiles = u->calculate_attackable_tiles();
 		std::vector<reference<unit>> units;
-		for (s8vec2 tile : tiles) {
-			reference<unit> _u = this->m_map->get_unit_at(tile);
-			if (_u) {
+		if (!u->get_equipped_weapon()) return units;
+		u8vec2 range = u->get_equipped_weapon()->get_stats().range;
+		for (size_t i = 0; i < this->m_map->get_unit_count(); i++) {
+			reference<unit> _u = this->m_map->get_unit(i);
+			s8vec2 delta = u->get_pos() - _u->get_pos();
+			delta.x = abs(delta.x);
+			delta.y = abs(delta.y);
+			unsigned char delta_total = (unsigned char)delta.x + (unsigned char)delta.y;
+			if (delta_total >= range.x && delta_total <= range.y) {
 				if (_u->get_affiliation() == unit_affiliation::enemy || _u->get_affiliation() == unit_affiliation::separate_enemy) {
 					units.push_back(_u);
-					break;
 				}
 			}
 		}
