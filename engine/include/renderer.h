@@ -41,6 +41,12 @@ namespace fe_engine {
 #else
 			= 4,
 #endif
+			black
+#ifdef _WIN32
+			= 0,
+#else
+			= 5,
+#endif
 		};
 		renderer();
 		~renderer();

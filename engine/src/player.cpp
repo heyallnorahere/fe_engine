@@ -1,4 +1,5 @@
 #include "player.h"
+#include "util.h"
 namespace fe_engine {
 	player::player(reference<controller> c, reference<map> m, reference<ui_controller> uc) {
 		this->m_controller = c;
@@ -54,7 +55,18 @@ namespace fe_engine {
 			size_t width, height;
 			r->get_buffer_size(width, height);
 			if (this->m_cursor_pos.y < height - 1) {
-				r->render_char_at(this->m_cursor_pos.x, this->m_cursor_pos.y + 1 + (height - this->m_map->get_height()), 'v', renderer::color::white);
+				renderer::color color = renderer::color::white;
+				if (this->m_selected) {
+					constexpr float interval = 0.5f;
+					float modded = fmod(util::get_current_time(), interval * 2.f);
+					if (modded < interval) {
+						color = renderer::color::red;
+					}
+					else {
+						color = renderer::color::black;
+					}
+				}
+				r->render_char_at(this->m_cursor_pos.x, this->m_cursor_pos.y + 1 + (height - this->m_map->get_height()), 'v', color);
 			}
 		}
 	}

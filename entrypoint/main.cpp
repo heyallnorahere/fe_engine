@@ -25,6 +25,12 @@ int main() {
 		u = fe_engine::reference<fe_engine::unit>::create(stats, fe_engine::u8vec2{ 18, 8 }, fe_engine::unit_affiliation::enemy);
 		u->set_equipped_weapon(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::darkmagic));
 		map->add_unit(u);
+		u = fe_engine::reference<fe_engine::unit>::create(stats, fe_engine::u8vec2{ 1, 8 }, fe_engine::unit_affiliation::ally);
+		u->set_equipped_weapon(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::whitemagic));
+		map->add_unit(u);
+		u = fe_engine::reference<fe_engine::unit>::create(stats, fe_engine::u8vec2{ 18, 1 }, fe_engine::unit_affiliation::separate_enemy);
+		u->set_equipped_weapon(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::lance));
+		map->add_unit(u);
 	}
 	while (true) {
 		map->update();
