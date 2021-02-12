@@ -2,6 +2,7 @@
 #include "reference.h"
 #include "renderer.h"
 #include <list>
+#include <vector>
 #include "unit.h"
 #include "map.h"
 namespace fe_engine {
@@ -14,6 +15,7 @@ namespace fe_engine {
 		size_t get_unit_count() const;
 		reference<unit> get_unit(size_t index) const;
 		reference<unit> get_unit_at(s8vec2 pos) const;
+		std::vector<reference<unit>> get_all_units_of_affiliation(unit_affiliation affiliation);
 		size_t get_width() const;
 		size_t get_height() const;
 	private:

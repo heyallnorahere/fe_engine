@@ -8,9 +8,9 @@
 namespace fe_engine {
 	enum class unit_affiliation {
 		player,
-		ally,
 		enemy,
 		separate_enemy,
+		ally,
 	};
 	class unit : public ref_counted {
 	public:
@@ -43,6 +43,7 @@ namespace fe_engine {
 		void attack(reference<unit> to_attack);
 		unit_stats::stat_type get_available_movement() const;
 		void refresh_movement();
+		bool can_move() const;
 	private:
 		struct attack_packet {
 			unsigned char might, hit, crit;
@@ -53,6 +54,7 @@ namespace fe_engine {
 		unit_affiliation m_affiliation;
 		reference<weapon> m_equipped_weapon;
 		std::list<reference<item>> m_inventory;
+		bool m_can_move;
 		attack_packet generate_attack_packet(reference<unit> other);
 		void receive_attack_packet(attack_packet packet, reference<unit> sender);
 	};

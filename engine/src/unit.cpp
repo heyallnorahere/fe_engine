@@ -35,10 +35,15 @@ namespace fe_engine {
 				this->m_equipped_weapon.reset();
 			}
 		}
+		// placeholder
+		if (this->m_affiliation != unit_affiliation::player) {
+			this->m_can_move = false;
+		}
 	}
 	void unit::move(s8vec2 offset, char consumption_multiplier) {
 		this->m_pos += offset;
 		this->m_movement -= (abs(offset.x) + abs(offset.y)) * consumption_multiplier;
+		this->m_can_move = (consumption_multiplier <= 0);
 	}
 	reference<weapon> unit::get_equipped_weapon() const {
 		return this->m_equipped_weapon;
@@ -91,5 +96,9 @@ namespace fe_engine {
 	}
 	void unit::refresh_movement() {
 		this->m_movement = this->m_stats.movement;
+		this->m_can_move = true;
+	}
+	bool unit::can_move() const {
+		return this->m_can_move;
 	}
 }

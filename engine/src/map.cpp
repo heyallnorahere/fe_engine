@@ -57,6 +57,15 @@ namespace fe_engine {
 		}
 		return reference<unit>();
 	}
+	std::vector<reference<unit>> map::get_all_units_of_affiliation(unit_affiliation affiliation) {
+		std::vector<reference<unit>> units;
+		for (reference<unit> u : this->m_units) {
+			if (u->get_affiliation() == affiliation) {
+				units.push_back(u);
+			}
+		}
+		return units;
+	}
 	size_t map::get_width() const {
 		return this->m_width;
 	}

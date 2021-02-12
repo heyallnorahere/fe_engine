@@ -1,16 +1,17 @@
 #include "player.h"
 #include "util.h"
 namespace fe_engine {
-	player::player(reference<controller> c, reference<map> m, reference<ui_controller> uc) {
+	player::player(reference<controller> c, reference<map> m, reference<ui_controller> uc, reference<phase_manager> pm) {
 		this->m_controller = c;
 		this->m_map = m;
 		this->m_ui_controller = uc;
+		this->m_phase_manager = pm;
 		memset(&this->m_cursor_pos, 0, sizeof(u8vec2));
 	}
 	void player::update() {
 		this->m_controller->update();
 		this->m_ui_controller->set_can_close(true);
-		if (!this->m_ui_controller->get_unit_menu_target()) {
+		if (!this->m_ui_controller->get_unit_menu_target() && this->m_phase_manager->get_current_phase() == unit_affiliation::player) {
 			controller::buttons buttons = this->m_controller->get_state();
 			bool update_tile_selection = false;
 			s8vec2 to_move = { 0, 0 };
@@ -58,7 +59,7 @@ namespace fe_engine {
 				else {
 					reference<unit> u = this->m_map->get_unit_at(this->m_cursor_pos);
 					if (u) {
-						if (u->get_affiliation() == unit_affiliation::player) {
+						if (u->get_affiliation() == unit_affiliation::player && u->can_move()) {
 							this->m_selected = u;
 						}
 					}
@@ -68,6 +69,17 @@ namespace fe_engine {
 				this->m_cursor_pos = this->m_selected->get_pos();
 				this->m_selected.reset();
 			}
+		}
+		std::vector<reference<unit>> units = this->m_map->get_all_units_of_affiliation(this->m_phase_manager->get_current_phase());
+		bool next_phase = false;
+		for (reference<unit> u : units) {
+			if (!u->can_move()) {
+				next_phase = true;
+				break;
+			}
+		}
+		if (next_phase && !this->m_ui_controller->get_unit_menu_target()) {
+			this->m_phase_manager->cycle_phase(this->m_map);
 		}
 	}
 	void player::render_cursor(const reference<renderer>& r) {
