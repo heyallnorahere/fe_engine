@@ -13,29 +13,45 @@ namespace fe_engine {
 		if (!this->m_ui_controller->get_unit_menu_target()) {
 			controller::buttons buttons = this->m_controller->get_state();
 			bool update_tile_selection = false;
+			s8vec2 to_move = { 0, 0 };
 			if (buttons.right.down && (size_t)this->m_cursor_pos.x < this->m_map->get_width() - 1) {
-				this->m_cursor_pos.x++;
+				to_move.x++;
 				update_tile_selection = true;
 			}
 			if (buttons.left.down && this->m_cursor_pos.x > 0) {
-				this->m_cursor_pos.x--;
+				to_move.x--;
 				update_tile_selection = true;
 			}
 			if (buttons.up.down && (size_t)this->m_cursor_pos.y < this->m_map->get_height() - 1) {
-				this->m_cursor_pos.y++;
+				to_move.y++;
 				update_tile_selection = true;
 			}
 			if (buttons.down.down && this->m_cursor_pos.y > 0) {
-				this->m_cursor_pos.y--;
+				to_move.y--;
 				update_tile_selection = true;
+			}
+			if (this->m_selected) {
+				s8vec2 delta = (this->m_cursor_pos + to_move) - this->m_selected->get_pos();
+				unsigned char delta_length = static_cast<unsigned char>(abs(delta.x) + abs(delta.y));
+				if (delta_length > this->m_selected->get_available_movement()) {
+					update_tile_selection = false;
+				}
+				else {
+					this->m_cursor_pos += to_move;
+				}
+			}
+			else {
+				this->m_cursor_pos += to_move;
 			}
 			if (update_tile_selection) {
 				this->m_ui_controller->set_info_panel_target(this->m_map->get_unit_at(this->m_cursor_pos));
 			}
 			if (buttons.a.down) {
 				if (this->m_selected) {
+					s8vec2 original_position = this->m_selected->get_pos();
 					this->m_selected->move(this->m_cursor_pos - this->m_selected->get_pos());
-					this->m_ui_controller->set_unit_menu_target(this->m_selected);
+					this->m_ui_controller->set_info_panel_target(this->m_selected);
+					this->m_ui_controller->set_unit_menu_target(this->m_selected, original_position);
 					this->m_ui_controller->set_can_close(false);
 					this->m_selected.reset();
 				}
@@ -47,6 +63,10 @@ namespace fe_engine {
 						}
 					}
 				}
+			}
+			if (buttons.b.down && this->m_selected) {
+				this->m_cursor_pos = this->m_selected->get_pos();
+				this->m_selected.reset();
 			}
 		}
 	}

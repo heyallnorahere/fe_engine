@@ -26,7 +26,7 @@ namespace fe_engine {
 			stat_type defense;
 			stat_type resilience;
 			stat_type charm;
-			stat_type move;
+			stat_type movement;
 		};
 		unit(const unit_stats& stats, s8vec2 pos, unit_affiliation affiliation);
 		~unit();
@@ -35,19 +35,21 @@ namespace fe_engine {
 		unit_stats::stat_type get_current_hp() const;
 		unit_affiliation get_affiliation() const;
 		void update();
-		void move(s8vec2 offset);
+		void move(s8vec2 offset, char consumption_multiplier = 1);
 		reference<weapon> get_equipped_weapon() const;
 		void set_equipped_weapon(const reference<weapon>& w);
 		const std::list<reference<item>>& get_inventory() const;
 		std::list<reference<item>>& get_inventory();
 		void attack(reference<unit> to_attack);
+		unit_stats::stat_type get_available_movement() const;
+		void refresh_movement();
 	private:
 		struct attack_packet {
 			unsigned char might, hit, crit;
 		};
 		unit_stats m_stats;
 		s8vec2 m_pos;
-		unit_stats::stat_type m_hp;
+		unit_stats::stat_type m_hp, m_movement;
 		unit_affiliation m_affiliation;
 		reference<weapon> m_equipped_weapon;
 		std::list<reference<item>> m_inventory;

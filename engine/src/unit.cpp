@@ -6,6 +6,7 @@ namespace fe_engine {
 		this->m_pos = pos;
 		this->m_hp = this->m_stats.max_hp;
 		this->m_affiliation = affiliation;
+		this->refresh_movement();
 	}
 	unit::~unit() {
 		// todo: delete
@@ -35,8 +36,9 @@ namespace fe_engine {
 			}
 		}
 	}
-	void unit::move(s8vec2 offset) {
+	void unit::move(s8vec2 offset, char consumption_multiplier) {
 		this->m_pos += offset;
+		this->m_movement -= (abs(offset.x) + abs(offset.y)) * consumption_multiplier;
 	}
 	reference<weapon> unit::get_equipped_weapon() const {
 		return this->m_equipped_weapon;
@@ -83,5 +85,11 @@ namespace fe_engine {
 			}
 			this->m_hp -= packet.might;
 		}
+	}
+	unit::unit_stats::stat_type unit::get_available_movement() const {
+		return this->m_movement;
+	}
+	void unit::refresh_movement() {
+		this->m_movement = this->m_stats.movement;
 	}
 }

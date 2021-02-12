@@ -10,12 +10,13 @@ namespace fe_engine {
 	void ui_controller::set_info_panel_target(reference<unit> u) {
 		this->m_info_panel_target = u;
 	}
-	void ui_controller::set_unit_menu_target(reference<unit> u) {
+	void ui_controller::set_unit_menu_target(reference<unit> u, s8vec2 original_position) {
 		this->m_unit_menu_target = u;
 		this->m_unit_menu_index = 0;
 		this->refresh_base_menu_items();
 		this->m_unit_menu_state.page = menu_page::base;
 		this->m_unit_menu_state.selected_item.reset();
+		this->m_unit_menu_state.original_position = original_position;
 	}
 	void ui_controller::update() {
 		if (this->m_unit_menu_target) {
@@ -30,6 +31,11 @@ namespace fe_engine {
 				}
 				if (buttons.a.down && this->m_can_close) {
 					this->m_menu_items[this->m_unit_menu_index].on_select(reference<ui_controller>(this));
+				}
+				if (buttons.b.down && this->m_can_close) {
+					this->m_unit_menu_target->move(this->m_unit_menu_state.original_position - this->m_unit_menu_target->get_pos(), -1);
+					this->close_unit_menu();
+					this->m_info_panel_target.reset();
 				}
 				break;
 			case menu_page::item:
@@ -138,9 +144,12 @@ namespace fe_engine {
 				affiliation = "Third Army";
 				break;
 			}
-			std::stringstream hp_string;
-			hp_string << (unsigned int)this->m_info_panel_target->get_current_hp() << "/" << (unsigned int)this->m_info_panel_target->get_stats().max_hp;
-			this->m_renderer->render_string_at(origin_x, origin_y + height - 1, affiliation + " unit     " + hp_string.str(), renderer::color::white);
+			std::stringstream hp_string, mv_string;
+			hp_string << "HP: " << (unsigned int)this->m_info_panel_target->get_current_hp() << "/" << (unsigned int)this->m_info_panel_target->get_stats().max_hp;
+			mv_string << "Movement: " << (unsigned int)this->m_info_panel_target->get_available_movement() << "/" << (unsigned int)this->m_info_panel_target->get_stats().movement;
+			this->m_renderer->render_string_at(origin_x, origin_y + height - 1, affiliation + " unit", renderer::color::white);
+			this->m_renderer->render_string_at(origin_x, origin_y + height - 2, hp_string.str(), renderer::color::white);
+			this->m_renderer->render_string_at(origin_x, origin_y + height - 3, mv_string.str(), renderer::color::white);
 		}
 	}
 	void ui_controller::render_unit_menu(size_t origin_x, size_t origin_y, size_t width, size_t height) {

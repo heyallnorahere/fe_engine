@@ -10,7 +10,7 @@ int main() {
 	memset(&stats, 0, sizeof(fe_engine::unit::unit_stats));
 	stats.level = 1;
 	stats.max_hp = 30;
-	stats.move = 5;
+	stats.movement = 5;
 	fe_engine::reference<fe_engine::controller> controller = fe_engine::reference<fe_engine::controller>::create(0);
 	fe_engine::reference<fe_engine::ui_controller> ui_controller = fe_engine::reference<fe_engine::ui_controller>::create(renderer, map, controller);
 	fe_engine::reference<fe_engine::player> player = fe_engine::reference<fe_engine::player>::create(controller, map, ui_controller);

@@ -12,7 +12,7 @@ namespace fe_engine {
 	public:
 		ui_controller(reference<renderer> r, reference<map> m, reference<controller> c);
 		void set_info_panel_target(reference<unit> u);
-		void set_unit_menu_target(reference<unit> u);
+		void set_unit_menu_target(reference<unit> u, s8vec2 original_position);
 		void update();
 		void render();
 		reference<unit> get_unit_menu_target() const;
@@ -31,6 +31,7 @@ namespace fe_engine {
 		struct menu_state {
 			menu_page page;
 			reference<item> selected_item;
+			s8vec2 original_position;
 		};
 		reference<renderer> m_renderer;
 		reference<map> m_map;
