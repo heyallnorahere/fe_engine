@@ -71,10 +71,10 @@ namespace fe_engine {
 			}
 		}
 		std::vector<reference<unit>> units = this->m_map->get_all_units_of_affiliation(this->m_phase_manager->get_current_phase());
-		bool next_phase = false;
+		bool next_phase = true;
 		for (reference<unit> u : units) {
-			if (!u->can_move()) {
-				next_phase = true;
+			if (u->can_move()) {
+				next_phase = false;
 				break;
 			}
 		}
