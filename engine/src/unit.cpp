@@ -40,7 +40,7 @@ namespace fe_engine {
 			this->m_can_move = false;
 		}
 	}
-	void unit::move(s8vec2 offset, char consumption_multiplier) {
+	void unit::move(s8vec2 offset, uint8_t consumption_multiplier) {
 		this->m_pos += offset;
 		this->m_movement -= (abs(offset.x) + abs(offset.y)) * consumption_multiplier;
 		this->m_can_move = (consumption_multiplier <= 0);

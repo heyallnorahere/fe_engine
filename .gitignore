@@ -415,3 +415,6 @@ MigrationBackup/
 .cmake/
 out/
 config.h
+*.sln
+*.*proj
+*.*proj.filters
