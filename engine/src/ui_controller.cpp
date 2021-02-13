@@ -145,8 +145,8 @@ namespace fe_engine {
 				break;
 			}
 			std::stringstream hp_string, mv_string;
-			hp_string << "HP: " << (unsigned int)this->m_info_panel_target->get_current_hp() << "/" << (unsigned int)this->m_info_panel_target->get_stats().max_hp;
-			mv_string << "Movement: " << (unsigned int)this->m_info_panel_target->get_available_movement() << "/" << (unsigned int)this->m_info_panel_target->get_stats().movement;
+			hp_string << "HP: " << (uint32_t)this->m_info_panel_target->get_current_hp() << "/" << (uint32_t)this->m_info_panel_target->get_stats().max_hp;
+			mv_string << "Movement: " << (uint32_t)this->m_info_panel_target->get_available_movement() << "/" << (uint32_t)this->m_info_panel_target->get_stats().movement;
 			this->m_renderer->render_string_at(origin_x, origin_y + height - 1, affiliation + " unit", renderer::color::white);
 			this->m_renderer->render_string_at(origin_x, origin_y + height - 2, hp_string.str(), renderer::color::white);
 			this->m_renderer->render_string_at(origin_x, origin_y + height - 3, mv_string.str(), renderer::color::white);
@@ -220,7 +220,7 @@ namespace fe_engine {
 						affiliation = "Third Army";
 						break;
 					}
-					std::string text = affiliation + " unit (" + std::to_string((unsigned int)units[i]->get_current_hp()) + "/" + std::to_string((unsigned int)units[i]->get_stats().max_hp) + ")";
+					std::string text = affiliation + " unit (" + std::to_string((uint32_t)units[i]->get_current_hp()) + "/" + std::to_string((uint32_t)units[i]->get_stats().max_hp) + ")";
 					this->m_renderer->render_string_at(origin_x + 2, y, text, selected ? renderer::color::red : renderer::color::white);
 				}
 			}
@@ -264,7 +264,7 @@ namespace fe_engine {
 			s8vec2 delta = u->get_pos() - _u->get_pos();
 			delta.x = abs(delta.x);
 			delta.y = abs(delta.y);
-			unsigned char delta_total = (unsigned char)delta.x + (unsigned char)delta.y;
+			uint8_t delta_total = (uint8_t)delta.x + (uint8_t)delta.y;
 			if (delta_total >= range.x && delta_total <= range.y) {
 				if (_u->get_affiliation() == unit_affiliation::enemy || _u->get_affiliation() == unit_affiliation::separate_enemy) {
 					units.push_back(_u);

@@ -15,7 +15,7 @@ namespace fe_engine {
 			whitemagic = 'W',
 		};
 		struct weapon_stats {
-			using stat_type = unsigned char;
+			using stat_type = uint8_t;
 			stat_type attack;
 			stat_type hit_rate;
 			stat_type critical_rate;

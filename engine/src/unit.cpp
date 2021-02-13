@@ -81,9 +81,9 @@ namespace fe_engine {
 		return packet;
 	}
 	void unit::receive_attack_packet(attack_packet packet, reference<unit> sender) {
-		unsigned char offset = this->m_stats.luck - sender->m_stats.luck;
-		unsigned char hit = static_cast<unsigned char>(random_number_generator::generate(0, 100)) + offset;
-		unsigned char crit = static_cast<unsigned char>(random_number_generator::generate(0, 100)) + offset;
+		uint8_t offset = this->m_stats.luck - sender->m_stats.luck;
+		uint8_t hit = static_cast<uint8_t>(random_number_generator::generate(0, 100)) + offset;
+		uint8_t crit = static_cast<uint8_t>(random_number_generator::generate(0, 100)) + offset;
 		if (hit <= packet.hit) {
 			if (crit <= packet.crit) {
 				packet.might *= 3;

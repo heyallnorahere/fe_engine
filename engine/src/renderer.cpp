@@ -60,7 +60,7 @@ namespace fe_engine {
 			for (size_t x = 0; x < this->m_width; x++) {
 				char* buffer = util::buffer_cast<char>(this->m_buffer);
 				// this is assuming that the buffers size is m_width * m_height * sizeof(char)
-				char c = buffer[this->get_index_for_pos(x, (size_t)y)];
+				int8_t c = buffer[this->get_index_for_pos(x, (size_t)y)];
 				color* color_buffer = util::buffer_cast<color>(this->m_color_buffer);
 				color _c = color_buffer[this->get_index_for_pos(x, (size_t)y)];
 				print_char(c, _c);

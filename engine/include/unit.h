@@ -15,7 +15,7 @@ namespace fe_engine {
 	class unit : public ref_counted {
 	public:
 		struct unit_stats {
-			using stat_type = unsigned char;
+			using stat_type = uint8_t;
 			stat_type level;
 			stat_type max_hp;
 			stat_type strength;
@@ -46,7 +46,7 @@ namespace fe_engine {
 		bool can_move() const;
 	private:
 		struct attack_packet {
-			unsigned char might, hit, crit;
+			uint8_t might, hit, crit;
 		};
 		unit_stats m_stats;
 		s8vec2 m_pos;

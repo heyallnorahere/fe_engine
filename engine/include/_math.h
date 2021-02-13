@@ -1,5 +1,6 @@
 #pragma once
 #include <cmath>
+#include <cstdint>
 namespace fe_engine {
 	// basic vec2 struct, good enough for our purposes
 	template<typename T> struct vec2t {
@@ -57,9 +58,9 @@ namespace fe_engine {
 			return normal;
 		}
 	};
-	using u8vec2 = vec2t<unsigned char>;
-	using s8vec2 = vec2t<char>;
-	using u32vec2 = vec2t<unsigned int>;
+	using u8vec2 = vec2t<uint8_t>;
+	using s8vec2 = vec2t<int8_t>;
+	using u32vec2 = vec2t<uint32_t>;
 	using s32vec2 = vec2t<int>;
 	using vec2 = vec2t<double>;
 }

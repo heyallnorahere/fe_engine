@@ -33,7 +33,7 @@ namespace fe_engine {
 			}
 			if (this->m_selected) {
 				s8vec2 delta = (this->m_cursor_pos + to_move) - this->m_selected->get_pos();
-				unsigned char delta_length = static_cast<unsigned char>(abs(delta.x) + abs(delta.y));
+				uint8_t delta_length = static_cast<uint8_t>(abs(delta.x) + abs(delta.y));
 				if (delta_length > this->m_selected->get_available_movement()) {
 					update_tile_selection = false;
 				}
