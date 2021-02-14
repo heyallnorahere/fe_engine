@@ -15,7 +15,7 @@ static void print_char(char c, fe_engine::renderer::color _c) {
 #ifdef _WIN32
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(console, (WORD)_c);
-	WriteConsole(console, &c, 1, NULL, NULL);
+	WriteConsoleA(console, &c, 1, NULL, NULL);
 #endif
 }
 static void disable_console_cursor() {

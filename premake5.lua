@@ -34,6 +34,15 @@ project "engine"
         symbols "On"
     filter "configurations:Release"
     optimize "On"
+project "scriptcore"
+    location "scriptcore"
+    kind "SharedLib"
+    language "C#"
+    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+    files {
+        "%{prj.name}/src/**.cs"
+    }    
 project "entrypoint"
     location "entrypoint"
     kind "ConsoleApp"
@@ -43,14 +52,17 @@ project "entrypoint"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
     files {
-        "%{prj.name}/**.h",
-        "%{prj.name}/**.cpp"
+        "%{prj.name}/src/**.h",
+        "%{prj.name}/src/**.cpp"
     }
     includedirs {
         "engine/include"
     }
     links {
         "engine"
+    }
+    postbuildcommands {
+        '{COPY} "../vendor/binaries/%{cfg.buildcfg}/bin/*.dll" "%{cfg.targetdir}"'
     }
     filter "configurations:Debug"
         symbols "On"

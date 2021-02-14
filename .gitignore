@@ -416,5 +416,8 @@ MigrationBackup/
 out/
 *.sln
 *.*proj
-*.*proj.filters
+*.*proj.*
 !vendor/**
+.NET*.cs
+*.tlog/
+bin-int/

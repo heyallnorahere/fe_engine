@@ -1,5 +1,5 @@
-#include "config.h"
-#if defined(_WIN32) && USE_XINPUT
+#if defined(_WIN32)
+#pragma comment(lib, "xinput.lib")
 #include "controller.h"
 #define _AMD64_
 #include <Xinput.h>
