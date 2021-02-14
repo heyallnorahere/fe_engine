@@ -418,3 +418,5 @@ config.h
 *.sln
 *.*proj
 *.*proj.filters
+!vendor/**
+!vendor/**
