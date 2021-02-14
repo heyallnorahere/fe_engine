@@ -1,5 +1,0 @@
-﻿cmake_minimum_required (VERSION 3.8)
-include_directories ("../engine/include")
-file (GLOB sourcefiles "*.cpp" "*.h")
-add_executable (fireemblembutnot ${sourcefiles})
-target_link_libraries (fireemblembutnot engine)
