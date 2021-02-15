@@ -32,6 +32,10 @@ namespace FEEngine {
                 SetHP_Native(this.Index, value);
             }
         }
+        public void Move(Vec2 offset)
+        {
+            Move_Native(this.Index, offset);
+        }
         internal Unit(ulong index)
         {
             this.Index = index;
@@ -44,6 +48,10 @@ namespace FEEngine {
         {
             return new Unit(GetUnitAt_Native(position));
         }
+        public static Unit MakeFromIndex(ulong index)
+        {
+            return new Unit(index);
+        }
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void GetPosition_Native(ulong index, out Vec2 position);
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -52,6 +60,8 @@ namespace FEEngine {
         private static extern uint GetHP_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void SetHP_Native(ulong index, uint hp);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void Move_Native(ulong index, Vec2 offset);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern ulong GetUnitAt_Native(Vec2 position);
     }

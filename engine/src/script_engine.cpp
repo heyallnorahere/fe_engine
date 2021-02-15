@@ -57,6 +57,24 @@ namespace fe_engine {
 		MonoObject* exception = NULL;
 		return mono_runtime_invoke(method, object, params, &exception);
 	}
+	MonoClassField* get_field_id(MonoClass* _class, const std::string& name) {
+		return mono_class_get_field_from_name(_class, name.c_str());
+	}
+	MonoObject* get_field(MonoClassField* field, MonoObject* object, MonoDomain* domain) {
+		return mono_field_get_value_object(domain, field, object);
+	}
+	void set_field(MonoObject* object, MonoClassField* field, void* value) {
+		mono_field_set_value(object, field, value);
+	}
+	MonoProperty* get_property_id(MonoClass* _class, const std::string& name) {
+		return mono_class_get_property_from_name(_class, name.c_str());
+	}
+	MonoObject* get_property(MonoProperty* property, MonoObject* object) {
+		return mono_property_get_value(property, object, NULL, NULL);
+	}
+	void set_property(MonoProperty* property, MonoObject* object, void* value) {
+		mono_property_set_value(property, object, &value, NULL);
+	}
 	script_engine::script_engine(const std::string& core_assembly_path, reference<map> m) {
 		this->init_engine(core_assembly_path, m);
 	}
@@ -84,7 +102,9 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.Unit::SetPosition_Native", script_wrappers::FEEngine_Unit_SetPosition);
 		mono_add_internal_call("FEEngine.Unit::GetHP_Native", script_wrappers::FEEngine_Unit_GetHP);
 		mono_add_internal_call("FEEngine.Unit::SetHP_Native", script_wrappers::FEEngine_Unit_SetHP);
+		mono_add_internal_call("FEEngine.Unit::Move_Native", script_wrappers::FEEngine_Unit_Move);
 		mono_add_internal_call("FEEngine.Unit::GetUnitAt_Native", script_wrappers::FEEngine_Unit_GetUnitAt);
+		mono_add_internal_call("FEEngine.Map::GetUnitCount_Native", script_wrappers::FEEngine_Map_GetUnitCount);
 	}
 	void script_engine::init_engine(const std::string& core_assembly_path, reference<map> m) {
 		this->init_mono();

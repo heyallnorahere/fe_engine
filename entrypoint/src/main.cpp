@@ -40,6 +40,8 @@ int main() {
 	fe_engine::reference<fe_engine::cs_method> Init = test_class->get_method("FEEngine.Test:Init()");
 	fe_engine::reference<fe_engine::cs_method> DoStuff = test_class->get_method("FEEngine.Test:DoStuff()");
 	test_object->call_method(Init);
+	fe_engine::reference<fe_engine::behavior> test = fe_engine::reference<fe_engine::behavior>::create(core->get_class("FEEngine", "TestBehavior"), core);
+	test->on_attach(0);
 	while (true) {
 		map->update();
 		player->update();
@@ -52,7 +54,9 @@ int main() {
 		if (controller->get_state().x.down) {
 			test_object->call_method(DoStuff);
 		}
+		test->on_unit_update();
 		renderer->present();
 	}
+	test->on_detach();
 	return 0;
 }

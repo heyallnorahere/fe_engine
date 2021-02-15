@@ -11,3 +11,5 @@
 #include "_random.h"
 #include "phase_manager.h"
 #include "script_engine.h"
+#include "mono_classes.h"
+#include "behavior.h"

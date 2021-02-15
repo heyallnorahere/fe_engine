@@ -22,6 +22,9 @@ namespace fe_engine::script_wrappers {
 	void FEEngine_Unit_SetHP(uint64_t unit_index, uint32_t hp) {
 		script_wrapper_map->get_unit(unit_index)->set_current_hp(hp);
 	}
+	void FEEngine_Unit_Move(uint64_t unit_index, s32vec2 offset) {
+		script_wrapper_map->get_unit(unit_index)->move(offset);
+	}
 	uint64_t FEEngine_Unit_GetUnitAt(s32vec2 position) {
 		for (uint64_t i = 0; i < script_wrapper_map->get_unit_count(); i++) {
 			if (script_wrapper_map->get_unit(i)->get_pos() == (s8vec2)position) {
@@ -29,5 +32,8 @@ namespace fe_engine::script_wrappers {
 			}
 		}
 		return std::numeric_limits<uint64_t>::max();
+	}
+	uint64_t FEEngine_Map_GetUnitCount() {
+		return script_wrapper_map->get_unit_count();
 	}
 }
