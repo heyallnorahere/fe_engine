@@ -33,9 +33,10 @@ namespace fe_engine {
 		const unit_stats& get_stats() const;
 		s8vec2 get_pos() const;
 		unit_stats::stat_type get_current_hp() const;
+		void set_current_hp(unit_stats::stat_type hp);
 		unit_affiliation get_affiliation() const;
 		void update();
-		void move(s8vec2 offset, uint8_t consumption_multiplier = 1);
+		void move(s8vec2 offset, int8_t consumption_multiplier = 1);
 		reference<weapon> get_equipped_weapon() const;
 		void set_equipped_weapon(const reference<weapon>& w);
 		const std::list<reference<item>>& get_inventory() const;

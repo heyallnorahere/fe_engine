@@ -20,6 +20,12 @@ namespace fe_engine {
 	unit::unit_stats::stat_type unit::get_current_hp() const {
 		return this->m_hp;
 	}
+	void unit::set_current_hp(unit_stats::stat_type hp) {
+		this->m_hp = hp;
+		if (this->m_hp > this->m_stats.max_hp) {
+			this->m_hp = this->m_stats.max_hp;
+		}
+	}
 	unit_affiliation unit::get_affiliation() const {
 		return this->m_affiliation;
 	}
@@ -40,7 +46,7 @@ namespace fe_engine {
 			this->m_can_move = false;
 		}
 	}
-	void unit::move(s8vec2 offset, uint8_t consumption_multiplier) {
+	void unit::move(s8vec2 offset, int8_t consumption_multiplier) {
 		this->m_pos += offset;
 		this->m_movement -= (abs(offset.x) + abs(offset.y)) * consumption_multiplier;
 		this->m_can_move = (consumption_multiplier <= 0);

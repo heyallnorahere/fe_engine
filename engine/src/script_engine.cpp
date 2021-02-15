@@ -4,6 +4,7 @@
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/attrdefs.h>
 #include <Windows.h>
+#include "script_wrappers.h"
 namespace fe_engine {
 	MonoAssembly* load_assembly_from_file(const char* filepath) {
 		if (!filepath) {
@@ -43,8 +44,8 @@ namespace fe_engine {
 	static MonoClass* get_class(MonoImage* image, const std::string& namespace_name, const std::string& class_name) {
 		return mono_class_from_name(image, namespace_name.c_str(), class_name.c_str());
 	}
-	script_engine::script_engine(const std::string& core_assembly_path) {
-		this->init_engine(core_assembly_path);
+	script_engine::script_engine(const std::string& core_assembly_path, reference<map> m) {
+		this->init_engine(core_assembly_path, m);
 	}
 	script_engine::~script_engine() {
 		this->shutdown_engine();
@@ -61,7 +62,15 @@ namespace fe_engine {
 	void script_engine::shutdown_mono() {
 		mono_jit_cleanup(this->m_domain);
 	}
-	void script_engine::init_engine(const std::string& core_assembly_path) {
+	static void register_wrappers() {
+		// unit class
+		mono_add_internal_call("FEEngine.Unit::GetPosition_Native", script_wrappers::FEEngine_Unit_GetPosition);
+		mono_add_internal_call("FEEngine.Unit::SetPosition_Native", script_wrappers::FEEngine_Unit_SetPosition);
+		mono_add_internal_call("FEEngine.Unit::GetHP_Native", script_wrappers::FEEngine_Unit_GetHP);
+		mono_add_internal_call("FEEngine.Unit::SetHP_Native", script_wrappers::FEEngine_Unit_SetHP);
+		mono_add_internal_call("FEEngine.Unit::GetUnitAt_Native", script_wrappers::FEEngine_Unit_GetUnitAt);
+	}
+	void script_engine::init_engine(const std::string& core_assembly_path, reference<map> m) {
 		this->init_mono();
 		MonoDomain* domain = NULL;
 		bool cleanup = false;
@@ -71,7 +80,8 @@ namespace fe_engine {
 			cleanup = true;
 		}
 		this->m_core = load_assembly_from_file(core_assembly_path.c_str());
-		// register functions
+		script_wrappers::set_map(m);
+		register_wrappers();
 		if (cleanup) {
 			mono_domain_unload(this->m_domain);
 			this->m_domain = domain;
