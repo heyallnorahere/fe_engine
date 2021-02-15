@@ -8,14 +8,16 @@ namespace FEEngine
 {
     class Test
     {
-        int x = 0;
+        private Unit unit;
+        public void Init()
+        {
+            this.unit = Unit.GetUnitAt(new Math.Vec2(1, 1));
+        }
         public void DoStuff()
         {
-            Unit u = Unit.GetUnitAt(new Math.Vec2(1 + x, 1));
-            Math.Vec2 pos = u.Position;
-            pos.X++;
-            this.x++;
-            u.Position = pos;
+            Math.Vec2 pos = this.unit.Position;
+            pos.Y++;
+            this.unit.Position = pos;
         }
     }
 }
