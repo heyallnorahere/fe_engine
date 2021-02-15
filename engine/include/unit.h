@@ -3,6 +3,7 @@
 #include "_math.h"
 #include "controller.h"
 #include "weapon.h"
+#include "behavior.h"
 #include <list>
 #include <vector>
 namespace fe_engine {
@@ -36,6 +37,7 @@ namespace fe_engine {
 		void set_current_hp(unit_stats::stat_type hp);
 		unit_affiliation get_affiliation() const;
 		void update();
+		void unit_update();
 		void move(s8vec2 offset, int8_t consumption_multiplier = 1);
 		reference<weapon> get_equipped_weapon() const;
 		void set_equipped_weapon(const reference<weapon>& w);
@@ -43,8 +45,10 @@ namespace fe_engine {
 		std::list<reference<item>>& get_inventory();
 		void attack(reference<unit> to_attack);
 		unit_stats::stat_type get_available_movement() const;
+		void set_available_movement(unit_stats::stat_type mv);
 		void refresh_movement();
 		bool can_move() const;
+		void attach_behavior(reference<behavior> b, uint64_t map_index);
 	private:
 		struct attack_packet {
 			uint8_t might, hit, crit;
@@ -55,6 +59,7 @@ namespace fe_engine {
 		unit_affiliation m_affiliation;
 		reference<weapon> m_equipped_weapon;
 		std::list<reference<item>> m_inventory;
+		reference<behavior> m_behavior;
 		bool m_can_move;
 		attack_packet generate_attack_packet(reference<unit> other);
 		void receive_attack_packet(attack_packet packet, reference<unit> sender);

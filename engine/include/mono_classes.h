@@ -24,6 +24,7 @@ namespace fe_engine {
 	class cs_method : public ref_counted {
 	public:
 		static cs_object* call_function(reference<cs_method> method, void** params = NULL);
+		void* raw();
 	private:
 		cs_method(void* method, MonoDomain* domain);
 		void* m_method;
@@ -55,6 +56,7 @@ namespace fe_engine {
 		std::string get_full_name();
 		std::string get_namespace_name();
 		std::string get_class_name();
+		void* raw();
 	private:
 		cs_class(void* _class, MonoDomain* domain, void* image, const std::string& ns_name, const std::string& cls_name);
 		void* m_class;

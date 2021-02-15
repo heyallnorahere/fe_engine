@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace FEEngine
 {
-    class Map
+    public class Map
     {
         public static ulong GetUnitCount()
         {

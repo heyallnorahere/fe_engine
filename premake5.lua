@@ -43,6 +43,23 @@ project "scriptcore"
     files {
         "%{prj.name}/src/**.cs"
     }
+    postbuildcommands {
+        '{COPY} "%{cfg.targetdir}/%{prj.name}.dll" "../entrypoint/script-assemblies"'
+    }
+project "sample-scripts"
+    location "sample-scripts"
+    kind "SharedLib"
+    language "C#"
+        targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+    files {
+        "%{prj.name}/src/**.cs"
+    }
+    links {
+        "scriptcore"
+    }
+    postbuildcommands {
+    }
 project "entrypoint"
     location "entrypoint"
     kind "ConsoleApp"
@@ -60,11 +77,13 @@ project "entrypoint"
     }
     links {
         "engine",
-        "scriptcore"
+        "scriptcore",
+        "sample-scripts"
     }
     postbuildcommands {
         '{COPY} "../vendor/binaries/%{cfg.buildcfg}/bin/*.dll" "%{cfg.targetdir}"',
-        '{COPY} "%{cfg.targetdir}/../scriptcore/scriptcore.dll" "script-assemblies/"'
+        '{COPY} "%{cfg.targetdir}/../scriptcore/scriptcore.dll" "script-assemblies/"',
+        '{COPY} "%{cfg.targetdir}/../sample-scripts/sample-scripts.dll" "script-assemblies/"'
     }
     filter "configurations:Debug"
         symbols "On"

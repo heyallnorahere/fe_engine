@@ -14,18 +14,20 @@ namespace fe_engine {
 		reference<cs_object> unit_object = reference<cs_object>(cs_method::call_function(unit_creation_method, args));
 		reference<cs_field> parent_field = this->m_class->get_field("parent");
 		this->m_instance->set_field(parent_field, unit_object->raw());
-		this->m_instance->call_method(this->m_methods["on_attach"]);
+		reference<cs_method> method = this->m_methods["on_attach"];
+		if (method->raw()) {
+			this->m_instance->call_method(method);
+		}
 	}
 	void behavior::on_unit_update() {
-		this->m_instance->call_method(this->m_methods["on_update"]);
-	}
-	void behavior::on_detach() {
-		this->m_instance->call_method(this->m_methods["on_detach"]);
+		reference<cs_method> method = this->m_methods["on_update"];
+		if (method->raw()) {
+			this->m_instance->call_method(method);
+		}
 	}
 	void behavior::register_methods() {
 		std::string prefix = this->m_class->get_full_name();
 		this->m_methods["on_attach"] = this->m_class->get_method(prefix + ":OnAttach()");
 		this->m_methods["on_update"] = this->m_class->get_method(prefix + ":OnUpdate()");
-		this->m_methods["on_detach"] = this->m_class->get_method(prefix + ":OnDetach()");
 	}
 }

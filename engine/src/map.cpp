@@ -15,6 +15,13 @@ namespace fe_engine {
 		}
 		this->m_units.remove_if([](const reference<unit>& u) { return u->get_current_hp() == 0; });
 	}
+	void map::update_units(unit_affiliation affiliation) {
+		for (auto& u : this->m_units) {
+			if (u->get_affiliation() == affiliation) {
+				u->unit_update();
+			}
+		}
+	}
 	void map::render(const reference<renderer>& r) {
 		for (const auto& u : this->m_units) {
 			renderer::color color = renderer::color::white;

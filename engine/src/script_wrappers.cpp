@@ -17,10 +17,16 @@ namespace fe_engine::script_wrappers {
 		u->move(static_cast<s8vec2>(in_position) - pos, 0);
 	}
 	uint32_t FEEngine_Unit_GetHP(uint64_t unit_index) {
-		return script_wrapper_map->get_unit(unit_index)->get_current_hp();
+		return (uint32_t)script_wrapper_map->get_unit(unit_index)->get_current_hp();
 	}
 	void FEEngine_Unit_SetHP(uint64_t unit_index, uint32_t hp) {
-		script_wrapper_map->get_unit(unit_index)->set_current_hp(hp);
+		script_wrapper_map->get_unit(unit_index)->set_current_hp((unit::unit_stats::stat_type)hp);
+	}
+	uint32_t FEEngine_Unit_GetCurrentMovement(uint64_t unit_index) {
+		return (uint32_t)script_wrapper_map->get_unit(unit_index)->get_available_movement();
+	}
+	void FEEngine_Unit_SetCurrentMovement(uint64_t unit_index, uint32_t mv) {
+		script_wrapper_map->get_unit(unit_index)->set_available_movement((unit::unit_stats::stat_type)mv);
 	}
 	void FEEngine_Unit_Move(uint64_t unit_index, s32vec2 offset) {
 		script_wrapper_map->get_unit(unit_index)->move(offset);

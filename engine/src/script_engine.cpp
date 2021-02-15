@@ -102,6 +102,8 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.Unit::SetPosition_Native", script_wrappers::FEEngine_Unit_SetPosition);
 		mono_add_internal_call("FEEngine.Unit::GetHP_Native", script_wrappers::FEEngine_Unit_GetHP);
 		mono_add_internal_call("FEEngine.Unit::SetHP_Native", script_wrappers::FEEngine_Unit_SetHP);
+		mono_add_internal_call("FEEngine.Unit::GetCurrentMovement_Native", script_wrappers::FEEngine_Unit_GetCurrentMovement);
+		mono_add_internal_call("FEEngine.Unit::SetCurrentMovement_Native", script_wrappers::FEEngine_Unit_SetCurrentMovement);
 		mono_add_internal_call("FEEngine.Unit::Move_Native", script_wrappers::FEEngine_Unit_Move);
 		mono_add_internal_call("FEEngine.Unit::GetUnitAt_Native", script_wrappers::FEEngine_Unit_GetUnitAt);
 		mono_add_internal_call("FEEngine.Map::GetUnitCount_Native", script_wrappers::FEEngine_Map_GetUnitCount);

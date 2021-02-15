@@ -7,6 +7,13 @@ using System.Runtime.CompilerServices;
 using FEEngine.Math;
 namespace FEEngine {
     public class Unit {
+        public enum Affiliation
+        {
+            player,
+            enemy,
+            third_army,
+            ally,
+        }
         public ulong Index { get; private set; }
         public Vec2 Position
         {
@@ -32,9 +39,28 @@ namespace FEEngine {
                 SetHP_Native(this.Index, value);
             }
         }
+        public uint CurrentMovement
+        {
+            get
+            {
+                return GetCurrentMovement_Native(this.Index);
+            }
+            private set
+            {
+                SetCurrentMovement_Native(this.Index, value);
+            }
+        }
         public void Move(Vec2 offset)
         {
-            Move_Native(this.Index, offset);
+            Vec2 to_move = offset;
+            int taxicab_length = to_move.TaxicabLength();
+            if (taxicab_length > this.CurrentMovement)
+            {
+                float x = (float)to_move.X / (float)taxicab_length;
+                float y = (float)to_move.Y / (float)taxicab_length;
+                to_move = new Vec2((int)(x * this.CurrentMovement), (int)(y * this.CurrentMovement));
+            }
+            Move_Native(this.Index, to_move);
         }
         internal Unit(ulong index)
         {
@@ -60,6 +86,10 @@ namespace FEEngine {
         private static extern uint GetHP_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void SetHP_Native(ulong index, uint hp);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern uint GetCurrentMovement_Native(ulong index);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void SetCurrentMovement_Native(ulong index, uint movement);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void Move_Native(ulong index, Vec2 offset);
         [MethodImpl(MethodImplOptions.InternalCall)]

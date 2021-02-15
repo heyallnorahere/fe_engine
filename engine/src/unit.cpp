@@ -41,9 +41,15 @@ namespace fe_engine {
 				this->m_equipped_weapon.reset();
 			}
 		}
-		// placeholder
+	}
+	void unit::unit_update() {
 		if (this->m_affiliation != unit_affiliation::player) {
-			this->m_can_move = false;
+			if (!this->m_behavior) {
+				this->m_can_move = false;
+			}
+			else {
+				this->m_behavior->on_unit_update();
+			}
 		}
 	}
 	void unit::move(s8vec2 offset, int8_t consumption_multiplier) {
@@ -100,11 +106,18 @@ namespace fe_engine {
 	unit::unit_stats::stat_type unit::get_available_movement() const {
 		return this->m_movement;
 	}
+	void unit::set_available_movement(unit_stats::stat_type mv) {
+		this->m_movement = mv;
+	}
 	void unit::refresh_movement() {
 		this->m_movement = this->m_stats.movement;
 		this->m_can_move = true;
 	}
 	bool unit::can_move() const {
 		return this->m_can_move;
+	}
+	void unit::attach_behavior(reference<behavior> b, uint64_t map_index) {
+		this->m_behavior = b;
+		this->m_behavior->on_attach(map_index);
 	}
 }

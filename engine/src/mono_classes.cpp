@@ -42,6 +42,9 @@ namespace fe_engine {
 	std::string cs_class::get_class_name() {
 		return this->m_class_name;
 	}
+	void* cs_class::raw() {
+		return this->m_class;
+	}
 	cs_class::cs_class(void* _class, MonoDomain* domain, void* image, const std::string& ns_name, const std::string& cls_name) {
 		this->m_class = _class;
 		this->m_domain = domain;
@@ -81,6 +84,9 @@ namespace fe_engine {
 		MonoObject* object = ::fe_engine::call_method(NULL, (MonoMethod*)method->m_method, params);
 		uint32_t handle = mono_gchandle_new(object, false);
 		return new cs_object(handle, method->m_domain);
+	}
+	void* cs_method::raw() {
+		return this->m_method;
 	}
 	cs_method::cs_method(void* method, MonoDomain* domain) {
 		this->m_method = method;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FEEngine
 {
-    class Behavior
+    public class Behavior
     {
         protected Unit Parent { get { return this.parent; } }
         private Unit parent;
