@@ -9,7 +9,7 @@ namespace FEEngine
     class Test
     {
         int x = 0;
-        public void PrintText()
+        public void DoStuff()
         {
             Unit u = Unit.GetUnitAt(new Math.Vec2(1 + x, 1));
             Math.Vec2 pos = u.Position;
