@@ -412,12 +412,11 @@ MigrationBackup/
 .ionide/
 
 # End of https://www.toptal.com/developers/gitignore/api/cmake,c++,visualstudio
-.cmake/
 out/
 *.sln
-*.*proj
-*.*proj.*
+*.*proj*
 !vendor/**
+!**/mono/lib/**
 .NET*.cs
 *.tlog/
 bin-int/

@@ -28,12 +28,12 @@ project "engine"
         "vendor/include"
     }
     links {
-        "vendor/binaries/${cfg.buildcfg}/lib/*.lib"
+        "vendor/binaries/%{cfg.buildcfg}/lib/*.lib"
     }
     filter "configurations:Debug"
         symbols "On"
     filter "configurations:Release"
-    optimize "On"
+        optimize "On"
 project "scriptcore"
     location "scriptcore"
     kind "SharedLib"
@@ -42,7 +42,7 @@ project "scriptcore"
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
     files {
         "%{prj.name}/src/**.cs"
-    }    
+    }
 project "entrypoint"
     location "entrypoint"
     kind "ConsoleApp"
@@ -59,10 +59,12 @@ project "entrypoint"
         "engine/include"
     }
     links {
-        "engine"
+        "engine",
+        "scriptcore"
     }
     postbuildcommands {
-        '{COPY} "../vendor/binaries/%{cfg.buildcfg}/bin/*.dll" "%{cfg.targetdir}"'
+        '{COPY} "../vendor/binaries/%{cfg.buildcfg}/bin/*.dll" "%{cfg.targetdir}"',
+        '{COPY} "%{cfg.targetdir}/../scriptcore/scriptcore.dll" "script-assemblies/"'
     }
     filter "configurations:Debug"
         symbols "On"

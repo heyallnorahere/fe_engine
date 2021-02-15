@@ -15,6 +15,7 @@ int main() {
 	fe_engine::reference<fe_engine::ui_controller> ui_controller = fe_engine::reference<fe_engine::ui_controller>::create(renderer, map, controller);
 	fe_engine::reference<fe_engine::phase_manager> phase_manager = fe_engine::reference<fe_engine::phase_manager>::create();
 	fe_engine::reference<fe_engine::player> player = fe_engine::reference<fe_engine::player>::create(controller, map, ui_controller, phase_manager);
+	fe_engine::reference<fe_engine::script_engine> script_engine = fe_engine::reference<fe_engine::script_engine>::create("script-assemblies/scriptcore.dll");
 	{
 		fe_engine::reference<fe_engine::unit> u = fe_engine::reference<fe_engine::unit>::create(stats, fe_engine::u8vec2{ 1, 1 }, fe_engine::unit_affiliation::player);
 		u->get_inventory().push_back(fe_engine::reference<fe_engine::item>::create("reserve", fe_engine::item::usable, [](fe_engine::unit* unit) {
