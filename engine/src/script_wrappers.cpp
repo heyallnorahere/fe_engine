@@ -1,4 +1,8 @@
 #include "script_wrappers.h"
+#ifdef max
+#undef max
+#endif
+#include <limits>
 static fe_engine::reference<fe_engine::map> script_wrapper_map;
 namespace fe_engine::script_wrappers {
 	void set_map(reference<map> m) {
@@ -24,6 +28,6 @@ namespace fe_engine::script_wrappers {
 				return i;
 			}
 		}
-		return 0;
+		return std::numeric_limits<uint64_t>::max();
 	}
 }

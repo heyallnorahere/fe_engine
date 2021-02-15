@@ -34,6 +34,10 @@ int main() {
 		u->set_equipped_weapon(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::lance));
 		map->add_unit(u);
 	}
+	fe_engine::reference<fe_engine::assembly> core = script_engine->get_core();
+	fe_engine::reference<fe_engine::cs_class> test_class = core->get_class("FEEngine", "Test");
+	fe_engine::reference<fe_engine::cs_object> test_object = test_class->instantiate();
+	fe_engine::reference<fe_engine::cs_method> test_method = test_class->get_method("FEEngine.Test:PrintText()");
 	while (true) {
 		map->update();
 		player->update();
@@ -43,6 +47,9 @@ int main() {
 		map->render(renderer);
 		player->render_cursor(renderer);
 		ui_controller->render();
+		if (controller->get_state().x.down) {
+			test_object->call_method(test_method);
+		}
 		renderer->present();
 	}
 	return 0;
