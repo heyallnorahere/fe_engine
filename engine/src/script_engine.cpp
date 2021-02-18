@@ -104,9 +104,15 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.Unit::SetHP_Native", script_wrappers::FEEngine_Unit_SetHP);
 		mono_add_internal_call("FEEngine.Unit::GetCurrentMovement_Native", script_wrappers::FEEngine_Unit_GetCurrentMovement);
 		mono_add_internal_call("FEEngine.Unit::SetCurrentMovement_Native", script_wrappers::FEEngine_Unit_SetCurrentMovement);
+		mono_add_internal_call("FEEngine.Unit::GetStats_Native", script_wrappers::FEEngine_Unit_GetStats);
+		mono_add_internal_call("FEEngine.Unit::SetStats_Native", script_wrappers::FEEngine_Unit_SetStats);
 		mono_add_internal_call("FEEngine.Unit::Move_Native", script_wrappers::FEEngine_Unit_Move);
 		mono_add_internal_call("FEEngine.Unit::GetUnitAt_Native", script_wrappers::FEEngine_Unit_GetUnitAt);
 		mono_add_internal_call("FEEngine.Map::GetUnitCount_Native", script_wrappers::FEEngine_Map_GetUnitCount);
+		mono_add_internal_call("FEEngine.Map::GetSize_Native", script_wrappers::FEEngine_Map_GetSize);
+		mono_add_internal_call("FEEngine.Renderer::RenderCharAt_Native", script_wrappers::FEEngine_Renderer_RenderCharAt);
+		mono_add_internal_call("FEEngine.Renderer::RenderStringAt_Native", script_wrappers::FEEngine_Renderer_RenderStringAt);
+		mono_add_internal_call("FEEngine.Renderer::GetBufferSize_Native", script_wrappers::FEEngine_Renderer_GetBufferSize);
 	}
 	void script_engine::init_engine(const std::string& core_assembly_path, reference<map> m) {
 		this->init_mono();

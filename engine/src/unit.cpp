@@ -14,6 +14,9 @@ namespace fe_engine {
 	const unit::unit_stats& unit::get_stats() const {
 		return this->m_stats;
 	}
+	unit::unit_stats& unit::get_stats() {
+		return this->m_stats;
+	}
 	s8vec2 unit::get_pos() const {
 		return this->m_pos;
 	}
@@ -119,5 +122,8 @@ namespace fe_engine {
 	void unit::attach_behavior(reference<behavior> b, uint64_t map_index) {
 		this->m_behavior = b;
 		this->m_behavior->on_attach(map_index);
+	}
+	reference<behavior> unit::get_behavior() {
+		return this->m_behavior;
 	}
 }

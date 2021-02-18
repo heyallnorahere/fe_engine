@@ -12,7 +12,7 @@ namespace fe_engine {
 		void add_unit(const reference<unit>& unit);
 		void update();
 		void update_units(unit_affiliation affiliation);
-		void render(const reference<renderer>& r);
+		void render(reference<renderer> r);
 		size_t get_unit_count() const;
 		reference<unit> get_unit(size_t index) const;
 		reference<unit> get_unit_at(s8vec2 pos) const;

@@ -14,6 +14,20 @@ namespace FEEngine {
             third_army,
             ally,
         }
+        public struct UnitStats
+        {
+            public uint Level;
+            public uint MaxHP;
+            public uint Strength;
+            public uint Magic;
+            public uint Dexterity;
+            public uint Speed;
+            public uint Luck;
+            public uint Defense;
+            public uint Resilience;
+            public uint Charm;
+            public uint Movement;
+        }
         public ulong Index { get; private set; }
         public Vec2 Position
         {
@@ -48,6 +62,17 @@ namespace FEEngine {
             private set
             {
                 SetCurrentMovement_Native(this.Index, value);
+            }
+        }
+        public UnitStats Stats
+        {
+            get
+            {
+                return GetStats_Native(this.Index);
+            }
+            set
+            {
+                SetStats_Native(this.Index, value);
             }
         }
         public void Move(Vec2 offset)
@@ -90,6 +115,11 @@ namespace FEEngine {
         private static extern uint GetCurrentMovement_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void SetCurrentMovement_Native(ulong index, uint movement);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern UnitStats GetStats_Native(ulong index);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void SetStats_Native(ulong index, UnitStats stats);
+
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void Move_Native(ulong index, Vec2 offset);
         [MethodImpl(MethodImplOptions.InternalCall)]

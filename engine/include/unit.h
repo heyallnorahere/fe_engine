@@ -16,7 +16,7 @@ namespace fe_engine {
 	class unit : public ref_counted {
 	public:
 		struct unit_stats {
-			using stat_type = uint8_t;
+			using stat_type = uint32_t;
 			stat_type level;
 			stat_type max_hp;
 			stat_type strength;
@@ -32,6 +32,7 @@ namespace fe_engine {
 		unit(const unit_stats& stats, s8vec2 pos, unit_affiliation affiliation);
 		~unit();
 		const unit_stats& get_stats() const;
+		unit_stats& get_stats();
 		s8vec2 get_pos() const;
 		unit_stats::stat_type get_current_hp() const;
 		void set_current_hp(unit_stats::stat_type hp);
@@ -49,6 +50,7 @@ namespace fe_engine {
 		void refresh_movement();
 		bool can_move() const;
 		void attach_behavior(reference<behavior> b, uint64_t map_index);
+		reference<behavior> get_behavior();
 	private:
 		struct attack_packet {
 			uint8_t might, hit, crit;

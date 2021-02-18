@@ -10,5 +10,9 @@ namespace FEEngine
     {
         protected Unit Parent { get { return this.parent; } }
         private Unit parent;
+        protected Behavior()
+        {
+            parent = Unit.MakeFromIndex(0);
+        }
     }
 }

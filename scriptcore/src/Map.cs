@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
+using FEEngine.Math;
 
 namespace FEEngine
 {
@@ -21,7 +22,13 @@ namespace FEEngine
             }
             return Unit.MakeFromIndex(index);
         }
+        public static Vec2 GetSize()
+        {
+            return GetSize_Native();
+        }
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern ulong GetUnitCount_Native();
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern Vec2 GetSize_Native();
     }
 }

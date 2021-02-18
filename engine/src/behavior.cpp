@@ -1,4 +1,5 @@
 #include "behavior.h"
+#include <vector>
 namespace fe_engine {
 	behavior::behavior(reference<cs_class> _class, reference<assembly> core_assembly) {
 		this->m_class = _class;
@@ -25,9 +26,23 @@ namespace fe_engine {
 			this->m_instance->call_method(method);
 		}
 	}
+	void behavior::on_render(reference<renderer> r) {
+		reference<cs_method> method = this->m_methods["on_render"];
+		if (method->raw()) {
+			std::vector<void*> args(1);
+			uint64_t renderer_address = (uint64_t)r.get();
+			args[0] = &renderer_address;
+			reference<cs_object> r = cs_method::call_function(this->m_renderer_creation_method, args.data());
+			args[0] = r->raw();
+			this->m_instance->call_method(method, args.data());
+		}
+	}
 	void behavior::register_methods() {
 		std::string prefix = this->m_class->get_full_name();
 		this->m_methods["on_attach"] = this->m_class->get_method(prefix + ":OnAttach()");
 		this->m_methods["on_update"] = this->m_class->get_method(prefix + ":OnUpdate()");
+		this->m_methods["on_render"] = this->m_class->get_method(prefix + ":OnRender(Renderer)");
+		reference<cs_class> renderer_class = this->m_core->get_class("FEEngine", "Renderer");
+		this->m_renderer_creation_method = renderer_class->get_method("FEEngine.Renderer:MakeFromMemoryAddress(ulong)");
 	}
 }

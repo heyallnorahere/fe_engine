@@ -43,9 +43,6 @@ project "scriptcore"
     files {
         "%{prj.name}/src/**.cs"
     }
-    postbuildcommands {
-        '{COPY} "%{cfg.targetdir}/%{prj.name}.dll" "../entrypoint/script-assemblies"'
-    }
 project "sample-scripts"
     location "sample-scripts"
     kind "SharedLib"
@@ -57,8 +54,6 @@ project "sample-scripts"
     }
     links {
         "scriptcore"
-    }
-    postbuildcommands {
     }
 project "entrypoint"
     location "entrypoint"
@@ -89,4 +84,6 @@ project "entrypoint"
         symbols "On"
     filter "configurations:Release"
         optimize "On"
+    configuration "windows"
+        prelinkcommands { 'del /q "script-assemblies\\*.dll"' }
     

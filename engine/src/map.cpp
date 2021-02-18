@@ -22,8 +22,8 @@ namespace fe_engine {
 			}
 		}
 	}
-	void map::render(const reference<renderer>& r) {
-		for (const auto& u : this->m_units) {
+	void map::render(reference<renderer> r) {
+		for (auto& u : this->m_units) {
 			renderer::color color = renderer::color::white;
 			switch (u->get_affiliation()) {
 			case unit_affiliation::enemy:
@@ -46,6 +46,8 @@ namespace fe_engine {
 			size_t width, height;
 			r->get_buffer_size(width, height);
 			r->render_char_at(u->get_pos().x, u->get_pos().y + (height - this->m_height), unit_char, color);
+			reference<behavior> b = u->get_behavior();
+			if (b) b->on_render(r);
 		}
 	}
 	size_t map::get_unit_count() const {

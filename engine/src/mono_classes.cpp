@@ -76,6 +76,9 @@ namespace fe_engine {
 	void* cs_object::raw() {
 		return mono_gchandle_get_target(this->m_object);
 	}
+	cs_object::~cs_object() {
+		mono_gchandle_free(this->m_object);
+	}
 	cs_object::cs_object(uint32_t object, MonoDomain* domain) {
 		this->m_object = object;
 		this->m_domain = domain;
