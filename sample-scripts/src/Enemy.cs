@@ -36,7 +36,7 @@ namespace Scripts
         public void OnRender(Renderer renderer)
         {
             Vec2 size = renderer.GetBufferSize();
-            renderer.RenderStringAt(new Vec2(0, size.Y - 1), "rendering from c# is working", Renderer.Color.RED);
+            renderer.RenderStringAt(new Vec2(0, size.Y - 1), "from c#", Renderer.Color.RED);
         }
     }
 }
