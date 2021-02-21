@@ -422,3 +422,4 @@ out/
 bin-int/
 .DS_Store
 *.xcworkspace/**
+Makefile

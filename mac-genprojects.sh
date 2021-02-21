@@ -1,1 +1,1 @@
-vendor/binaries/premake5 xcode4
+vendor/binaries/macos/premake5 gmake --dotnet=mono

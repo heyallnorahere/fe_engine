@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include "script_wrappers.h"
+#include <iostream>
 namespace fe_engine {
 	MonoAssembly* load_assembly_from_file(const char* filepath) {
         std::vector<char> file_data;
@@ -41,6 +42,12 @@ namespace fe_engine {
 	}
 	MonoObject* call_method(MonoObject* object, MonoMethod* method, void** params = NULL) {
 		MonoObject* exception = NULL;
+#ifdef DEBUG_ENABLED
+		std::cout << "calling method" << std::endl;
+		std::cout << "object: " << std::to_string(object) << std::endl;
+		std::cout << "method: " << std::to_string(method) << std::endl;
+		std::cout << "params pointer: " << std::to_string(params) << std::endl;
+#endif
 		return mono_runtime_invoke(method, object, params, &exception);
 	}
 	MonoClassField* get_field_id(MonoClass* _class, const std::string& name) {
@@ -74,6 +81,9 @@ namespace fe_engine {
 		return reference<assembly>(new assembly(this->m_core, this->m_domain));
 	}
 	void script_engine::init_mono() {
+#ifdef DEBUG_ENABLED
+		std::cout << "initializing mono" << std::endl;
+#endif
 		mono_set_assemblies_path("mono/lib");
 		MonoDomain* domain = mono_jit_init("FEEngine");
 		char* name = (char*)"FEEngineRuntime";
@@ -116,6 +126,9 @@ namespace fe_engine {
 			mono_domain_unload(this->m_domain);
 			this->m_domain = domain;
 		}
+#ifdef DEBUG_ENABLED
+		std::cout << "initialized mono!" << std::endl;
+#endif
 	}
 	void script_engine::shutdown_engine() {
 		this->shutdown_mono();

@@ -27,11 +27,12 @@ project "engine"
         "%{prj.name}/include"
     }
     sysincludedirs {
-        "vendor/include"
+        "vendor/include/%{cfg.system}"
     }
-    links {
-        "vendor/binaries/%{cfg.buildcfg}/lib/*.lib"
-    }
+    filter "system:windows"
+        links {
+            "vendor/binaries/windows/%{cfg.buildcfg}/lib/*.lib"
+        }
     filter "configurations:Debug"
         symbols "On"
     filter "configurations:Release"
@@ -78,14 +79,29 @@ project "entrypoint"
         "sample-scripts"
     }
     postbuildcommands {
-        '{COPY} "../vendor/binaries/%{cfg.buildcfg}/bin/*.dll" "%{cfg.targetdir}"',
         '{COPY} "%{cfg.targetdir}/../scriptcore/scriptcore.dll" "script-assemblies/"',
         '{COPY} "%{cfg.targetdir}/../sample-scripts/sample-scripts.dll" "script-assemblies/"'
     }
     filter "configurations:Debug"
         symbols "On"
+        defines {
+            "DEBUG_ENABLED"
+        }
     filter "configurations:Release"
         optimize "On"
-    configuration "windows"
+    filter "system:windows"
         prelinkcommands { 'del /q "script-assemblies\\*.dll"' }
+        postbuildcommands {
+            '{COPY} "../vendor/binaries/%{cfg.buildcfg}/bin/*.dll" "%{cfg.targetdir}"'
+        }
+    filter "system:macosx"
+        links {
+            "monosgen-2.0",
+            "z"
+        }
+        syslibdirs {
+            "/usr/local/lib",
+            "/usr/local/opt/zlib/lib"
+        }
+
     
