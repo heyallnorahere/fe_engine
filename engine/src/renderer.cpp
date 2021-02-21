@@ -4,10 +4,9 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
-#ifdef _WIN32
+#ifdef FEENGINE_WINDOWS
 #include <Windows.h>
-#endif
-#ifndef _WIN32
+#else
 using color_map = std::unordered_map<fe_engine::renderer::color, std::string>;
 static color_map gen_color_map() {
 	color_map cm;
@@ -23,14 +22,14 @@ static color_map gen_color_map() {
 color_map _color_map = gen_color_map();
 #endif
 static void set_cursor_pos(int x, int y) {
-#ifdef _WIN32
+#ifdef FEENGINE_WINDOWS
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)x, (short)y });
 #else
 	std::cout << "\033[" << x << ";" << y << "H" << std::flush;
 #endif
 }
 static void print_char(char c, fe_engine::renderer::color _c) {
-#ifdef _WIN32
+#ifdef FEENGINE_WINDOWS
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(console, (WORD)_c);
 	WriteConsoleA(console, &c, 1, NULL, NULL);
@@ -39,7 +38,7 @@ static void print_char(char c, fe_engine::renderer::color _c) {
 #endif
 }
 static void disable_console_cursor() {
-#ifdef _WIN32
+#ifdef FEENGINE_WINDOWS
 	CONSOLE_CURSOR_INFO info;
 	info.dwSize = 20;
 	info.bVisible = false;

@@ -36,7 +36,7 @@ namespace fe_engine {
 	}
 	void controller::update() {
 		this->m_last = this->m_current;
-		if (is_controller_connected(this->m_index)) {
+		if (this->connected()) {
 			this->m_current = get_controller_state(this->m_index);
 			calculate_difference(this->m_current, this->m_last);
 		}

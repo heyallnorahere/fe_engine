@@ -33,6 +33,13 @@ project "engine"
         links {
             "vendor/binaries/windows/%{cfg.buildcfg}/lib/*.lib"
         }
+        defines {
+            "FEENGINE_WINDOWS"
+        }
+    filter "system:macosx"
+        defines {
+            "FEENGINE_MACOSX"
+        }
     filter "configurations:Debug"
         symbols "On"
     filter "configurations:Release"
@@ -103,5 +110,3 @@ project "entrypoint"
             "/usr/local/lib",
             "/usr/local/opt/zlib/lib"
         }
-
-    

@@ -1,4 +1,4 @@
-#if defined(_WIN32)
+#ifdef FEENGINE_WINDOWS
 #pragma comment(lib, "xinput.lib")
 #include "controller.h"
 #define _AMD64_

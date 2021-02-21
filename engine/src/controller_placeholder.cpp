@@ -1,4 +1,4 @@
-#ifndef _WIN32
+#if !defined(FEENGINE_WINDOWS)
 #include "controller.h"
 bool is_controller_connected(size_t index) {
     return true;

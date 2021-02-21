@@ -423,3 +423,5 @@ bin-int/
 .DS_Store
 *.xcworkspace/**
 Makefile
+.vscode/**
+!.vscode/launch.json

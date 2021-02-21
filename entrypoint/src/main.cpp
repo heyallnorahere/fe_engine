@@ -2,9 +2,6 @@
 #include <engine.h>
 #include <vector>
 #include <filesystem>
-#ifdef _WIN32
-#include <Windows.h>
-#endif
 static std::vector<std::string> get_file_entries(const std::string& directory, const std::string& exclude = "") {
 	std::vector<std::string> filenames;
 	for (const auto& n : std::filesystem::directory_iterator(directory)) {
