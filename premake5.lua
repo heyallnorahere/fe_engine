@@ -24,7 +24,9 @@ project "engine"
         "%{prj.name}/include/**.h"
     }
     includedirs {
-        "%{prj.name}/include",
+        "%{prj.name}/include"
+    }
+    sysincludedirs {
         "vendor/include"
     }
     links {
@@ -67,7 +69,7 @@ project "entrypoint"
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp"
     }
-    includedirs {
+    sysincludedirs {
         "engine/include"
     }
     links {

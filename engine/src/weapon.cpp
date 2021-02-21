@@ -1,5 +1,4 @@
 #include "weapon.h"
-#include "..\include\weapon.h"
 namespace fe_engine {
 	std::string weapon_type_to_string(weapon::type type) {
 		switch (type) {

@@ -3,41 +3,27 @@
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/attrdefs.h>
-#include <Windows.h>
+#include <fstream>
+#include <vector>
+#include <string>
 #include "script_wrappers.h"
 namespace fe_engine {
 	MonoAssembly* load_assembly_from_file(const char* filepath) {
-		if (!filepath) {
-			return NULL;
-		}
-		HANDLE file = CreateFileA(filepath, FILE_READ_ACCESS, NULL, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (file == INVALID_HANDLE_VALUE) {
-			return NULL;
-		}
-		DWORD file_size = GetFileSize(file, NULL);
-		if (file_size == INVALID_FILE_SIZE) {
-			return NULL;
-		}
-		void* file_data = malloc(file_size);
-		if (!file_data) {
-			CloseHandle(file);
-			return NULL;
-		}
-		DWORD read = 0;
-		ReadFile(file, file_data, file_size, &read, NULL);
-		if (file_size != read) {
-			free(file_data);
-			CloseHandle(file);
-			return NULL;
-		}
+        std::vector<char> file_data;
+        std::ifstream file(filepath, std::ios::binary);
+        std::string line;
+        while (getline(file, line)) {
+            for (char c : line) {
+                file_data.push_back(c);
+            }
+        }
+        file.close();
 		MonoImageOpenStatus status;
-		MonoImage* image = mono_image_open_from_data_full(reinterpret_cast<char*>(file_data), file_size, true, &status, false);
+		MonoImage* image = mono_image_open_from_data_full(file_data.data(), file_data.size(), true, &status, false);
 		if (status != MONO_IMAGE_OK) {
 			return NULL;
 		}
 		MonoAssembly* assembly = mono_assembly_load_from_full(image, filepath, &status, false);
-		free(file_data);
-		CloseHandle(file);
 		mono_image_close(image);
 		return assembly;
 	}
@@ -98,21 +84,21 @@ namespace fe_engine {
 	}
 	static void register_wrappers() {
 		// unit class
-		mono_add_internal_call("FEEngine.Unit::GetPosition_Native", script_wrappers::FEEngine_Unit_GetPosition);
-		mono_add_internal_call("FEEngine.Unit::SetPosition_Native", script_wrappers::FEEngine_Unit_SetPosition);
-		mono_add_internal_call("FEEngine.Unit::GetHP_Native", script_wrappers::FEEngine_Unit_GetHP);
-		mono_add_internal_call("FEEngine.Unit::SetHP_Native", script_wrappers::FEEngine_Unit_SetHP);
-		mono_add_internal_call("FEEngine.Unit::GetCurrentMovement_Native", script_wrappers::FEEngine_Unit_GetCurrentMovement);
-		mono_add_internal_call("FEEngine.Unit::SetCurrentMovement_Native", script_wrappers::FEEngine_Unit_SetCurrentMovement);
-		mono_add_internal_call("FEEngine.Unit::GetStats_Native", script_wrappers::FEEngine_Unit_GetStats);
-		mono_add_internal_call("FEEngine.Unit::SetStats_Native", script_wrappers::FEEngine_Unit_SetStats);
-		mono_add_internal_call("FEEngine.Unit::Move_Native", script_wrappers::FEEngine_Unit_Move);
-		mono_add_internal_call("FEEngine.Unit::GetUnitAt_Native", script_wrappers::FEEngine_Unit_GetUnitAt);
-		mono_add_internal_call("FEEngine.Map::GetUnitCount_Native", script_wrappers::FEEngine_Map_GetUnitCount);
-		mono_add_internal_call("FEEngine.Map::GetSize_Native", script_wrappers::FEEngine_Map_GetSize);
-		mono_add_internal_call("FEEngine.Renderer::RenderCharAt_Native", script_wrappers::FEEngine_Renderer_RenderCharAt);
-		mono_add_internal_call("FEEngine.Renderer::RenderStringAt_Native", script_wrappers::FEEngine_Renderer_RenderStringAt);
-		mono_add_internal_call("FEEngine.Renderer::GetBufferSize_Native", script_wrappers::FEEngine_Renderer_GetBufferSize);
+		mono_add_internal_call("FEEngine.Unit::GetPosition_Native", (void*)script_wrappers::FEEngine_Unit_GetPosition);
+		mono_add_internal_call("FEEngine.Unit::SetPosition_Native", (void*)script_wrappers::FEEngine_Unit_SetPosition);
+		mono_add_internal_call("FEEngine.Unit::GetHP_Native", (void*)script_wrappers::FEEngine_Unit_GetHP);
+		mono_add_internal_call("FEEngine.Unit::SetHP_Native", (void*)script_wrappers::FEEngine_Unit_SetHP);
+		mono_add_internal_call("FEEngine.Unit::GetCurrentMovement_Native",  (void*)script_wrappers::FEEngine_Unit_GetCurrentMovement);
+		mono_add_internal_call("FEEngine.Unit::SetCurrentMovement_Native", (void*)script_wrappers::FEEngine_Unit_SetCurrentMovement);
+		mono_add_internal_call("FEEngine.Unit::GetStats_Native", (void*)script_wrappers::FEEngine_Unit_GetStats);
+		mono_add_internal_call("FEEngine.Unit::SetStats_Native", (void*)script_wrappers::FEEngine_Unit_SetStats);
+		mono_add_internal_call("FEEngine.Unit::Move_Native", (void*)script_wrappers::FEEngine_Unit_Move);
+		mono_add_internal_call("FEEngine.Unit::GetUnitAt_Native", (void*)script_wrappers::FEEngine_Unit_GetUnitAt);
+		mono_add_internal_call("FEEngine.Map::GetUnitCount_Native", (void*)script_wrappers::FEEngine_Map_GetUnitCount);
+		mono_add_internal_call("FEEngine.Map::GetSize_Native", (void*)script_wrappers::FEEngine_Map_GetSize);
+		mono_add_internal_call("FEEngine.Renderer::RenderCharAt_Native", (void*)script_wrappers::FEEngine_Renderer_RenderCharAt);
+		mono_add_internal_call("FEEngine.Renderer::RenderStringAt_Native", (void*)script_wrappers::FEEngine_Renderer_RenderStringAt);
+		mono_add_internal_call("FEEngine.Renderer::GetBufferSize_Native", (void*)script_wrappers::FEEngine_Renderer_GetBufferSize);
 	}
 	void script_engine::init_engine(const std::string& core_assembly_path, reference<map> m) {
 		this->init_mono();

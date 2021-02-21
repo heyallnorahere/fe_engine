@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdlib>
 namespace fe_engine {
 	namespace util {
 		class buffer {

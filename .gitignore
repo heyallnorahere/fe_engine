@@ -420,3 +420,5 @@ out/
 .NET*.cs
 *.tlog/
 bin-int/
+.DS_Store
+*.xcworkspace/**
