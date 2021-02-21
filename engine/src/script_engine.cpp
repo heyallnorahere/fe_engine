@@ -14,7 +14,7 @@
 #endif
 namespace fe_engine {
 	util::buffer* read_file(const char* filepath) {
-		#ifdef _WIN32
+#ifdef _WIN32
 		HANDLE file = CreateFileA(filepath, FILE_READ_ACCESS, NULL, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (file == INVALID_HANDLE_VALUE) {
 			return NULL;
@@ -36,7 +36,7 @@ namespace fe_engine {
 			return NULL;
 		}
 		CloseHandle(file);
-		#else
+#else
 		FILE* f = fopen(filepath, "rb");
 		fseek(f, 0, SEEK_END);
 		size_t file_size = ftell(f);
@@ -45,7 +45,7 @@ namespace fe_engine {
 		memset(file_data, 0, file_size * sizeof(char));
 		size_t read = fread(file_data, sizeof(char), file_size, f);
 		fclose(f);
-		#endif
+#endif
 		util::buffer* buf = new util::buffer(file_size * sizeof(char));
 		memcpy(buf->get(), file_data, buf->get_size());
 		free(file_data);
