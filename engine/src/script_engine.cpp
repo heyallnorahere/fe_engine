@@ -6,26 +6,61 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include "script_wrappers.h"
 #include <iostream>
+#include "script_wrappers.h"
+#include "buffer.h"
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 namespace fe_engine {
+	util::buffer* read_file(const char* filepath) {
+		#ifdef _WIN32
+		HANDLE file = CreateFileA(filepath, FILE_READ_ACCESS, NULL, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (file == INVALID_HANDLE_VALUE) {
+			return NULL;
+		}
+		size_t file_size = GetFileSize(file, NULL);
+		if (file_size == INVALID_FILE_SIZE) {
+			return NULL;
+		}
+		void* file_data = malloc(file_size);
+		if (!file_data) {
+			CloseHandle(file);
+			return NULL;
+		}
+		DWORD read = 0;
+		ReadFile(file, file_data, file_size, &read, NULL);
+		if (file_size != read) {
+			free(file_data);
+			CloseHandle(file);
+			return NULL;
+		}
+		CloseHandle(file);
+		#else
+		FILE* f = fopen(filepath, "rb");
+		fseek(f, 0, SEEK_END);
+		size_t file_size = ftell(f);
+		rewind(f);
+		void* file_data = malloc(file_size * sizeof(char));
+		memset(file_data, 0, file_size * sizeof(char));
+		size_t read = fread(file_data, sizeof(char), file_size, f);
+		fclose(f);
+		#endif
+		util::buffer* buf = new util::buffer(file_size * sizeof(char));
+		memcpy(buf->get(), file_data, buf->get_size());
+		free(file_data);
+		return buf;
+	}
 	MonoAssembly* load_assembly_from_file(const char* filepath) {
-        std::vector<char> file_data;
-        std::ifstream file(filepath, std::ios::binary);
-        std::string line;
-        while (getline(file, line)) {
-            for (char c : line) {
-                file_data.push_back(c);
-            }
-        }
-        file.close();
+        util::buffer* buf = read_file(filepath);
 		MonoImageOpenStatus status;
-		MonoImage* image = mono_image_open_from_data_full(file_data.data(), file_data.size(), true, &status, false);
+		MonoImage* image = mono_image_open_from_data_full(util::buffer_cast<char>(buf), buf->get_size(), true, &status, false);
 		if (status != MONO_IMAGE_OK) {
 			return NULL;
 		}
 		MonoAssembly* assembly = mono_assembly_load_from_full(image, filepath, &status, false);
 		mono_image_close(image);
+		delete buf;
 		return assembly;
 	}
 	MonoClass* get_class(MonoImage* image, const std::string& namespace_name, const std::string& class_name) {
@@ -42,12 +77,6 @@ namespace fe_engine {
 	}
 	MonoObject* call_method(MonoObject* object, MonoMethod* method, void** params = NULL) {
 		MonoObject* exception = NULL;
-#ifdef DEBUG_ENABLED
-		std::cout << "calling method" << std::endl;
-		std::cout << "object: " << std::to_string(object) << std::endl;
-		std::cout << "method: " << std::to_string(method) << std::endl;
-		std::cout << "params pointer: " << std::to_string(params) << std::endl;
-#endif
 		return mono_runtime_invoke(method, object, params, &exception);
 	}
 	MonoClassField* get_field_id(MonoClass* _class, const std::string& name) {
@@ -81,9 +110,6 @@ namespace fe_engine {
 		return reference<assembly>(new assembly(this->m_core, this->m_domain));
 	}
 	void script_engine::init_mono() {
-#ifdef DEBUG_ENABLED
-		std::cout << "initializing mono" << std::endl;
-#endif
 		mono_set_assemblies_path("mono/lib");
 		MonoDomain* domain = mono_jit_init("FEEngine");
 		char* name = (char*)"FEEngineRuntime";
@@ -126,9 +152,6 @@ namespace fe_engine {
 			mono_domain_unload(this->m_domain);
 			this->m_domain = domain;
 		}
-#ifdef DEBUG_ENABLED
-		std::cout << "initialized mono!" << std::endl;
-#endif
 	}
 	void script_engine::shutdown_engine() {
 		this->shutdown_mono();

@@ -1,0 +1,19 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "debug entrypoint (mac)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/Debug-macosx-x86_64/entrypoint/entrypoint",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/entrypoint",
+            "environment": [],
+            "MIMode": "lldb"
+        }
+    ]
+}

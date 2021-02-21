@@ -3,12 +3,30 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #ifdef _WIN32
 #include <Windows.h>
+#endif
+#ifndef _WIN32
+using color_map = std::unordered_map<fe_engine::renderer::color, std::string>;
+static color_map gen_color_map() {
+	color_map cm;
+	using clr = fe_engine::renderer::color;
+	cm[clr::red] = "\033[31m";
+	cm[clr::green] = "\033[32m";
+	cm[clr::blue] = "\033[34m";
+	cm[clr::yellow] = "\033[33m";
+	cm[clr::white] = "\033[37m";
+	cm[clr::black] = "\033[30m";
+	return cm;
+}
+color_map _color_map = gen_color_map();
 #endif
 static void set_cursor_pos(int x, int y) {
 #ifdef _WIN32
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)x, (short)y });
+#else
+	std::cout << "\033[" << x << ";" << y << "H" << std::flush;
 #endif
 }
 static void print_char(char c, fe_engine::renderer::color _c) {
@@ -16,6 +34,8 @@ static void print_char(char c, fe_engine::renderer::color _c) {
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(console, (WORD)_c);
 	WriteConsoleA(console, &c, 1, NULL, NULL);
+#else
+	std::cout << _color_map[_c] << c << std::flush;
 #endif
 }
 static void disable_console_cursor() {

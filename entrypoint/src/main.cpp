@@ -1,23 +1,18 @@
 ﻿#include <iostream>
 #include <engine.h>
 #include <vector>
+#include <filesystem>
 #ifdef _WIN32
 #include <Windows.h>
 #endif
-static std::vector<std::string> get_file_entries(const std::string& wildcard, const std::string& exclude = "") {
+static std::vector<std::string> get_file_entries(const std::string& directory, const std::string& exclude = "") {
 	std::vector<std::string> filenames;
-#ifdef _WIN32
-	WIN32_FIND_DATAA wfd;
-	HANDLE h = FindFirstFileA(wildcard.c_str(), &wfd);
-	do {
-		if (!exclude.empty()) {
-			if (exclude == std::string(wfd.cFileName)) {
-				continue;
-			}
+	for (const auto& n : std::filesystem::directory_iterator(directory)) {
+		if (n.path() == exclude && !exclude.empty()) {
+			continue;
 		}
-		filenames.push_back(wfd.cFileName);
-	} while (FindNextFileA(h, &wfd));
-#endif
+		filenames.push_back(n.path());
+	}
 	return filenames;
 }
 int main() {
@@ -40,9 +35,9 @@ int main() {
 	fe_engine::reference<fe_engine::assembly> core = script_engine->get_core();
 	fe_engine::reference<fe_engine::cs_class> test_class = core->get_class("FEEngine", "Test");
 	std::string directory = "script-assemblies/";
-	std::vector<std::string> script_assembly_names = get_file_entries(directory + "*.dll", "scriptcore.dll");
+	std::vector<std::string> script_assembly_names = get_file_entries(directory, directory + "scriptcore.dll");
 	for (auto filename : script_assembly_names) {
-		script_assemblies.push_back(script_engine->load_assembly(directory + filename));
+		script_assemblies.push_back(script_engine->load_assembly(filename));
 	}
 	fe_engine::reference<fe_engine::cs_class> enemy_script;
 	for (auto assembly : script_assemblies) {
