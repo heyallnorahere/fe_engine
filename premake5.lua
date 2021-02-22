@@ -85,10 +85,6 @@ project "entrypoint"
         "scriptcore",
         "sample-scripts"
     }
-    postbuildcommands {
-        '{COPY} "%{cfg.targetdir}/../scriptcore/scriptcore.dll" "script-assemblies/"',
-        '{COPY} "%{cfg.targetdir}/../sample-scripts/sample-scripts.dll" "script-assemblies/"'
-    }
     filter "configurations:Debug"
         symbols "On"
         defines {
@@ -97,9 +93,18 @@ project "entrypoint"
     filter "configurations:Release"
         optimize "On"
     filter "system:windows"
-        prelinkcommands { 'del /q "script-assemblies\\*.dll"' }
+        prelinkcommands {
+            'del /q "script-assemblies\\*"',
+        }
         postbuildcommands {
-            '{COPY} "../vendor/binaries/%{cfg.buildcfg}/bin/*.dll" "%{cfg.targetdir}"'
+            '{COPY} "../vendor/binaries/windows/%{cfg.buildcfg}/bin/*.dll" "%{cfg.targetdir}\\"',
+            '{COPY} "%{cfg.targetdir}/../scriptcore/scriptcore.dll" "script-assemblies\\"',
+            '{COPY} "%{cfg.targetdir}/../sample-scripts/sample-scripts.dll" "script-assemblies\\"'
+        }
+    filter "system:not windows"
+        postbuildcommands {
+            '{COPY} "%{cfg.targetdir}/../scriptcore/scriptcore.dll" "script-assemblies/"',
+            '{COPY} "%{cfg.targetdir}/../sample-scripts/sample-scripts.dll" "script-assemblies/"'
         }
     filter "system:macosx"
         links {

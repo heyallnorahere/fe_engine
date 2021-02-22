@@ -5,10 +5,10 @@
 static std::vector<std::string> get_file_entries(const std::string& directory, const std::string& exclude = "") {
 	std::vector<std::string> filenames;
 	for (const auto& n : std::filesystem::directory_iterator(directory)) {
-		if (n.path() == exclude && !exclude.empty()) {
+		if (n.path().string() == exclude && !exclude.empty()) {
 			continue;
 		}
-		filenames.push_back(n.path());
+		filenames.push_back(n.path().string());
 	}
 	return filenames;
 }

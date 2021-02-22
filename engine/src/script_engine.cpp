@@ -9,12 +9,12 @@
 #include <iostream>
 #include "script_wrappers.h"
 #include "buffer.h"
-#ifdef _WIN32
+#ifdef FEENGINE_WINDOWS
 #include <Windows.h>
 #endif
 namespace fe_engine {
 	util::buffer* read_file(const char* filepath) {
-#ifdef _WIN32
+#ifdef FEENGINE_WINDOWS
 		HANDLE file = CreateFileA(filepath, FILE_READ_ACCESS, NULL, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (file == INVALID_HANDLE_VALUE) {
 			return NULL;
