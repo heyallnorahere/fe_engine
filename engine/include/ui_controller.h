@@ -4,13 +4,14 @@
 #include "renderer.h"
 #include "map.h"
 #include "controller.h"
+#include "input_mapper.h"
 #include <string>
 #include <vector>
 #include <functional>
 namespace fe_engine {
 	class ui_controller : public ref_counted {
 	public:
-		ui_controller(reference<renderer> r, reference<map> m, reference<controller> c);
+		ui_controller(reference<renderer> r, reference<map> m, reference<input_mapper> im);
 		void set_info_panel_target(reference<unit> u);
 		void set_unit_menu_target(reference<unit> u, s8vec2 original_position);
 		void update();
@@ -35,7 +36,7 @@ namespace fe_engine {
 		};
 		reference<renderer> m_renderer;
 		reference<map> m_map;
-		reference<controller> m_controller;
+		reference<input_mapper> m_imapper;
 		reference<unit> m_info_panel_target, m_unit_menu_target;
 		std::vector<unit_menu_item> m_menu_items;
 		menu_state m_unit_menu_state;

@@ -1,6 +1,7 @@
 #pragma once
 #include "reference.h"
 #include "controller.h"
+#include "input_mapper.h"
 #include "_math.h"
 #include "map.h"
 #include "renderer.h"
@@ -10,11 +11,11 @@
 namespace fe_engine {
 	class player : public ref_counted {
 	public:
-		player(reference<controller> c, reference<map> m, reference<ui_controller> uc, reference<phase_manager> pm);
+		player(reference<input_mapper> im, reference<map> m, reference<ui_controller> uc, reference<phase_manager> pm);
 		void update();
 		void render_cursor(const reference<renderer>& r);
 	private:
-		reference<controller> m_controller;
+		reference<input_mapper> m_imapper;
 		reference<map> m_map;
 		reference<ui_controller> m_ui_controller;
 		reference<unit> m_selected;

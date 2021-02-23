@@ -2,10 +2,10 @@
 #include <sstream>
 #include <cassert>
 namespace fe_engine {
-	ui_controller::ui_controller(reference<renderer> r, reference<map> m, reference<controller> c) {
+	ui_controller::ui_controller(reference<renderer> r, reference<map> m, reference<input_mapper> im) {
 		this->m_renderer = r;
 		this->m_map = m;
-		this->m_controller = c;
+		this->m_imapper = im;
 	}
 	void ui_controller::set_info_panel_target(reference<unit> u) {
 		this->m_info_panel_target = u;
@@ -20,19 +20,19 @@ namespace fe_engine {
 	}
 	void ui_controller::update() {
 		if (this->m_unit_menu_target) {
-			controller::buttons buttons = this->m_controller->get_state();
-			if (buttons.up.down && this->m_unit_menu_index > 0) {
+			auto input = this->m_imapper->get_state();
+			if (input.up && this->m_unit_menu_index > 0) {
 				this->m_unit_menu_index--;
 			}
 			switch (this->m_unit_menu_state.page) {
 			case menu_page::base:
-				if (buttons.down.down && this->m_unit_menu_index < this->m_menu_items.size() - 1) {
+				if (input.down && this->m_unit_menu_index < this->m_menu_items.size() - 1) {
 					this->m_unit_menu_index++;
 				}
-				if (buttons.a.down && this->m_can_close) {
+				if (input.ok && this->m_can_close) {
 					this->m_menu_items[this->m_unit_menu_index].on_select(reference<ui_controller>(this));
 				}
-				if (buttons.b.down && this->m_can_close) {
+				if (input.back && this->m_can_close) {
 					this->m_unit_menu_target->move(this->m_unit_menu_state.original_position - this->m_unit_menu_target->get_pos(), -1);
 					this->close_unit_menu();
 					this->m_info_panel_target.reset();
@@ -41,17 +41,17 @@ namespace fe_engine {
 			case menu_page::item:
 			{
 				std::list<reference<item>> inventory = this->m_unit_menu_target->get_inventory();
-				if (buttons.down.down && this->m_unit_menu_index < inventory.size() - 1) {
+				if (input.down && this->m_unit_menu_index < inventory.size() - 1) {
 					this->m_unit_menu_index++;
 				}
-				if (buttons.a.down && this->m_can_close && inventory.size() > 0) {
+				if (input.ok && this->m_can_close && inventory.size() > 0) {
 					auto it = inventory.begin();
 					std::advance(it, this->m_unit_menu_index);
 					this->m_unit_menu_state.selected_item = *it;
 					this->m_unit_menu_state.page = menu_page::item_select;
 					this->m_unit_menu_index = 0;
 				}
-				if (buttons.b.down && this->m_can_close) {
+				if (input.back && this->m_can_close) {
 					this->m_unit_menu_state.page = menu_page::base;
 					this->m_unit_menu_index = 0;
 				}
@@ -60,13 +60,13 @@ namespace fe_engine {
 			case menu_page::item_select:
 			{
 				std::vector<unit_menu_item> menu_items = this->generate_menu_items(this->m_unit_menu_state.selected_item);
-				if (buttons.down.down && this->m_unit_menu_index < menu_items.size() - 1) {
+				if (input.down && this->m_unit_menu_index < menu_items.size() - 1) {
 					this->m_unit_menu_index++;
 				}
-				if (buttons.a.down && this->m_can_close) {
+				if (input.ok && this->m_can_close) {
 					menu_items[this->m_unit_menu_index].on_select(reference<ui_controller>(this));
 				}
-				if (buttons.b.down && this->m_can_close) {
+				if (input.back && this->m_can_close) {
 					this->m_unit_menu_state.page = menu_page::item;
 					this->m_unit_menu_state.selected_item.reset();
 					this->m_unit_menu_index = 0;
@@ -76,14 +76,14 @@ namespace fe_engine {
 			case menu_page::enemy_select:
 			{
 				std::vector<reference<unit>> units = this->get_attackable_units(this->m_unit_menu_target);
-				if (buttons.down.down && this->m_unit_menu_index < units.size() - 1) {
+				if (input.down && this->m_unit_menu_index < units.size() - 1) {
 					this->m_unit_menu_index++;
 				}
-				if (buttons.a.down && this->m_can_close) {
+				if (input.ok && this->m_can_close) {
 					this->m_unit_menu_target->attack(units[this->m_unit_menu_index]);
 					this->close_unit_menu();
 				}
-				if (buttons.b.down && this->m_can_close) {
+				if (input.back && this->m_can_close) {
 					this->m_unit_menu_state.page = menu_page::base;
 					this->m_unit_menu_index = 0;
 				}
