@@ -86,6 +86,14 @@ namespace FEEngine {
             }
             Move_Native(this.Index, to_move);
         }
+        public ulong GetInventorySize()
+        {
+            return GetInventorySize_Native(this.Index);
+        }
+        public Item GetInventoryItem(ulong index)
+        {
+            return Item.MakeFromInventoryIndex(this, index);
+        }
         internal Unit(ulong index)
         {
             this.Index = index;
@@ -119,6 +127,8 @@ namespace FEEngine {
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void SetStats_Native(ulong index, UnitStats stats);
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern ulong GetInventorySize_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void Move_Native(ulong index, Vec2 offset);
         [MethodImpl(MethodImplOptions.InternalCall)]

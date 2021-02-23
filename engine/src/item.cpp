@@ -8,6 +8,9 @@ namespace fe_engine {
 	std::string item::get_name() const {
 		return this->m_name;
 	}
+	void item::set_name(const std::string& name) {
+		this->m_name = name;
+	}
 	uint32_t item::get_item_flags() const {
 		return this->m_flags;
 	}

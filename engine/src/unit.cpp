@@ -20,10 +20,10 @@ namespace fe_engine {
 	s8vec2 unit::get_pos() const {
 		return this->m_pos;
 	}
-	unit::unit_stats::stat_type unit::get_current_hp() const {
+	int16_t unit::get_current_hp() const {
 		return this->m_hp;
 	}
-	void unit::set_current_hp(unit_stats::stat_type hp) {
+	void unit::set_current_hp(int16_t hp) {
 		this->m_hp = hp;
 		if (this->m_hp > this->m_stats.max_hp) {
 			this->m_hp = this->m_stats.max_hp;
@@ -87,18 +87,18 @@ namespace fe_engine {
 			magic = true;
 			white_magic = true;
 		}
-		unit_stats::stat_type defense = other->m_stats.defense;
+		int16_t defense = other->m_stats.defense;
 		if (magic && !white_magic) defense = other->m_stats.resistance;
-		packet.might = weapon_stats.attack + (magic ? this->m_stats.magic : this->m_stats.strength) - defense;
-		packet.hit = weapon_stats.hit_rate + this->m_stats.dexterity - other->m_stats.dexterity;
-		packet.crit = weapon_stats.critical_rate;
+		packet.might = (int16_t)weapon_stats.attack + (magic ? this->m_stats.magic : this->m_stats.strength) - defense;
+		packet.hit = (int16_t)weapon_stats.hit_rate + this->m_stats.dexterity - other->m_stats.dexterity;
+		packet.crit = (int16_t)weapon_stats.critical_rate;
 		this->m_equipped_weapon->consume_durability();
 		return packet;
 	}
 	void unit::receive_attack_packet(attack_packet packet, reference<unit> sender) {
-		uint8_t offset = this->m_stats.luck - sender->m_stats.luck;
-		uint8_t hit = static_cast<uint8_t>(random_number_generator::generate(0, 100)) + offset;
-		uint8_t crit = static_cast<uint8_t>(random_number_generator::generate(0, 100)) + offset;
+		int16_t offset = this->m_stats.luck - sender->m_stats.luck;
+		int16_t hit = static_cast<int16_t>(random_number_generator::generate(0, 100)) + offset;
+		int16_t crit = static_cast<int16_t>(random_number_generator::generate(0, 100)) + offset;
 		if (hit <= packet.hit) {
 			if (crit <= packet.crit) {
 				packet.might *= 3;
@@ -106,10 +106,10 @@ namespace fe_engine {
 			this->m_hp -= packet.might;
 		}
 	}
-	unit::unit_stats::stat_type unit::get_available_movement() const {
+	int16_t unit::get_available_movement() const {
 		return this->m_movement;
 	}
-	void unit::set_available_movement(unit_stats::stat_type mv) {
+	void unit::set_available_movement(int16_t mv) {
 		this->m_movement = mv;
 	}
 	void unit::refresh_movement() {

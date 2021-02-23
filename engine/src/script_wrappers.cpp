@@ -5,6 +5,7 @@
 #include <limits>
 #include <mono/jit/jit.h>
 static fe_engine::reference<fe_engine::map> script_wrapper_map;
+static MonoDomain* domain;
 namespace fe_engine {
 	static renderer::color parse_cs_color_enum(int color) {
 		switch (color) {
@@ -31,9 +32,15 @@ namespace fe_engine {
 	static std::string from_mono(MonoString* str) {
 		return std::string(mono_string_to_utf8(str));
 	}
+	static MonoString* to_mono(const std::string& str) {
+		return mono_string_new(domain, str.c_str());
+	}
 	namespace script_wrappers {
 		void set_map(reference<map> m) {
 			script_wrapper_map = m;
+		}
+		void set_domain(MonoDomain* domain) {
+			::domain = domain;
 		}
 		void FEEngine_Unit_GetPosition(uint64_t unit_index, s32vec2* out_position) {
 			*out_position = script_wrapper_map->get_unit(unit_index)->get_pos();
@@ -47,13 +54,16 @@ namespace fe_engine {
 			return (uint32_t)script_wrapper_map->get_unit(unit_index)->get_current_hp();
 		}
 		void FEEngine_Unit_SetHP(uint64_t unit_index, uint32_t hp) {
-			script_wrapper_map->get_unit(unit_index)->set_current_hp((unit::unit_stats::stat_type)hp);
+			script_wrapper_map->get_unit(unit_index)->set_current_hp((int16_t)hp);
 		}
 		uint32_t FEEngine_Unit_GetCurrentMovement(uint64_t unit_index) {
 			return (uint32_t)script_wrapper_map->get_unit(unit_index)->get_available_movement();
 		}
 		void FEEngine_Unit_SetCurrentMovement(uint64_t unit_index, uint32_t mv) {
-			script_wrapper_map->get_unit(unit_index)->set_available_movement((unit::unit_stats::stat_type)mv);
+			script_wrapper_map->get_unit(unit_index)->set_available_movement((int16_t)mv);
+		}
+		uint64_t FEEngine_Unit_GetInventorySize(uint64_t unit_index) {
+			return script_wrapper_map->get_unit(unit_index)->get_inventory().size();
 		}
 		unit::unit_stats FEEngine_Unit_GetStats(uint64_t unit_index) {
 			return script_wrapper_map->get_unit(unit_index)->get_stats();
@@ -94,6 +104,20 @@ namespace fe_engine {
 			size_t width, height;
 			r->get_buffer_size(width, height);
 			return { (int32_t)width, (int32_t)height };
+		}
+		MonoString* FEEngine_Item_GetName(uint64_t unit_index, uint64_t item_index) {
+			std::list<reference<item>>& inventory = script_wrapper_map->get_unit(unit_index)->get_inventory();
+			std::list<reference<item>>::iterator it = inventory.begin();
+			std::advance(it, item_index);
+			reference<item> i = *it;
+			return to_mono(i->get_name());
+		}
+		void FEEngine_Item_SetName(uint64_t unit_index, uint64_t item_index, MonoString* name) {
+			std::list<reference<item>>& inventory = script_wrapper_map->get_unit(unit_index)->get_inventory();
+			std::list<reference<item>>::iterator it = inventory.begin();
+			std::advance(it, item_index);
+			reference<item> i = *it;
+			i->set_name(from_mono(name));
 		}
 	}
 }

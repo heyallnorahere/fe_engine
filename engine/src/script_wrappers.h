@@ -5,10 +5,12 @@
 #include "renderer.h"
 extern "C" {
 	typedef struct _MonoString MonoString;
+	typedef struct _MonoDomain MonoDomain;
 }
 namespace fe_engine {
 	namespace script_wrappers {
 		void set_map(reference<map> m);
+		void set_domain(MonoDomain* domain);
 		// unit class
 		void FEEngine_Unit_GetPosition(uint64_t unit_index, s32vec2* out_position);
 		void FEEngine_Unit_SetPosition(uint64_t unit_index, s32vec2 in_position);
@@ -18,6 +20,7 @@ namespace fe_engine {
 		void FEEngine_Unit_SetStats(uint64_t unit_index, unit::unit_stats stats);
 		uint32_t FEEngine_Unit_GetCurrentMovement(uint64_t unit_index);
 		void FEEngine_Unit_SetCurrentMovement(uint64_t unit_index, uint32_t mv);
+		uint64_t FEEngine_Unit_GetInventorySize(uint64_t unit_index);
 		void FEEngine_Unit_Move(uint64_t unit_index, s32vec2 offset);
 		uint64_t FEEngine_Unit_GetUnitAt(s32vec2 position);
 		// map class
@@ -27,5 +30,8 @@ namespace fe_engine {
 		void FEEngine_Renderer_RenderCharAt(renderer* address, s32vec2 position, char character, int color);
 		void FEEngine_Renderer_RenderStringAt(renderer* address, s32vec2 position, MonoString* text, int color);
 		s32vec2 FEEngine_Renderer_GetBufferSize(renderer* address);
+		// item class
+		MonoString* FEEngine_Item_GetName(uint64_t unit_index, uint64_t item_index);
+		void FEEngine_Item_SetName(uint64_t unit_index, uint64_t item_index, MonoString* name);
 	}
 }

@@ -66,7 +66,7 @@ int main() {
 		}
 	}
 	// load json files
-	fe_engine::reference<json_parser> parser = fe_engine::reference<json_parser>::create("data/map.json");
+	fe_engine::reference<json_parser> parser = fe_engine::reference<json_parser>::create("data/map.json", script_assemblies[0]);
 	for (size_t i = 0; i < parser->get_unit_count(); i++) {
 		auto unit = parser->make_unit_from_index(i);
 		map->add_unit(unit);

@@ -76,7 +76,8 @@ project "entrypoint"
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
     files {
         "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp"
+        "%{prj.name}/src/**.cpp",
+        "%{prj.name}/data/**.json"
     }
     sysincludedirs {
         "engine/include",

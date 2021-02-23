@@ -39,15 +39,16 @@ namespace json_types {
 		item_data* pointer;
 	};
 	struct weapon_data : public item_subdata {
-		uint8_t attack;
-		uint8_t hit;
-		uint8_t crit;
-		uint8_t durability;
+		int16_t attack;
+		int16_t hit;
+		int16_t crit;
+		int16_t durability;
 		s8vec2 range;
 		weapon::type type;
 	};
 	struct consumable_data : public item_subdata {
-		// todo: implement
+		bool has_behavior;
+		std::string behavior_name;
 	};
 	struct item_data {
 		std::string name;
@@ -67,10 +68,10 @@ namespace json_types {
 		j["name"].get_to(id.name);
 		j["is weapon"].get_to(id.is_weapon);
 		if (id.is_weapon) {
-			id.data = new weapon_data;
+			id.data = reference<weapon_data>::create();
 		}
 		else {
-			id.data = new consumable_data;
+			id.data = reference<consumable_data>::create();
 		}
 		id.data->pointer = &id;
 		j["data"].get_to(id.data);
@@ -84,6 +85,11 @@ namespace json_types {
 			j["durability"].get_to(wd->durability);
 			j["range"].get_to(wd->range);
 			j["type"].get_to(wd->type);
+		}
+		else {
+			reference<consumable_data> cd = isd;
+			cd->has_behavior = j.find("behavior") != j.end();
+			if (cd->has_behavior) j["behavior"].get_to(cd->behavior_name);
 		}
 	}
 }
@@ -103,10 +109,11 @@ reference<unit> json_parser::make_unit_from_index(size_t index) {
 	}
 	return unit_object;
 }
-json_parser::json_parser(const std::string& json_path) {
+json_parser::json_parser(const std::string& json_path, fe_engine::reference<fe_engine::assembly> script_assembly) {
 	std::ifstream file(json_path);
 	file >> this->m_file;
 	file.close();
+	this->m_script_assembly = script_assembly;
 	this->load_items();
 }
 void json_parser::load_items() {

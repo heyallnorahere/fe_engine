@@ -11,6 +11,7 @@ namespace fe_engine {
 		using on_use_proc = void(*)(unit* u);
 		item(const std::string& name, uint32_t flags = 0, on_use_proc on_use = NULL);
 		std::string get_name() const;
+		void set_name(const std::string& name);
 		uint32_t get_item_flags() const;
 		on_use_proc get_on_use_proc() const;
 	protected:

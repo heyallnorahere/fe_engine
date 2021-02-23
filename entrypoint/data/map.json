@@ -1,10 +1,10 @@
 {
   "items": [
     {
-      "name": "RESERVE",
+      "name": "Generic sword",
       "is weapon": true,
       "data": {
-        "attack": 1,
+        "attack": 100,
         "hit": 100,
         "crit": 100,
         "durability": 100,
