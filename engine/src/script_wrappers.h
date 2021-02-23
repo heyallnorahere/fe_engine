@@ -3,6 +3,7 @@
 #include "map.h"
 #include "unit.h"
 #include "renderer.h"
+#include "weapon.h"
 extern "C" {
 	typedef struct _MonoString MonoString;
 	typedef struct _MonoDomain MonoDomain;
@@ -22,6 +23,7 @@ namespace fe_engine {
 		void FEEngine_Unit_SetCurrentMovement(uint64_t unit_index, uint32_t mv);
 		uint64_t FEEngine_Unit_GetInventorySize(uint64_t unit_index);
 		void FEEngine_Unit_Move(uint64_t unit_index, s32vec2 offset);
+		bool FEEngine_Unit_HasWeaponEquipped(uint64_t unit_index);
 		uint64_t FEEngine_Unit_GetUnitAt(s32vec2 position);
 		// map class
 		uint64_t FEEngine_Map_GetUnitCount();
@@ -34,5 +36,9 @@ namespace fe_engine {
 		MonoString* FEEngine_Item_GetName(uint64_t unit_index, uint64_t item_index);
 		void FEEngine_Item_SetName(uint64_t unit_index, uint64_t item_index, MonoString* name);
 		void FEEngine_Item_Use(uint64_t unit_index, uint64_t item_index);
+		bool FEEngine_Item_IsWeapon(uint64_t unit_index, uint64_t item_index);
+		// weapon class
+		weapon::weapon_stats FEEngine_Weapon_GetStats(uint64_t unit, uint64_t index);
+		void FEEngine_Weapon_SetStats(uint64_t unit, uint64_t index, weapon::weapon_stats stats);
 	}
 }

@@ -75,6 +75,9 @@ namespace fe_engine {
 		void FEEngine_Unit_Move(uint64_t unit_index, s32vec2 offset) {
 			script_wrapper_map->get_unit(unit_index)->move(offset);
 		}
+		bool FEEngine_Unit_HasWeaponEquipped(uint64_t unit_index) {
+			return script_wrapper_map->get_unit(unit_index)->get_equipped_weapon();
+		}
 		uint64_t FEEngine_Unit_GetUnitAt(s32vec2 position) {
 			for (uint64_t i = 0; i < script_wrapper_map->get_unit_count(); i++) {
 				if (script_wrapper_map->get_unit(i)->get_pos() == (s8vec2)position) {
@@ -108,16 +111,28 @@ namespace fe_engine {
 		}
 		MonoString* FEEngine_Item_GetName(uint64_t unit_index, uint64_t item_index) {
 			std::list<reference<item>>& inventory = script_wrapper_map->get_unit(unit_index)->get_inventory();
-			std::list<reference<item>>::iterator it = inventory.begin();
-			std::advance(it, item_index);
-			reference<item> i = *it;
+			reference<item> i;
+			if (item_index != inventory.size()) {
+				std::list<reference<item>>::iterator it = inventory.begin();
+				std::advance(it, item_index);
+				i = *it;
+			}
+			else {
+				i = script_wrapper_map->get_unit(unit_index)->get_equipped_weapon();
+			}
 			return to_mono(i->get_name());
 		}
 		void FEEngine_Item_SetName(uint64_t unit_index, uint64_t item_index, MonoString* name) {
 			std::list<reference<item>>& inventory = script_wrapper_map->get_unit(unit_index)->get_inventory();
-			std::list<reference<item>>::iterator it = inventory.begin();
-			std::advance(it, item_index);
-			reference<item> i = *it;
+			reference<item> i;
+			if (item_index != inventory.size()) {
+				std::list<reference<item>>::iterator it = inventory.begin();
+				std::advance(it, item_index);
+				i = *it;
+			}
+			else {
+				i = script_wrapper_map->get_unit(unit_index)->get_equipped_weapon();
+			}
 			i->set_name(from_mono(name));
 		}
 		void FEEngine_Item_Use(uint64_t unit_index, uint64_t item_index) {
@@ -133,6 +148,44 @@ namespace fe_engine {
 				ib->on_use();
 			}
 			inventory.remove_if([&](reference<item> _i) { return _i.get() == i.get(); });
+		}
+		bool FEEngine_Item_IsWeapon(uint64_t unit_index, uint64_t item_index) {
+			reference<unit> u = script_wrapper_map->get_unit(unit_index);
+			std::list<reference<item>>& inventory = u->get_inventory();
+			std::list<reference<item>>::iterator it = inventory.begin();
+			std::advance(it, item_index);
+			reference<item> i = *it;
+			return i->get_item_flags() & item::weapon;
+		}
+		weapon::weapon_stats FEEngine_Weapon_GetStats(uint64_t unit, uint64_t index) {
+			reference<::fe_engine::unit> u = script_wrapper_map->get_unit(unit);
+			std::list<reference<item>>& inventory = u->get_inventory();
+			reference<weapon> w;
+			if (index != inventory.size()) {
+				std::list<reference<item>>::iterator it = inventory.begin();
+				std::advance(it, index);
+				w = *it;
+			}
+			else {
+				w = u->get_equipped_weapon();
+			}
+			assert(w);
+			return w->get_stats();
+		}
+		void FEEngine_Weapon_SetStats(uint64_t unit, uint64_t index, weapon::weapon_stats stats) {
+			reference<::fe_engine::unit> u = script_wrapper_map->get_unit(unit);
+			std::list<reference<item>>& inventory = u->get_inventory();
+			reference<weapon> w;
+			if (index != inventory.size()) {
+				std::list<reference<item>>::iterator it = inventory.begin();
+				std::advance(it, index);
+				w = *it;
+			}
+			else {
+				w = u->get_equipped_weapon();
+			}
+			assert(w);
+			w->get_stats() = stats;
 		}
 	}
 }

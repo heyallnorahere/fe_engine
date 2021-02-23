@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using FEEngine.Math;
+
 namespace FEEngine {
     public class Unit {
         public enum Affiliation
@@ -94,6 +95,22 @@ namespace FEEngine {
         {
             return Item.MakeFromInventoryIndex(this, index);
         }
+        public Weapon GetInventoryWeapon(ulong index)
+        {
+            return Weapon.MakeFromInventoryIndex(this, index);
+        }
+        public Weapon GetEquippedWeapon()
+        {
+            if (!this.HasWeaponEquipped())
+            {
+                throw new Exception("No weapon has been equipped!");
+            }
+            return Weapon.MakeFromInventoryIndex(this, this.GetInventorySize());
+        }
+        public bool HasWeaponEquipped()
+        {
+            return HasWeaponEquipped_Native(this.Index);
+        }
         internal Unit(ulong index)
         {
             this.Index = index;
@@ -131,6 +148,8 @@ namespace FEEngine {
         private static extern ulong GetInventorySize_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void Move_Native(ulong index, Vec2 offset);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool HasWeaponEquipped_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern ulong GetUnitAt_Native(Vec2 position);
     }

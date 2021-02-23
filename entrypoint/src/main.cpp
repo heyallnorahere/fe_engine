@@ -31,7 +31,7 @@ int main() {
 	// create a renderer
 	fe_engine::reference<fe_engine::renderer> renderer = fe_engine::reference<fe_engine::renderer>::create();
 	// resize the buffer
-	renderer->set_buffer_size((size_t)((double)width * 4.5), height + 5);
+	renderer->set_buffer_size((size_t)((double)width * 4.5), height * 3);
 	// set stats for placeholder units
 	fe_engine::unit::unit_stats stats;
 	memset(&stats, 0, sizeof(fe_engine::unit::unit_stats));
@@ -93,6 +93,7 @@ int main() {
 		u = fe_engine::reference<fe_engine::unit>::create(stats, fe_engine::u8vec2{ 18, 8 }, fe_engine::unit_affiliation::enemy, map.get());
 		u->get_inventory().push_back(fe_engine::reference<fe_engine::item>::create("Vulnerary", fe_engine::item::usable, fe_engine::reference<fe_engine::item_behavior>::create(vulnerary_script, core)));
 		u->set_equipped_weapon(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::darkmagic));
+		u->get_inventory().push_back(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::axe));
 		u->attach_behavior(fe_engine::reference<fe_engine::behavior>::create(enemy_script, core), map->get_unit_count());
 		map->add_unit(u);
 		u = fe_engine::reference<fe_engine::unit>::create(stats, fe_engine::u8vec2{ 1, 8 }, fe_engine::unit_affiliation::ally, map.get());

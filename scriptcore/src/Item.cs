@@ -23,7 +23,15 @@ namespace FEEngine
         }
         public void Use()
         {
+            if (this.IsWeapon())
+            {
+                return;
+            }
             Use_Native(this.parentIndex, this.Index);
+        }
+        public bool IsWeapon()
+        {
+            return IsWeapon_Native(this.parentIndex, this.Index);
         }
         protected Item(ulong parent, ulong inventoryIndex)
         {
@@ -40,5 +48,7 @@ namespace FEEngine
         private static extern void SetName_Native(ulong unit, ulong index, String name);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void Use_Native(ulong unit, ulong index);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsWeapon_Native(ulong unit, ulong index);
     }
 }

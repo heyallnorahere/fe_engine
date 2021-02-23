@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <cassert>
 #include "script_wrappers.h"
 #include "buffer.h"
 #ifdef FEENGINE_WINDOWS
@@ -77,7 +78,9 @@ namespace fe_engine {
 	}
 	MonoObject* call_method(MonoObject* object, MonoMethod* method, void** params = NULL) {
 		MonoObject* exception = NULL;
-		return mono_runtime_invoke(method, object, params, &exception);
+		MonoObject* return_value = mono_runtime_invoke(method, object, params, &exception);
+		assert(!exception);
+		return return_value;
 	}
 	MonoClassField* get_field_id(MonoClass* _class, const std::string& name) {
 		return mono_class_get_field_from_name(_class, name.c_str());
@@ -130,6 +133,7 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.Unit::GetStats_Native", (void*)script_wrappers::FEEngine_Unit_GetStats);
 		mono_add_internal_call("FEEngine.Unit::SetStats_Native", (void*)script_wrappers::FEEngine_Unit_SetStats);
 		mono_add_internal_call("FEEngine.Unit::Move_Native", (void*)script_wrappers::FEEngine_Unit_Move);
+		mono_add_internal_call("FEEngine.Unit::HasWeaponEquipped_Native", (void*)script_wrappers::FEEngine_Unit_HasWeaponEquipped);
 		mono_add_internal_call("FEEngine.Unit::GetUnitAt_Native", (void*)script_wrappers::FEEngine_Unit_GetUnitAt);
 		mono_add_internal_call("FEEngine.Map::GetUnitCount_Native", (void*)script_wrappers::FEEngine_Map_GetUnitCount);
 		mono_add_internal_call("FEEngine.Map::GetSize_Native", (void*)script_wrappers::FEEngine_Map_GetSize);
@@ -139,6 +143,9 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.Item::GetName_Native", (void*)script_wrappers::FEEngine_Item_GetName);
 		mono_add_internal_call("FEEngine.Item::SetName_Native", (void*)script_wrappers::FEEngine_Item_SetName);
 		mono_add_internal_call("FEEngine.Item::Use_Native", (void*)script_wrappers::FEEngine_Item_Use);
+		mono_add_internal_call("FEEngine.Item::IsWeapon_Native", (void*)script_wrappers::FEEngine_Item_IsWeapon);
+		mono_add_internal_call("FEEngine.Weapon::GetStats_Native", (void*)script_wrappers::FEEngine_Weapon_GetStats);
+		mono_add_internal_call("FEEngine.Weapon::SetStats_Native", (void*)script_wrappers::FEEngine_Weapon_SetStats);
 	}
 	void script_engine::init_engine(const std::string& core_assembly_path, reference<map> m) {
 		this->init_mono();

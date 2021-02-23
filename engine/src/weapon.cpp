@@ -39,7 +39,7 @@ namespace fe_engine {
 	weapon::type weapon::get_type() const {
 		return this->m_type;
 	}
-	weapon::weapon_stats weapon::get_stats() const {
+	weapon::weapon_stats& weapon::get_stats() {
 		return this->m_stats;
 	}
 	int32_t weapon::get_current_durability() const {
