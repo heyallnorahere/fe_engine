@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using FEEngine.Math;
 
 namespace FEEngine
 {
@@ -32,6 +33,15 @@ namespace FEEngine
         public void OnUpdate()
         {
             Console.WriteLine("whoa wacky");
+        }
+    }
+    class TestItem : ItemBehavior
+    {
+        public void OnUse()
+        {
+            Vec2 pos = this.Parent.Parent.Position;
+            pos += new Vec2(1, 1);
+            this.Parent.Parent.Position = pos;
         }
     }
 }

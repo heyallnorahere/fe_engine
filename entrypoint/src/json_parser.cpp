@@ -102,18 +102,19 @@ reference<unit> json_parser::make_unit_from_index(size_t index) {
 	std::vector<json_types::unit_data> data;
 	this->m_file["units"].get_to(data);
 	json_types::unit_data current_unit = data[index];
-	reference<unit> unit_object = reference<unit>::create(current_unit.stats, current_unit.pos, current_unit.affiliation);
+	reference<unit> unit_object = reference<unit>::create(current_unit.stats, current_unit.pos, current_unit.affiliation, this->m_map.get());
 	if (current_unit.has_weapon) unit_object->set_equipped_weapon((reference<weapon>)this->m_items[current_unit.equipped_weapon]);
 	for (size_t index : current_unit.inventory) {
 		unit_object->get_inventory().push_back(this->m_items[index]);
 	}
 	return unit_object;
 }
-json_parser::json_parser(const std::string& json_path, fe_engine::reference<fe_engine::assembly> script_assembly) {
+json_parser::json_parser(const std::string& json_path, fe_engine::reference<fe_engine::assembly> script_assembly, fe_engine::reference<fe_engine::map> map) {
 	std::ifstream file(json_path);
 	file >> this->m_file;
 	file.close();
 	this->m_script_assembly = script_assembly;
+	this->m_map = map;
 	this->load_items();
 }
 void json_parser::load_items() {

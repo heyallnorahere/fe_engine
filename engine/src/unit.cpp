@@ -1,11 +1,18 @@
 #include "unit.h"
 #include "_random.h"
+#include "map.h"
+#ifdef max
+#undef max
+#endif
+#include <limits>
+#include <cassert>
 namespace fe_engine {
-	unit::unit(const unit_stats& stats, s8vec2 pos, unit_affiliation affiliation) {
+	unit::unit(const unit_stats& stats, s8vec2 pos, unit_affiliation affiliation, map* m) {
 		this->m_stats = stats;
 		this->m_pos = pos;
 		this->m_hp = this->m_stats.max_hp;
 		this->m_affiliation = affiliation;
+		this->m_map = m;
 		this->refresh_movement();
 	}
 	unit::~unit() {
@@ -39,6 +46,22 @@ namespace fe_engine {
 			}
 			return false;
 		});
+		for (size_t i = 0; i < this->m_inventory.size(); i++) {
+			std::list<reference<item>>::iterator it = this->m_inventory.begin();
+			std::advance(it, i);
+			reference<item> _i = *it;
+			if (!_i->initialized()) {
+				size_t unit_index = std::numeric_limits<size_t>::max();
+				for (size_t j = 0; j < this->m_map->get_unit_count(); j++) {
+					if (this->m_map->get_unit(j).get() == this) {
+						unit_index = j;
+						break;
+					}
+				}
+				assert(unit_index != std::numeric_limits<size_t>::max());
+				_i->init(i, unit_index);
+			}
+		}
 		if (this->m_equipped_weapon) {
 			if (this->m_equipped_weapon->get_current_durability() <= 0) {
 				this->m_equipped_weapon.reset();

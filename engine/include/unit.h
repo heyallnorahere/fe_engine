@@ -13,6 +13,7 @@ namespace fe_engine {
 		separate_enemy,
 		ally,
 	};
+	class map;
 	class unit : public ref_counted {
 	public:
 		struct unit_stats {
@@ -28,7 +29,7 @@ namespace fe_engine {
 			int16_t charm;
 			int16_t movement;
 		};
-		unit(const unit_stats& stats, s8vec2 pos, unit_affiliation affiliation);
+		unit(const unit_stats& stats, s8vec2 pos, unit_affiliation affiliation, map* m = NULL);
 		~unit();
 		const unit_stats& get_stats() const;
 		unit_stats& get_stats();
@@ -61,6 +62,7 @@ namespace fe_engine {
 		reference<weapon> m_equipped_weapon;
 		std::list<reference<item>> m_inventory;
 		reference<behavior> m_behavior;
+		map* m_map = NULL;
 		bool m_can_move;
 		attack_packet generate_attack_packet(reference<unit> other);
 		void receive_attack_packet(attack_packet packet, reference<unit> sender);

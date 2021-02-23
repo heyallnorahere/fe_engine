@@ -35,7 +35,11 @@ namespace Scripts
         public void OnRender(Renderer renderer)
         {
             Vec2 size = renderer.GetBufferSize();
-            renderer.RenderStringAt(new Vec2(0, size.Y - 1), this.Parent.GetInventorySize().ToString(), Renderer.Color.RED);
+            for (ulong i = 0; i < this.Parent.GetInventorySize(); i++)
+            {
+                Item item = this.Parent.GetInventoryItem(i);
+                renderer.RenderStringAt(new Vec2(0, size.Y - (1 + (int)i)), i.ToString() + ": " + item.Name, Renderer.Color.RED);
+            }
         }
     }
 }

@@ -232,9 +232,8 @@ namespace fe_engine {
 		std::vector<unit_menu_item> items;
 		if (i->get_item_flags() & item::usable) {
 			items.push_back({ "Use", [](reference<ui_controller> controller) {
-				item::on_use_proc proc = controller->m_unit_menu_state.selected_item->get_on_use_proc();
-				assert(proc);
-				proc(controller->m_unit_menu_target.get());
+				reference<item_behavior> behavior = controller->m_unit_menu_state.selected_item->get_behavior();
+				if (behavior) behavior->on_use();
 				controller->m_unit_menu_target->get_inventory().remove_if([&](reference<item> i) { return controller->m_unit_menu_state.selected_item.get() == i.get(); });
 				controller->close_unit_menu();
 			} });

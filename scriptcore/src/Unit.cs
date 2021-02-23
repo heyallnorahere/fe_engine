@@ -8,10 +8,10 @@ namespace FEEngine {
     public class Unit {
         public enum Affiliation
         {
-            player,
-            enemy,
-            third_army,
-            ally,
+            PLAYER,
+            ENEMY,
+            THIRD_ARMY,
+            ALLY,
         }
         public struct UnitStats
         {

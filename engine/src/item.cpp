@@ -1,9 +1,10 @@
 #include "item.h"
 namespace fe_engine {
-	item::item(const std::string& name, uint32_t flags, on_use_proc on_use) {
+	item::item(const std::string& name, uint32_t flags, reference<item_behavior> itembehavior) {
 		this->m_name = name;
 		this->m_flags = flags;
-		this->m_on_use = on_use;
+		this->m_behavior = itembehavior;
+		this->m_initialized = false;
 	}
 	std::string item::get_name() const {
 		return this->m_name;
@@ -14,7 +15,16 @@ namespace fe_engine {
 	uint32_t item::get_item_flags() const {
 		return this->m_flags;
 	}
-	item::on_use_proc item::get_on_use_proc() const {
-		return this->m_on_use;
+	bool item::initialized() {
+		return this->m_initialized;
+	}
+	void item::init(uint64_t index, uint64_t parent_index) {
+		if (this->m_behavior) {
+			this->m_behavior->on_attach(parent_index, index);
+		}
+		this->m_initialized = true;
+	}
+	reference<item_behavior> item::get_behavior() {
+		return this->m_behavior;
 	}
 }
