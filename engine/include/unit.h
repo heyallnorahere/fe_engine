@@ -17,25 +17,25 @@ namespace fe_engine {
 	class unit : public ref_counted {
 	public:
 		struct unit_stats {
-			int16_t level;
-			int16_t max_hp;
-			int16_t strength;
-			int16_t magic;
-			int16_t dexterity;
-			int16_t speed;
-			int16_t luck;
-			int16_t defense;
-			int16_t resistance;
-			int16_t charm;
-			int16_t movement;
+			int32_t level;
+			int32_t max_hp;
+			int32_t strength;
+			int32_t magic;
+			int32_t dexterity;
+			int32_t speed;
+			int32_t luck;
+			int32_t defense;
+			int32_t resistance;
+			int32_t charm;
+			int32_t movement;
 		};
 		unit(const unit_stats& stats, s8vec2 pos, unit_affiliation affiliation, map* m = NULL);
 		~unit();
 		const unit_stats& get_stats() const;
 		unit_stats& get_stats();
 		s8vec2 get_pos() const;
-		int16_t get_current_hp() const;
-		void set_current_hp(int16_t hp);
+		int32_t get_current_hp() const;
+		void set_current_hp(int32_t hp);
 		unit_affiliation get_affiliation() const;
 		void update();
 		void unit_update();
@@ -45,19 +45,19 @@ namespace fe_engine {
 		const std::list<reference<item>>& get_inventory() const;
 		std::list<reference<item>>& get_inventory();
 		void attack(reference<unit> to_attack);
-		int16_t get_available_movement() const;
-		void set_available_movement(int16_t mv);
+		int32_t get_available_movement() const;
+		void set_available_movement(int32_t mv);
 		void refresh_movement();
 		bool can_move() const;
 		void attach_behavior(reference<behavior> b, uint64_t map_index);
 		reference<behavior> get_behavior();
 	private:
 		struct attack_packet {
-			int16_t might, hit, crit;
+			int32_t might, hit, crit;
 		};
 		unit_stats m_stats;
 		s8vec2 m_pos;
-		int16_t m_hp, m_movement;
+		int32_t m_hp, m_movement;
 		unit_affiliation m_affiliation;
 		reference<weapon> m_equipped_weapon;
 		std::list<reference<item>> m_inventory;

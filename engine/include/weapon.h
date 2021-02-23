@@ -15,20 +15,20 @@ namespace fe_engine {
 			whitemagic = 'W',
 		};
 		struct weapon_stats {
-			int16_t attack;
-			int16_t hit_rate;
-			int16_t critical_rate;
-			int16_t durability;
-			vec2t<int16_t> range;
+			int32_t attack;
+			int32_t hit_rate;
+			int32_t critical_rate;
+			int32_t durability;
+			vec2t<int32_t> range;
 		};
 		weapon(type weapon_type, weapon_stats stats = { 1, 100, 0, 50, { 1, 1 } }, const std::string& name = "");
 		type get_type() const;
 		weapon_stats get_stats() const;
-		int16_t get_current_durability() const;
-		void consume_durability(int16_t uses = 1);
+		int32_t get_current_durability() const;
+		void consume_durability(int32_t uses = 1);
 	private:
 		type m_type;
 		weapon_stats m_stats;
-		int16_t m_durability;
+		int32_t m_durability;
 	};
 }

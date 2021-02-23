@@ -3,6 +3,7 @@
 #undef max
 #endif
 #include <limits>
+#include <cassert>
 #include <mono/jit/jit.h>
 static fe_engine::reference<fe_engine::map> script_wrapper_map;
 static MonoDomain* domain;
@@ -54,13 +55,13 @@ namespace fe_engine {
 			return (uint32_t)script_wrapper_map->get_unit(unit_index)->get_current_hp();
 		}
 		void FEEngine_Unit_SetHP(uint64_t unit_index, uint32_t hp) {
-			script_wrapper_map->get_unit(unit_index)->set_current_hp((int16_t)hp);
+			script_wrapper_map->get_unit(unit_index)->set_current_hp((int32_t)hp);
 		}
 		uint32_t FEEngine_Unit_GetCurrentMovement(uint64_t unit_index) {
 			return (uint32_t)script_wrapper_map->get_unit(unit_index)->get_available_movement();
 		}
 		void FEEngine_Unit_SetCurrentMovement(uint64_t unit_index, uint32_t mv) {
-			script_wrapper_map->get_unit(unit_index)->set_available_movement((int16_t)mv);
+			script_wrapper_map->get_unit(unit_index)->set_available_movement((int32_t)mv);
 		}
 		uint64_t FEEngine_Unit_GetInventorySize(uint64_t unit_index) {
 			return script_wrapper_map->get_unit(unit_index)->get_inventory().size();
@@ -118,6 +119,20 @@ namespace fe_engine {
 			std::advance(it, item_index);
 			reference<item> i = *it;
 			i->set_name(from_mono(name));
+		}
+		void FEEngine_Item_Use(uint64_t unit_index, uint64_t item_index) {
+			reference<unit> u = script_wrapper_map->get_unit(unit_index);
+			std::list<reference<item>>& inventory = u->get_inventory();
+			std::list<reference<item>>::iterator it = inventory.begin();
+			std::advance(it, item_index);
+			reference<item> i = *it;
+			assert(!i->used());
+			i->set_used(true);
+			reference<item_behavior> ib = i->get_behavior();
+			if (ib) {
+				ib->on_use();
+			}
+			inventory.remove_if([&](reference<item> _i) { return _i.get() == i.get(); });
 		}
 	}
 }

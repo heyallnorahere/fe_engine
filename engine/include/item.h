@@ -13,6 +13,8 @@ namespace fe_engine {
 		std::string get_name() const;
 		void set_name(const std::string& name);
 		uint32_t get_item_flags() const;
+		bool used();
+		void set_used(bool used);
 		bool initialized();
 		void init(uint64_t index, uint64_t parent_index);
 		reference<item_behavior> get_behavior();
@@ -20,6 +22,6 @@ namespace fe_engine {
 		std::string m_name;
 		uint32_t m_flags;
 		reference<item_behavior> m_behavior;
-		bool m_initialized;
+		bool m_initialized, m_used;
 	};
 }

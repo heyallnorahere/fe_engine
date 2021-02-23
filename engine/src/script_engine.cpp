@@ -138,6 +138,7 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.Renderer::GetBufferSize_Native", (void*)script_wrappers::FEEngine_Renderer_GetBufferSize);
 		mono_add_internal_call("FEEngine.Item::GetName_Native", (void*)script_wrappers::FEEngine_Item_GetName);
 		mono_add_internal_call("FEEngine.Item::SetName_Native", (void*)script_wrappers::FEEngine_Item_SetName);
+		mono_add_internal_call("FEEngine.Item::Use_Native", (void*)script_wrappers::FEEngine_Item_Use);
 	}
 	void script_engine::init_engine(const std::string& core_assembly_path, reference<map> m) {
 		this->init_mono();

@@ -9,7 +9,7 @@ namespace Scripts
 {
     class Vulnerary : ItemBehavior
     {
-        void OnUse()
+        public void OnUse()
         {
             uint hp = this.Parent.Parent.HP;
             uint maxHp = this.Parent.Parent.Stats.MaxHP;

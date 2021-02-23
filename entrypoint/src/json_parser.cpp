@@ -41,10 +41,10 @@ namespace json_types {
 		item_data* pointer;
 	};
 	struct weapon_data : public item_subdata {
-		int16_t attack;
-		int16_t hit;
-		int16_t crit;
-		int16_t durability;
+		int32_t attack;
+		int32_t hit;
+		int32_t crit;
+		int32_t durability;
 		s8vec2 range;
 		weapon::type type;
 	};

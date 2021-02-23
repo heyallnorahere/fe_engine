@@ -22,14 +22,6 @@ namespace FEEngine
     }
     class TestBehavior : Behavior
     {
-        public void OnAttach()
-        {
-            // todo: attach
-        }
-        public void OnDetach()
-        {
-            // todo: detach
-        }
         public void OnUpdate()
         {
             Console.WriteLine("whoa wacky");

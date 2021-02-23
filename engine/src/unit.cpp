@@ -27,10 +27,10 @@ namespace fe_engine {
 	s8vec2 unit::get_pos() const {
 		return this->m_pos;
 	}
-	int16_t unit::get_current_hp() const {
+	int32_t unit::get_current_hp() const {
 		return this->m_hp;
 	}
-	void unit::set_current_hp(int16_t hp) {
+	void unit::set_current_hp(int32_t hp) {
 		this->m_hp = hp;
 		if (this->m_hp > this->m_stats.max_hp) {
 			this->m_hp = this->m_stats.max_hp;
@@ -110,29 +110,40 @@ namespace fe_engine {
 			magic = true;
 			white_magic = true;
 		}
-		int16_t defense = other->m_stats.defense;
+		int32_t defense = other->m_stats.defense;
 		if (magic && !white_magic) defense = other->m_stats.resistance;
-		packet.might = (int16_t)weapon_stats.attack + (magic ? this->m_stats.magic : this->m_stats.strength) - defense;
-		packet.hit = (int16_t)weapon_stats.hit_rate + this->m_stats.dexterity - other->m_stats.dexterity;
-		packet.crit = (int16_t)weapon_stats.critical_rate;
+		packet.might = (int32_t)weapon_stats.attack + (magic ? this->m_stats.magic : this->m_stats.strength) - defense;
+		packet.hit = (int32_t)weapon_stats.hit_rate + this->m_stats.dexterity - other->m_stats.dexterity;
+		packet.crit = (int32_t)weapon_stats.critical_rate;
 		this->m_equipped_weapon->consume_durability();
 		return packet;
 	}
 	void unit::receive_attack_packet(attack_packet packet, reference<unit> sender) {
-		int16_t offset = this->m_stats.luck - sender->m_stats.luck;
-		int16_t hit = static_cast<int16_t>(random_number_generator::generate(0, 100)) + offset;
-		int16_t crit = static_cast<int16_t>(random_number_generator::generate(0, 100)) + offset;
+		int32_t offset = this->m_stats.luck - sender->m_stats.luck;
+		int32_t hit = static_cast<int32_t>(random_number_generator::generate(0, 100)) + offset;
+		if (hit < 0)
+			hit = 0;
+		if (hit > 100)
+			hit = 100;
+		int32_t crit = static_cast<int32_t>(random_number_generator::generate(0, 100)) + offset;
+		if (crit < 0)
+			crit = 0;
+		if (crit > 100)
+			crit = 100;
 		if (hit <= packet.hit) {
 			if (crit <= packet.crit) {
 				packet.might *= 3;
 			}
+			if (packet.might > this->m_hp) {
+				packet.might = this->m_hp;
+			}
 			this->m_hp -= packet.might;
 		}
 	}
-	int16_t unit::get_available_movement() const {
+	int32_t unit::get_available_movement() const {
 		return this->m_movement;
 	}
-	void unit::set_available_movement(int16_t mv) {
+	void unit::set_available_movement(int32_t mv) {
 		this->m_movement = mv;
 	}
 	void unit::refresh_movement() {

@@ -25,21 +25,24 @@ namespace Scripts
         }
         public void OnUpdate()
         {
+            if (this.Parent.HP < this.Parent.Stats.MaxHP)
+            {
+                for (ulong i = 0; i < this.Parent.GetInventorySize(); i++)
+                {
+                    Item item = this.Parent.GetInventoryItem(i);
+                    if (item.Name == "Vulnerary")
+                    {
+                        item.Use();
+                        break;
+                    }
+                }
+            }
             Vec2 delta = new Vec2(0, 0);
             foreach (Unit u in units)
             {
                 delta += u.Position - this.Parent.Position;
             }
             this.Parent.Move(delta);
-        }
-        public void OnRender(Renderer renderer)
-        {
-            Vec2 size = renderer.GetBufferSize();
-            for (ulong i = 0; i < this.Parent.GetInventorySize(); i++)
-            {
-                Item item = this.Parent.GetInventoryItem(i);
-                renderer.RenderStringAt(new Vec2(0, size.Y - (1 + (int)i)), i.ToString() + ": " + item.Name, Renderer.Color.RED);
-            }
         }
     }
 }

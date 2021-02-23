@@ -5,6 +5,7 @@ namespace fe_engine {
 		this->m_flags = flags;
 		this->m_behavior = itembehavior;
 		this->m_initialized = false;
+		this->m_used = false;
 	}
 	std::string item::get_name() const {
 		return this->m_name;
@@ -14,6 +15,12 @@ namespace fe_engine {
 	}
 	uint32_t item::get_item_flags() const {
 		return this->m_flags;
+	}
+	bool item::used() {
+		return this->m_used;
+	}
+	void item::set_used(bool used) {
+		this->m_used = used;
 	}
 	bool item::initialized() {
 		return this->m_initialized;

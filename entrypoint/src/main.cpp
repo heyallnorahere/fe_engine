@@ -60,8 +60,8 @@ int main() {
 	for (auto filename : script_assembly_names) {
 		script_assemblies.push_back(script_engine->load_assembly(filename));
 	}
-	// load a test behavior
-	fe_engine::reference<fe_engine::cs_class> enemy_script;
+	// load test behaviors
+	fe_engine::reference<fe_engine::cs_class> enemy_script, vulnerary_script;
 	for (auto assembly : script_assemblies) {
 		fe_engine::reference<fe_engine::cs_class> cls = assembly->get_class("Scripts", "Enemy");
 		if (cls->raw()) {
@@ -69,6 +69,14 @@ int main() {
 			break;
 		}
 	}
+	for (auto assembly : script_assemblies) {
+		fe_engine::reference<fe_engine::cs_class> cls = assembly->get_class("Scripts", "Vulnerary");
+		if (cls->raw()) {
+			vulnerary_script = cls;
+			break;
+		}
+	}
+
 	// load json files
 	fe_engine::reference<json_parser> parser = fe_engine::reference<json_parser>::create("data/map.json", script_assemblies, core, map.get());
 	for (size_t i = 0; i < parser->get_unit_count(); i++) {
@@ -83,6 +91,7 @@ int main() {
 		u->get_inventory().push_back(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::axe));
 		map->add_unit(u);
 		u = fe_engine::reference<fe_engine::unit>::create(stats, fe_engine::u8vec2{ 18, 8 }, fe_engine::unit_affiliation::enemy, map.get());
+		u->get_inventory().push_back(fe_engine::reference<fe_engine::item>::create("Vulnerary", fe_engine::item::usable, fe_engine::reference<fe_engine::item_behavior>::create(vulnerary_script, core)));
 		u->set_equipped_weapon(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::darkmagic));
 		u->attach_behavior(fe_engine::reference<fe_engine::behavior>::create(enemy_script, core), map->get_unit_count());
 		map->add_unit(u);

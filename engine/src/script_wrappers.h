@@ -33,5 +33,6 @@ namespace fe_engine {
 		// item class
 		MonoString* FEEngine_Item_GetName(uint64_t unit_index, uint64_t item_index);
 		void FEEngine_Item_SetName(uint64_t unit_index, uint64_t item_index, MonoString* name);
+		void FEEngine_Item_Use(uint64_t unit_index, uint64_t item_index);
 	}
 }

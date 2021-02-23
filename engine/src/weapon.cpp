@@ -42,10 +42,10 @@ namespace fe_engine {
 	weapon::weapon_stats weapon::get_stats() const {
 		return this->m_stats;
 	}
-	int16_t weapon::get_current_durability() const {
+	int32_t weapon::get_current_durability() const {
 		return this->m_durability;
 	}
-	void weapon::consume_durability(int16_t uses) {
+	void weapon::consume_durability(int32_t uses) {
 		this->m_durability -= uses;
 	}
 }
