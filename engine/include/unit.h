@@ -25,7 +25,7 @@ namespace fe_engine {
 			stat_type speed;
 			stat_type luck;
 			stat_type defense;
-			stat_type resilience;
+			stat_type resistance;
 			stat_type charm;
 			stat_type movement;
 		};

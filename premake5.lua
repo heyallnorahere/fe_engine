@@ -8,6 +8,14 @@ workspace "fe_engine"
     flags {
         "MultiProcessorCompile"
     }
+    filter "system:windows"
+        defines {
+            "FEENGINE_WINDOWS"
+        }
+    filter "system:macosx"
+        defines {
+            "FEENGINE_MACOSX"
+        }
     startproject "entrypoint"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 project "engine"
@@ -32,13 +40,6 @@ project "engine"
     filter "system:windows"
         links {
             "vendor/binaries/windows/%{cfg.buildcfg}/lib/*.lib"
-        }
-        defines {
-            "FEENGINE_WINDOWS"
-        }
-    filter "system:macosx"
-        defines {
-            "FEENGINE_MACOSX"
         }
     filter "configurations:Debug"
         symbols "On"
@@ -78,7 +79,8 @@ project "entrypoint"
         "%{prj.name}/src/**.cpp"
     }
     sysincludedirs {
-        "engine/include"
+        "engine/include",
+        "vendor/submodules/json/include"
     }
     links {
         "engine",

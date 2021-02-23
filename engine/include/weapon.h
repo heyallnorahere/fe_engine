@@ -22,7 +22,7 @@ namespace fe_engine {
 			stat_type durability;
 			vec2t<stat_type> range;
 		};
-		weapon(type weapon_type, weapon_stats stats = { 1, 100, 0, 50, { 1, 1 } });
+		weapon(type weapon_type, weapon_stats stats = { 1, 100, 0, 50, { 1, 1 } }, const std::string& name = "");
 		type get_type() const;
 		weapon_stats get_stats() const;
 		weapon_stats::stat_type get_current_durability() const;

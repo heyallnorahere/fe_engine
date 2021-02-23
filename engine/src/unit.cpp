@@ -88,10 +88,10 @@ namespace fe_engine {
 			white_magic = true;
 		}
 		unit_stats::stat_type defense = other->m_stats.defense;
-		if (magic && !white_magic) defense *= -1;
+		if (magic && !white_magic) defense = other->m_stats.resistance;
 		packet.might = weapon_stats.attack + (magic ? this->m_stats.magic : this->m_stats.strength) - defense;
 		packet.hit = weapon_stats.hit_rate + this->m_stats.dexterity - other->m_stats.dexterity;
-		packet.crit = weapon_stats.critical_rate + this->m_stats.resilience - other->m_stats.resilience;
+		packet.crit = weapon_stats.critical_rate;
 		this->m_equipped_weapon->consume_durability();
 		return packet;
 	}

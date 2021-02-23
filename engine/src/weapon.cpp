@@ -31,7 +31,7 @@ namespace fe_engine {
 			break;
 		}
 	}
-	weapon::weapon(type weapon_type, weapon_stats stats) : item(weapon_type_to_string(weapon_type), item::equipable | item::weapon) {
+	weapon::weapon(type weapon_type, weapon_stats stats, const std::string& name) : item(name.empty() ? weapon_type_to_string(weapon_type) : name, item::equipable | item::weapon) {
 		this->m_type = weapon_type;
 		this->m_stats = stats;
 		this->m_durability = this->m_stats.durability;

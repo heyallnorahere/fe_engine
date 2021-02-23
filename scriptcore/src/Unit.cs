@@ -23,7 +23,7 @@ namespace FEEngine {
             public uint Speed;
             public uint Luck;
             public uint Defense;
-            public uint Resilience;
+            public uint Resistance;
             public uint Charm;
             public uint Movement;
         }

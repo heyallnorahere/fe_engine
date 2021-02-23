@@ -1,0 +1,50 @@
+{
+  "items": [
+    {
+      "name": "RESERVE",
+      "is weapon": true,
+      "data": {
+        "attack": 1,
+        "hit": 100,
+        "crit": 100,
+        "durability": 100,
+        "range": {
+          "x": 1,
+          "y": 1
+        },
+        "type": 83
+      }
+    },
+    {
+      "name": "reserve",
+      "is weapon": false,
+      "data": { }
+    }
+  ],
+  "units": [
+    {
+      "pos": {
+        "x": 0,
+        "y": 0
+      },
+      "stats": {
+        "lvl": 10,
+        "hp": 100,
+        "str": 99999,
+        "mag": 0,
+        "dex": 999,
+        "spd": 100,
+        "lck": 100,
+        "def": 100,
+        "res": 100,
+        "cha": 100,
+        "mv": 100
+      },
+      "affiliation": 0,
+      "inventory": [
+        0,
+        1
+      ]
+    }
+  ]
+}
