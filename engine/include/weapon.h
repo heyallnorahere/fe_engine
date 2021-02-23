@@ -5,14 +5,14 @@ namespace fe_engine {
 	class weapon : public item {
 	public:
 		enum class type {
-			fists = 'F',
-			sword = 'S',
-			lance = 'L',
-			axe = 'A',
-			bow = 'B',
-			blackmagic = 'Y',
-			darkmagic = 'X',
-			whitemagic = 'W',
+			fists,
+			sword,
+			lance,
+			axe,
+			bow,
+			blackmagic,
+			darkmagic,
+			whitemagic,
 		};
 		struct weapon_stats {
 			uint32_t attack;
@@ -26,6 +26,7 @@ namespace fe_engine {
 		weapon_stats& get_stats();
 		int32_t get_current_durability() const;
 		void consume_durability(int32_t uses = 1);
+		static char get_char_from_type(type t);
 	private:
 		type m_type;
 		weapon_stats m_stats;

@@ -39,13 +39,13 @@ namespace fe_engine {
 				color = renderer::color::yellow;
 				break;
 			}
-			char unit_char = (char)weapon::type::fists;
+			weapon::type type = weapon::type::fists;
 			if (u->get_equipped_weapon()) {
-				unit_char = (char)u->get_equipped_weapon()->get_type();
+				type = u->get_equipped_weapon()->get_type();
 			}
 			size_t width, height;
 			r->get_buffer_size(width, height);
-			r->render_char_at(u->get_pos().x, u->get_pos().y + (height - this->m_height), unit_char, color);
+			r->render_char_at(u->get_pos().x, u->get_pos().y + (height - this->m_height), weapon::get_char_from_type(type), color);
 			reference<behavior> b = u->get_behavior();
 			if (b) b->on_render(r);
 		}

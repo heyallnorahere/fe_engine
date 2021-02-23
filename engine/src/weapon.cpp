@@ -48,4 +48,33 @@ namespace fe_engine {
 	void weapon::consume_durability(int32_t uses) {
 		this->m_durability -= uses;
 	}
+	char weapon::get_char_from_type(type t) {
+		switch (t) {
+		case type::fists:
+			return 'F';
+			break;
+		case type::sword:
+			return 'S';
+			break;
+		case type::lance:
+			return 'L';
+			break;
+		case type::axe:
+			return 'A';
+			break;
+		case type::bow:
+			return 'B';
+			break;
+		case type::blackmagic:
+			return 'Y';
+			break;
+		case type::darkmagic:
+			return 'X';
+			break;
+		case type::whitemagic:
+			return 'W';
+			break;
+		}
+		return 'U'; // other
+	}
 }
