@@ -5,6 +5,7 @@
 #include "unit.h"
 #include "_math.h"
 #include "controller.h"
+#include "input_mapper.h"
 #include "player.h"
 #include "weapon.h"
 #include "ui_controller.h"

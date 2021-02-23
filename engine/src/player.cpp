@@ -1,33 +1,33 @@
 #include "player.h"
 #include "util.h"
 namespace fe_engine {
-	player::player(reference<controller> c, reference<map> m, reference<ui_controller> uc, reference<phase_manager> pm) {
-		this->m_controller = c;
+	player::player(reference<input_mapper> im, reference<map> m, reference<ui_controller> uc, reference<phase_manager> pm) {
+		this->m_imapper = im;
 		this->m_map = m;
 		this->m_ui_controller = uc;
 		this->m_phase_manager = pm;
 		memset(&this->m_cursor_pos, 0, sizeof(u8vec2));
 	}
 	void player::update() {
-		this->m_controller->update();
+		this->m_imapper->update();
 		this->m_ui_controller->set_can_close(true);
 		if (!this->m_ui_controller->get_unit_menu_target() && this->m_phase_manager->get_current_phase() == unit_affiliation::player) {
-			controller::buttons buttons = this->m_controller->get_state();
+			auto input = this->m_imapper->get_state();
 			bool update_tile_selection = false;
 			s8vec2 to_move = { 0, 0 };
-			if (buttons.right.down && (size_t)this->m_cursor_pos.x < this->m_map->get_width() - 1) {
+			if (input.right && (size_t)this->m_cursor_pos.x < this->m_map->get_width() - 1) {
 				to_move.x++;
 				update_tile_selection = true;
 			}
-			if (buttons.left.down && this->m_cursor_pos.x > 0) {
+			if (input.left && this->m_cursor_pos.x > 0) {
 				to_move.x--;
 				update_tile_selection = true;
 			}
-			if (buttons.up.down && (size_t)this->m_cursor_pos.y < this->m_map->get_height() - 1) {
+			if (input.up && (size_t)this->m_cursor_pos.y < this->m_map->get_height() - 1) {
 				to_move.y++;
 				update_tile_selection = true;
 			}
-			if (buttons.down.down && this->m_cursor_pos.y > 0) {
+			if (input.down && this->m_cursor_pos.y > 0) {
 				to_move.y--;
 				update_tile_selection = true;
 			}
@@ -47,7 +47,7 @@ namespace fe_engine {
 			if (update_tile_selection) {
 				this->m_ui_controller->set_info_panel_target(this->m_map->get_unit_at(this->m_cursor_pos));
 			}
-			if (buttons.a.down) {
+			if (input.ok) {
 				if (this->m_selected) {
 					s8vec2 original_position = this->m_selected->get_pos();
 					this->m_selected->move(this->m_cursor_pos - this->m_selected->get_pos());
@@ -65,7 +65,7 @@ namespace fe_engine {
 					}
 				}
 			}
-			if (buttons.b.down && this->m_selected) {
+			if (input.back && this->m_selected) {
 				this->m_cursor_pos = this->m_selected->get_pos();
 				this->m_selected.reset();
 			}
