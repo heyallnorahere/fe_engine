@@ -12,7 +12,7 @@ namespace FEEngine
         private Item parent;
         protected ItemBehavior()
         {
-            this.parent = Map.GetUnit(0).GetInventoryItem(0);
+            this.parent = Unit.MakeFromIndex(0).GetInventoryItem(0);
         }
     }
 }

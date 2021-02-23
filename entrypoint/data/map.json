@@ -16,9 +16,11 @@
       }
     },
     {
-      "name": "reserve",
+      "name": "Vulnerary",
       "is weapon": false,
-      "data": { }
+      "data": {
+        "behavior": "Scripts.Vulnerary"
+      }
     }
   ],
   "units": [

@@ -6,6 +6,7 @@ using namespace fe_engine;
 // c++ std library
 #include <fstream>
 #include <vector>
+#include <cassert>
 namespace fe_engine {
 	void from_json(const nlohmann::json& j, unit::unit_stats& s) {
 		j["lvl"].get_to(s.level);
@@ -32,7 +33,8 @@ namespace json_types {
 		unit_affiliation affiliation;
 		std::vector<size_t> inventory;
 		size_t equipped_weapon;
-		bool has_weapon;
+		bool has_weapon, has_behavior;
+		std::string behavior_name;
 	};
 	struct item_data;
 	struct item_subdata : public ref_counted {
@@ -62,6 +64,8 @@ namespace json_types {
 		j["pos"].get_to(ud.pos);
 		j["stats"].get_to(ud.stats);
 		j["affiliation"].get_to(ud.affiliation);
+		ud.has_behavior = j.find("behavior") != j.end();
+		if (ud.has_behavior) j["behavior"].get_to(ud.behavior_name);
 	}
 	void from_json(const nlohmann::json& j, reference<item_subdata>& isd);
 	void from_json(const nlohmann::json& j, item_data& id) {
@@ -93,6 +97,17 @@ namespace json_types {
 		}
 	}
 }
+static void parse_cs_classname(const std::string& full_name, std::string& namespace_name, std::string& class_name) {
+	size_t period = full_name.find_last_of('.');
+	if (period != std::string::npos) {
+		namespace_name = full_name.substr(0, period);
+		class_name = full_name.substr(period + 1);
+	}
+	else {
+		namespace_name = "";
+		class_name = full_name;
+	}
+}
 size_t json_parser::get_unit_count() {
 	std::vector<nlohmann::json> units;
 	this->m_file["units"].get_to(units);
@@ -103,17 +118,25 @@ reference<unit> json_parser::make_unit_from_index(size_t index) {
 	this->m_file["units"].get_to(data);
 	json_types::unit_data current_unit = data[index];
 	reference<unit> unit_object = reference<unit>::create(current_unit.stats, current_unit.pos, current_unit.affiliation, this->m_map.get());
+	if (current_unit.has_behavior) {
+		std::string namespace_name, class_name;
+		parse_cs_classname(current_unit.behavior_name, namespace_name, class_name);
+		reference<cs_class> script = this->find_class(namespace_name, class_name);
+		assert(script);
+		unit_object->attach_behavior(reference<behavior>::create(script, this->m_core), this->m_map->get_unit_count());
+	}
 	if (current_unit.has_weapon) unit_object->set_equipped_weapon((reference<weapon>)this->m_items[current_unit.equipped_weapon]);
 	for (size_t index : current_unit.inventory) {
 		unit_object->get_inventory().push_back(this->m_items[index]);
 	}
 	return unit_object;
 }
-json_parser::json_parser(const std::string& json_path, fe_engine::reference<fe_engine::assembly> script_assembly, fe_engine::reference<fe_engine::map> map) {
+json_parser::json_parser(const std::string& json_path, std::vector<fe_engine::reference<fe_engine::assembly>> script_assemblies, fe_engine::reference<fe_engine::assembly> core_assembly, fe_engine::reference<fe_engine::map> map) {
 	std::ifstream file(json_path);
 	file >> this->m_file;
 	file.close();
-	this->m_script_assembly = script_assembly;
+	this->m_assemblies = script_assemblies;
+	this->m_core = core_assembly;
 	this->m_map = map;
 	this->load_items();
 }
@@ -132,8 +155,28 @@ void json_parser::load_items() {
 			stats.range = wd->range;
 			i = reference<weapon>::create(wd->type, stats, id.name);
 		} else {
-			i = reference<item>::create(id.name, item::usable);
+			reference<json_types::consumable_data> cd = id.data;
+			reference<item_behavior> itembehavior;
+			if (cd->has_behavior) {
+				std::string namespace_name, class_name;
+				parse_cs_classname(cd->behavior_name, namespace_name, class_name);
+				reference<cs_class> script = this->find_class(namespace_name, class_name);
+				assert(script);
+				itembehavior = reference<item_behavior>::create(script, this->m_core);
+			}
+			i = reference<item>::create(id.name, item::usable, itembehavior);
 		}
 		this->m_items.push_back(i);
 	}
+}
+fe_engine::reference<fe_engine::cs_class> json_parser::find_class(const std::string& namespace_name, const std::string& class_name) {
+	fe_engine::reference<fe_engine::cs_class> _class;
+	for (auto assembly : this->m_assemblies) {
+		fe_engine::reference<fe_engine::cs_class> cls = assembly->get_class(namespace_name, class_name);
+		if (cls->raw()) {
+			_class = cls;
+			break;
+		}
+	}
+	return _class;
 }
