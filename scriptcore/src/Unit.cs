@@ -7,7 +7,7 @@ using FEEngine.Math;
 
 namespace FEEngine {
     public class Unit {
-        public enum Affiliation
+        public enum UnitAffiliation
         {
             PLAYER,
             ENEMY,
@@ -75,6 +75,13 @@ namespace FEEngine {
                 SetStats_Native(this.Index, value);
             }
         }
+        public UnitAffiliation Affiliation
+        {
+            get
+            {
+                return GetAffiliation_Native(this.Index);
+            }
+        }
         public void Move(Vec2 offset)
         {
             Vec2 to_move = offset;
@@ -86,6 +93,14 @@ namespace FEEngine {
                 to_move = new Vec2((int)(x * this.CurrentMovement), (int)(y * this.CurrentMovement));
             }
             Move_Native(this.Index, to_move);
+        }
+        public void Attack(Unit other)
+        {
+            if (this.HP <= 0 || other.HP <= 0)
+            {
+                throw new Exception("One of the units specified does not exist!");
+            }
+            Attack_Native(this.Index, other.Index);
         }
         public ulong GetInventorySize()
         {
@@ -147,7 +162,11 @@ namespace FEEngine {
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern ulong GetInventorySize_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern UnitAffiliation GetAffiliation_Native(ulong index);
+        [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void Move_Native(ulong index, Vec2 offset);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void Attack_Native(ulong index, ulong otherIndex);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern bool HasWeaponEquipped_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]

@@ -130,9 +130,11 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.Unit::GetCurrentMovement_Native",  (void*)script_wrappers::FEEngine_Unit_GetCurrentMovement);
 		mono_add_internal_call("FEEngine.Unit::SetCurrentMovement_Native", (void*)script_wrappers::FEEngine_Unit_SetCurrentMovement);
 		mono_add_internal_call("FEEngine.Unit::GetInventorySize_Native", (void*)script_wrappers::FEEngine_Unit_GetInventorySize);
+		mono_add_internal_call("FEEngine.Unit::GetAffiliation_Native", (void*)script_wrappers::FEEngine_Unit_GetAffiliation);
 		mono_add_internal_call("FEEngine.Unit::GetStats_Native", (void*)script_wrappers::FEEngine_Unit_GetStats);
 		mono_add_internal_call("FEEngine.Unit::SetStats_Native", (void*)script_wrappers::FEEngine_Unit_SetStats);
 		mono_add_internal_call("FEEngine.Unit::Move_Native", (void*)script_wrappers::FEEngine_Unit_Move);
+		mono_add_internal_call("FEEngine.Unit::Attack_Native", (void*)script_wrappers::FEEngine_Unit_Attack);
 		mono_add_internal_call("FEEngine.Unit::HasWeaponEquipped_Native", (void*)script_wrappers::FEEngine_Unit_HasWeaponEquipped);
 		mono_add_internal_call("FEEngine.Unit::GetUnitAt_Native", (void*)script_wrappers::FEEngine_Unit_GetUnitAt);
 		mono_add_internal_call("FEEngine.Map::GetUnitCount_Native", (void*)script_wrappers::FEEngine_Map_GetUnitCount);

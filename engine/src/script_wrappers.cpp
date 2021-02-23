@@ -66,6 +66,9 @@ namespace fe_engine {
 		uint64_t FEEngine_Unit_GetInventorySize(uint64_t unit_index) {
 			return script_wrapper_map->get_unit(unit_index)->get_inventory().size();
 		}
+		unit_affiliation FEEngine_Unit_GetAffiliation(uint64_t unit_index) {
+			return script_wrapper_map->get_unit(unit_index)->get_affiliation();
+		}
 		unit::unit_stats FEEngine_Unit_GetStats(uint64_t unit_index) {
 			return script_wrapper_map->get_unit(unit_index)->get_stats();
 		}
@@ -74,6 +77,9 @@ namespace fe_engine {
 		}
 		void FEEngine_Unit_Move(uint64_t unit_index, s32vec2 offset) {
 			script_wrapper_map->get_unit(unit_index)->move(offset);
+		}
+		void FEEngine_Unit_Attack(uint64_t unit_index, uint64_t other_index) {
+			script_wrapper_map->get_unit(unit_index)->attack(script_wrapper_map->get_unit(other_index));
 		}
 		bool FEEngine_Unit_HasWeaponEquipped(uint64_t unit_index) {
 			return script_wrapper_map->get_unit(unit_index)->get_equipped_weapon();

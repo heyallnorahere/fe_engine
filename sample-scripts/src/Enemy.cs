@@ -9,20 +9,6 @@ namespace Scripts
 {
     class Enemy : Behavior
     {
-        private List<Unit> units;
-        public void OnAttach()
-        {
-            this.units = new List<Unit>();
-            for (ulong i = 0; i < Map.GetUnitCount(); i++)
-            {
-                Unit unit = Map.GetUnit(i);
-                if (unit.Index == this.Parent.Index)
-                {
-                    continue;
-                }
-                this.units.Add(unit);
-            }
-        }
         public void OnUpdate()
         {
             if (this.Parent.HP < this.Parent.Stats.MaxHP)
@@ -37,16 +23,56 @@ namespace Scripts
                     }
                 }
             }
-            Vec2 delta = new Vec2(0, 0);
-            foreach (Unit u in units)
+            List<Unit> units = new List<Unit>();
+            for (ulong i = 0; i < Map.GetUnitCount(); i++)
             {
-                delta += u.Position - this.Parent.Position;
+                Unit unit = Map.GetUnit(i);
+                if (unit.Affiliation == Unit.UnitAffiliation.PLAYER)
+                {
+                    units.Add(unit);
+                }
+            }
+            Vec2 delta = new Vec2(0, 0);
+            foreach (Unit unit in units)
+            {
+                delta += unit.Position - this.Parent.Position;
             }
             this.Parent.Move(delta);
+            List<Unit> canAttack = new List<Unit>();
+            if (this.Parent.HasWeaponEquipped())
+            {
+                Vec2 range = this.Parent.GetEquippedWeapon().Stats.Range;
+                foreach (Unit unit in units)
+                {
+                    int distance = (unit.Position - this.Parent.Position).TaxicabLength();
+                    if (distance >= range.X && distance <= range.Y)
+                    {
+                        canAttack.Add(unit);
+                    }
+                }
+            }
+            Unit closest = this.Parent;
+            foreach (Unit unit in canAttack)
+            {
+                if (unit.Index == this.Parent.Index)
+                {
+                    continue;
+                }
+                int distance = (unit.Position - this.Parent.Position).TaxicabLength();
+                int closestDistance = (closest.Position - this.Parent.Position).TaxicabLength();
+                if (distance < closestDistance || closest.Index == this.Parent.Index)
+                {
+                    closest = unit;
+                }
+            }
+            if (closest.Index != this.Parent.Index)
+            {
+                this.Parent.Attack(closest);
+            }
         }
         private void RenderWeapon(Renderer renderer, Weapon weapon, char indexChar, int y)
         {
-            renderer.RenderStringAt(new Vec2(0, y), indexChar + ": " + weapon.Name, Renderer.Color.WHITE);
+            renderer.RenderStringAt(new Vec2(0, y), indexChar + ": " + weapon.Name, Renderer.Color.RED);
         }
         public void OnRender(Renderer renderer)
         {
@@ -59,7 +85,7 @@ namespace Scripts
             }
             else
             {
-                renderer.RenderStringAt(new Vec2(0, y), "E: None", Renderer.Color.WHITE);
+                renderer.RenderStringAt(new Vec2(0, y), "E: None", Renderer.Color.RED);
             }
             List<Weapon> weapons = new List<Weapon>();
             for (ulong i = 0; i < this.Parent.GetInventorySize(); i++)
