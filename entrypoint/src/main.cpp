@@ -22,7 +22,7 @@ static std::vector<std::string> get_file_entries(const std::string& directory, c
 // entrypoint
 int main() {
 	fe_engine::logger::print("Intializing...", fe_engine::renderer::color::white);
-	// all of the loaded 
+	// all of the loaded assemblies
 	std::vector<fe_engine::reference<fe_engine::assembly>> script_assemblies;
 	// width and height of the map
 	constexpr size_t width = 20;
