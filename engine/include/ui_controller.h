@@ -43,9 +43,10 @@ namespace fe_engine {
 		bool m_can_close;
 		size_t m_unit_menu_index;
 		void close_unit_menu();
-		void render_frame(size_t info_panel_width, size_t unit_menu_width, size_t map_width, size_t map_height);
+		void render_frame(size_t info_panel_width, size_t unit_menu_width, size_t map_width, size_t map_height, size_t log_height);
 		void render_info_panel(size_t origin_x, size_t origin_y, size_t width, size_t height);
 		void render_unit_menu(size_t origin_x, size_t origin_y, size_t width, size_t height);
+		void render_log(size_t origin_x, size_t origin_y, size_t width, size_t height);
 		std::vector<unit_menu_item> generate_menu_items(reference<item> i);
 		std::vector<reference<unit>> get_attackable_units(reference<unit> u);
 		void refresh_base_menu_items();

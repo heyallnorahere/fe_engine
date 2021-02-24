@@ -42,5 +42,7 @@ namespace fe_engine {
 		// weapon class
 		weapon::weapon_stats FEEngine_Weapon_GetStats(uint64_t unit, uint64_t index);
 		void FEEngine_Weapon_SetStats(uint64_t unit, uint64_t index, weapon::weapon_stats stats);
+		// logger class
+		void FEEngine_Logger_Print(MonoString* message, int color);
 	}
 }

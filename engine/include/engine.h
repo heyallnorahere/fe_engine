@@ -14,3 +14,5 @@
 #include "script_engine.h"
 #include "mono_classes.h"
 #include "behavior.h"
+#include "item_behavior.h"
+#include "logger.h"

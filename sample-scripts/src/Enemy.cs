@@ -48,6 +48,7 @@ namespace Scripts
                     if (distance >= range.X && distance <= range.Y)
                     {
                         canAttack.Add(unit);
+                        Logger.Print(this.Parent.Index + " can attack " + unit.Index);
                     }
                 }
             }
@@ -68,13 +69,14 @@ namespace Scripts
             if (closest.Index != this.Parent.Index)
             {
                 this.Parent.Attack(closest);
+                Logger.Print(this.Parent.Index + ": Attacked unit " + closest.Index, Renderer.Color.RED);
             }
         }
         private void RenderWeapon(Renderer renderer, Weapon weapon, char indexChar, int y)
         {
             renderer.RenderStringAt(new Vec2(0, y), indexChar + ": " + weapon.Name, Renderer.Color.RED);
         }
-        public void OnRender(Renderer renderer)
+        /*public void OnRender(Renderer renderer)
         {
             Vec2 bufferSize = renderer.GetBufferSize();
             Vec2 mapSize = Map.GetSize();
@@ -100,6 +102,6 @@ namespace Scripts
                 Weapon weapon = weapons[i];
                 this.RenderWeapon(renderer, weapon, (i + 1).ToString()[0], y - (2 + i));
             }
-        }
+        }*/
     }
 }

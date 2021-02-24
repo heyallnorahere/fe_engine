@@ -1,6 +1,7 @@
 #include "ui_controller.h"
 #include <sstream>
 #include <cassert>
+#include "logger.h"
 namespace fe_engine {
 	ui_controller::ui_controller(reference<renderer> r, reference<map> m, reference<input_mapper> im) {
 		this->m_renderer = r;
@@ -99,9 +100,11 @@ namespace fe_engine {
 		this->m_renderer->get_buffer_size(viewport_width, viewport_height);
 		size_t unit_menu_width = 30;
 		size_t info_panel_width = viewport_width - (map_width + unit_menu_width + 3);
-		this->render_frame(info_panel_width, unit_menu_width, map_width, map_height);
+		size_t log_height = viewport_height - (map_height + 2);
+		this->render_frame(info_panel_width, unit_menu_width, map_width, map_height, log_height);
 		this->render_info_panel(map_width + 1, viewport_height - map_height, info_panel_width, map_height);
 		this->render_unit_menu(map_width + info_panel_width + 2, viewport_height - map_height, unit_menu_width, map_height);
+		this->render_log(0, 1, viewport_width - 1, log_height);
 	}
 	reference<unit> ui_controller::get_unit_menu_target() const {
 		return this->m_unit_menu_target;
@@ -112,17 +115,20 @@ namespace fe_engine {
 	void ui_controller::close_unit_menu() {
 		this->m_unit_menu_target.reset();
 	}
-	void ui_controller::render_frame(size_t info_panel_width, size_t unit_menu_width, size_t map_width, size_t map_height) {
+	void ui_controller::render_frame(size_t info_panel_width, size_t unit_menu_width, size_t map_width, size_t map_height, size_t log_height) {
 		size_t viewport_width, viewport_height;
 		this->m_renderer->get_buffer_size(viewport_width, viewport_height);
 		for (size_t y = viewport_height - map_height; y < viewport_height; y++) {
 			this->m_renderer->render_char_at(map_width, y, '#', renderer::color::white);
 			this->m_renderer->render_char_at(map_width + info_panel_width + 1, y, '#', renderer::color::white);
+		}
+		for (size_t y = 0; y < viewport_height; y++) {
 			this->m_renderer->render_char_at(map_width + info_panel_width + unit_menu_width + 2, y, '#', renderer::color::white);
 		}
 		for (size_t x = 0; x < map_width + info_panel_width + unit_menu_width + 3; x++) {
 			size_t y = viewport_height - (map_height + 1);
 			this->m_renderer->render_char_at(x, y, '#', renderer::color::white);
+			this->m_renderer->render_char_at(x, 0, '#', renderer::color::white);
 		}
 	}
 	void ui_controller::render_info_panel(size_t origin_x, size_t origin_y, size_t width, size_t height) {
@@ -226,6 +232,15 @@ namespace fe_engine {
 			}
 				break;
 			}
+		}
+	}
+	void ui_controller::render_log(size_t origin_x, size_t origin_y, size_t width, size_t height) {
+		std::vector<logger::message> log = logger::get_log();
+		size_t log_start = ((log.size() < height + 1) ? 0 : log.size() - (height + 1));
+		for (size_t i = log_start; i < log.size(); i++) {
+			logger::message message = log[i];
+			size_t y = origin_y + height - 1;
+			this->m_renderer->render_string_at(origin_x, y - (i - log_start), message.msg, message.color);
 		}
 	}
 	std::vector<ui_controller::unit_menu_item> ui_controller::generate_menu_items(reference<item> i) {

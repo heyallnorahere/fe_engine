@@ -148,6 +148,7 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.Item::IsWeapon_Native", (void*)script_wrappers::FEEngine_Item_IsWeapon);
 		mono_add_internal_call("FEEngine.Weapon::GetStats_Native", (void*)script_wrappers::FEEngine_Weapon_GetStats);
 		mono_add_internal_call("FEEngine.Weapon::SetStats_Native", (void*)script_wrappers::FEEngine_Weapon_SetStats);
+		mono_add_internal_call("FEEngine.Logger::Print_Native", (void*)script_wrappers::FEEngine_Logger_Print);
 	}
 	void script_engine::init_engine(const std::string& core_assembly_path, reference<map> m) {
 		this->init_mono();

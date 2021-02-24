@@ -5,6 +5,7 @@
 #include <limits>
 #include <cassert>
 #include <mono/jit/jit.h>
+#include "logger.h"
 static fe_engine::reference<fe_engine::map> script_wrapper_map;
 static MonoDomain* domain;
 namespace fe_engine {
@@ -192,6 +193,9 @@ namespace fe_engine {
 			}
 			assert(w);
 			w->get_stats() = stats;
+		}
+		void FEEngine_Logger_Print(MonoString* message, int color) {
+			logger::print(from_mono(message), parse_cs_color_enum(color));
 		}
 	}
 }

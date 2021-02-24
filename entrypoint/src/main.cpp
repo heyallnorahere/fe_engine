@@ -21,6 +21,7 @@ static std::vector<std::string> get_file_entries(const std::string& directory, c
 }
 // entrypoint
 int main() {
+	fe_engine::logger::print("Intializing...", fe_engine::renderer::color::white);
 	// all of the loaded 
 	std::vector<fe_engine::reference<fe_engine::assembly>> script_assemblies;
 	// width and height of the map
@@ -83,6 +84,7 @@ int main() {
 		auto unit = parser->make_unit_from_index(i);
 		map->add_unit(unit);
 	}
+	fe_engine::logger::print("Initialized!", fe_engine::renderer::color::green);
 	// add placeholder units of each affiliation
 	{
 		fe_engine::reference<fe_engine::unit> u = fe_engine::reference<fe_engine::unit>::create(stats, fe_engine::u8vec2{ 1, 1 }, fe_engine::unit_affiliation::player, map.get());
@@ -102,6 +104,7 @@ int main() {
 		u->set_equipped_weapon(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::lance));
 		map->add_unit(u);
 	}
+	fe_engine::logger::print("Starting main loop...", fe_engine::renderer::color::white);
 	// start the loop
 	while (true) {
 		// update the engine state
@@ -118,6 +121,7 @@ int main() {
 		// print the characters to the console
 		renderer->present();
 	}
+	fe_engine::logger::print("Shutting down. Goodbye!", fe_engine::renderer::color::green);
 	// free all of the allocated memory (via fe_engine::reference) and terminate the program
 	return 0;
 }
