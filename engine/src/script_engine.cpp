@@ -3,6 +3,7 @@
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/attrdefs.h>
+#include <mono/metadata/environment.h>
 #include <fstream>
 #include <vector>
 #include <string>
@@ -10,6 +11,7 @@
 #include <cassert>
 #include "script_wrappers.h"
 #include "buffer.h"
+#include "logger.h"
 #ifdef FEENGINE_WINDOWS
 #include <Windows.h>
 #endif
@@ -76,10 +78,25 @@ namespace fe_engine {
 		MonoMethodDesc* desc = mono_method_desc_new(method_desc.c_str(), false);
 		return mono_method_desc_search_in_image(desc, image);
 	}
+	std::string from_mono(MonoString* str);
+	MonoProperty* get_property_id(MonoClass* _class, const std::string& name);
+	MonoObject* get_property(MonoProperty* property, MonoObject* object);
+	static MonoObject* get_property(MonoObject* object, MonoClass* _class, const std::string& name) {
+		MonoProperty* id = get_property_id(_class, name);
+		return get_property(id, object);
+	}
 	MonoObject* call_method(MonoObject* object, MonoMethod* method, void** params = NULL) {
 		MonoObject* exception = NULL;
 		MonoObject* return_value = mono_runtime_invoke(method, object, params, &exception);
-		assert(!exception);
+		if (exception) {
+			MonoClass* exception_class = mono_get_exception_class();
+			MonoDomain* domain = mono_object_get_domain(exception);
+			std::string message = from_mono((MonoString*)get_property(exception, exception_class, "Message"));
+			std::string src = from_mono((MonoString*)get_property(exception, exception_class, "Source"));
+			logger::print("Exception occurred!", renderer::color::red);
+			logger::print("Message: " + message);
+			logger::print("Source assembly: " + src);
+		}
 		return return_value;
 	}
 	MonoClassField* get_field_id(MonoClass* _class, const std::string& name) {

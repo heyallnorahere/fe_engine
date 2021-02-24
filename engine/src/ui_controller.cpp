@@ -236,7 +236,7 @@ namespace fe_engine {
 	}
 	void ui_controller::render_log(size_t origin_x, size_t origin_y, size_t width, size_t height) {
 		std::vector<logger::message> log = logger::get_log();
-		size_t log_start = ((log.size() < height + 1) ? 0 : log.size() - (height + 1));
+		size_t log_start = ((log.size() < height) ? 0 : log.size() - height);
 		for (size_t i = log_start; i < log.size(); i++) {
 			logger::message message = log[i];
 			size_t y = origin_y + height - 1;

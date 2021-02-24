@@ -32,7 +32,7 @@ int main() {
 	// create a renderer
 	fe_engine::reference<fe_engine::renderer> renderer = fe_engine::reference<fe_engine::renderer>::create();
 	// resize the buffer
-	renderer->set_buffer_size((size_t)((double)width * 4.5), height * 3);
+	renderer->set_buffer_size((size_t)((double)width * 4.5), (size_t)((double)height * 2.75));
 	// set stats for placeholder units
 	fe_engine::unit::unit_stats stats;
 	memset(&stats, 0, sizeof(fe_engine::unit::unit_stats));

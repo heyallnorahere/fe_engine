@@ -72,11 +72,11 @@ namespace Scripts
                 Logger.Print(this.Parent.Index + ": Attacked unit " + closest.Index, Renderer.Color.RED);
             }
         }
-        private void RenderWeapon(Renderer renderer, Weapon weapon, char indexChar, int y)
+        /*private void RenderWeapon(Renderer renderer, Weapon weapon, char indexChar, int y)
         {
             renderer.RenderStringAt(new Vec2(0, y), indexChar + ": " + weapon.Name, Renderer.Color.RED);
         }
-        /*public void OnRender(Renderer renderer)
+        public void OnRender(Renderer renderer)
         {
             Vec2 bufferSize = renderer.GetBufferSize();
             Vec2 mapSize = Map.GetSize();

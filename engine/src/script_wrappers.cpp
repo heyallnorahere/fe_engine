@@ -31,7 +31,7 @@ namespace fe_engine {
 			break;
 		}
 	}
-	static std::string from_mono(MonoString* str) {
+	std::string from_mono(MonoString* str) {
 		return std::string(mono_string_to_utf8(str));
 	}
 	static MonoString* to_mono(const std::string& str) {
