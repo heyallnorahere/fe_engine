@@ -11,6 +11,9 @@ namespace fe_engine {
 	}
 	void map::update() {
 		for (auto& u : this->m_units) {
+			if (!u->initialized()) {
+				u->init();
+			}
 			u->update();
 		}
 		this->m_units.remove_if([](const reference<unit>& u) { return u->get_current_hp() <= 0; });

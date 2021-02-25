@@ -21,7 +21,7 @@ static std::vector<std::string> get_file_entries(const std::string& directory, c
 }
 // entrypoint
 int main() {
-	fe_engine::logger::print("Intializing...", fe_engine::renderer::color::white);
+	fe_engine::logger::print("Initializing...", fe_engine::renderer::color::white);
 	// all of the loaded assemblies
 	std::vector<fe_engine::reference<fe_engine::assembly>> script_assemblies;
 	// width and height of the map
@@ -86,7 +86,7 @@ int main() {
 	}
 	fe_engine::logger::print("Initialized!", fe_engine::renderer::color::green);
 	// add placeholder units of each affiliation
-	{
+	/*{
 		fe_engine::reference<fe_engine::unit> u = fe_engine::reference<fe_engine::unit>::create(stats, fe_engine::u8vec2{ 1, 1 }, fe_engine::unit_affiliation::player, map.get());
 		u->get_inventory().push_back(fe_engine::reference<fe_engine::item>::create("reserve", fe_engine::item::usable, fe_engine::reference<fe_engine::item_behavior>::create(test_item, core)));
 		u->set_equipped_weapon(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::sword, fe_engine::weapon::weapon_stats{ 5, 100, 0, 2, { 1, 1 } }));
@@ -103,7 +103,7 @@ int main() {
 		u = fe_engine::reference<fe_engine::unit>::create(stats, fe_engine::u8vec2{ 18, 1 }, fe_engine::unit_affiliation::separate_enemy, map.get());
 		u->set_equipped_weapon(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::lance));
 		map->add_unit(u);
-	}
+	}*/
 	fe_engine::logger::print("Starting main loop...", fe_engine::renderer::color::white);
 	// start the loop
 	while (true) {

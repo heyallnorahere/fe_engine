@@ -56,5 +56,13 @@ namespace FEEngine.Math
         {
             return vec1 + (-vec2);
         }
+        public static Vec2 operator*(Vec2 vec, int scalar)
+        {
+            return new Vec2(vec.X * scalar, vec.Y * scalar);
+        }
+        public static Vec2 operator/(Vec2 vec, int scalar)
+        {
+            return new Vec2(vec.X / scalar, vec.Y / scalar);
+        }
     }
 }

@@ -44,6 +44,12 @@ namespace fe_engine {
 		void set_domain(MonoDomain* domain) {
 			::domain = domain;
 		}
+		MonoString* FEEngine_Unit_GetName(uint64_t unit_index) {
+			return to_mono(script_wrapper_map->get_unit(unit_index)->get_name());
+		}
+		void FEEngine_Unit_SetName(uint64_t unit_index, MonoString* name) {
+			script_wrapper_map->get_unit(unit_index)->set_name(from_mono(name));
+		}
 		void FEEngine_Unit_GetPosition(uint64_t unit_index, s32vec2* out_position) {
 			*out_position = script_wrapper_map->get_unit(unit_index)->get_pos();
 		}

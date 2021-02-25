@@ -7,13 +7,15 @@
 #include <limits>
 #include <cassert>
 namespace fe_engine {
-	unit::unit(const unit_stats& stats, s8vec2 pos, unit_affiliation affiliation, map* m) {
+	unit::unit(const unit_stats& stats, s8vec2 pos, unit_affiliation affiliation, map* m, const std::string& name) {
 		this->m_stats = stats;
 		this->m_pos = pos;
 		this->m_hp = this->m_stats.max_hp;
 		this->m_affiliation = affiliation;
+		this->set_name(name);
 		this->m_map = m;
 		this->refresh_movement();
+		this->m_initialized = false;
 	}
 	unit::~unit() {
 		// todo: delete
@@ -155,9 +157,45 @@ namespace fe_engine {
 	}
 	void unit::attach_behavior(reference<behavior> b, uint64_t map_index) {
 		this->m_behavior = b;
-		this->m_behavior->on_attach(map_index);
+		this->m_map_index = map_index;
 	}
 	reference<behavior> unit::get_behavior() {
 		return this->m_behavior;
+	}
+	void unit::set_name(const std::string& name) {
+		if (name.empty()) {
+			std::string affiliation;
+			switch (this->m_affiliation) {
+			case unit_affiliation::player:
+				affiliation = "Player";
+				break;
+			case unit_affiliation::enemy:
+				affiliation = "Enemy";
+				break;
+			case unit_affiliation::separate_enemy:
+				affiliation = "Third Army";
+				break;
+			case unit_affiliation::ally:
+				affiliation = "Ally";
+				break;
+			default:
+				affiliation = "Unknown";
+				break;
+			}
+			this->m_name = affiliation + " unit";
+		}
+		else {
+			this->m_name = name;
+		}
+	}
+	std::string unit::get_name() {
+		return this->m_name;
+	}
+	bool unit::initialized() {
+		return this->m_initialized;
+	}
+	void unit::init() {
+		if (this->m_behavior) this->m_behavior->on_attach(this->m_map_index);
+		this->m_initialized = true;
 	}
 }

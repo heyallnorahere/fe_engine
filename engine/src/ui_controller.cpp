@@ -135,25 +135,10 @@ namespace fe_engine {
 		if (!this->m_info_panel_target) {
 			this->m_renderer->render_string_at(origin_x, origin_y + height - 1, "Empty tile", renderer::color::white);
 		} else {
-			std::string affiliation = "Unknown";
-			switch (this->m_info_panel_target->get_affiliation()) {
-			case unit_affiliation::player:
-				affiliation = "Player";
-				break;
-			case unit_affiliation::ally:
-				affiliation = "Ally";
-				break;
-			case unit_affiliation::enemy:
-				affiliation = "Enemy";
-				break;
-			case unit_affiliation::separate_enemy:
-				affiliation = "Third Army";
-				break;
-			}
 			std::stringstream hp_string, mv_string;
 			hp_string << "HP: " << (uint32_t)this->m_info_panel_target->get_current_hp() << "/" << (uint32_t)this->m_info_panel_target->get_stats().max_hp;
 			mv_string << "Movement: " << (uint32_t)this->m_info_panel_target->get_available_movement() << "/" << (uint32_t)this->m_info_panel_target->get_stats().movement;
-			this->m_renderer->render_string_at(origin_x, origin_y + height - 1, affiliation + " unit", renderer::color::white);
+			this->m_renderer->render_string_at(origin_x, origin_y + height - 1, this->m_info_panel_target->get_name(), renderer::color::white);
 			this->m_renderer->render_string_at(origin_x, origin_y + height - 2, hp_string.str(), renderer::color::white);
 			this->m_renderer->render_string_at(origin_x, origin_y + height - 3, mv_string.str(), renderer::color::white);
 		}
@@ -211,22 +196,7 @@ namespace fe_engine {
 					if (selected) {
 						this->m_renderer->render_char_at(origin_x, y, '>', renderer::color::red);
 					}
-					std::string affiliation = "Unknown";
-					switch (units[i]->get_affiliation()) {
-					case unit_affiliation::player:
-						affiliation = "Player";
-						break;
-					case unit_affiliation::ally:
-						affiliation = "Ally";
-						break;
-					case unit_affiliation::enemy:
-						affiliation = "Enemy";
-						break;
-					case unit_affiliation::separate_enemy:
-						affiliation = "Third Army";
-						break;
-					}
-					std::string text = affiliation + " unit (" + std::to_string((uint32_t)units[i]->get_current_hp()) + "/" + std::to_string((uint32_t)units[i]->get_stats().max_hp) + ")";
+					std::string text = units[i]->get_name() + " (" + std::to_string((uint32_t)units[i]->get_current_hp()) + "/" + std::to_string((uint32_t)units[i]->get_stats().max_hp) + ")";
 					this->m_renderer->render_string_at(origin_x + 2, y, text, selected ? renderer::color::red : renderer::color::white);
 				}
 			}

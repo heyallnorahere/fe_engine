@@ -29,6 +29,17 @@ namespace FEEngine {
             public uint Movement;
         }
         public ulong Index { get; private set; }
+        public String Name
+        {
+            get
+            {
+                return GetName_Native(this.Index);
+            }
+            set
+            {
+                SetName_Native(this.Index, value);
+            }
+        }
         public Vec2 Position
         {
             get
@@ -142,6 +153,10 @@ namespace FEEngine {
         {
             return new Unit(index);
         }
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern String GetName_Native(ulong index);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void SetName_Native(ulong index, String name);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void GetPosition_Native(ulong index, out Vec2 position);
         [MethodImpl(MethodImplOptions.InternalCall)]

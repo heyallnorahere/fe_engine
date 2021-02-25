@@ -140,6 +140,8 @@ namespace fe_engine {
 	}
 	static void register_wrappers() {
 		// unit class
+		mono_add_internal_call("FEEngine.Unit::GetName_Native", (void*)script_wrappers::FEEngine_Unit_GetName);
+		mono_add_internal_call("FEEngine.Unit::SetName_Native", (void*)script_wrappers::FEEngine_Unit_SetName);
 		mono_add_internal_call("FEEngine.Unit::GetPosition_Native", (void*)script_wrappers::FEEngine_Unit_GetPosition);
 		mono_add_internal_call("FEEngine.Unit::SetPosition_Native", (void*)script_wrappers::FEEngine_Unit_SetPosition);
 		mono_add_internal_call("FEEngine.Unit::GetHP_Native", (void*)script_wrappers::FEEngine_Unit_GetHP);

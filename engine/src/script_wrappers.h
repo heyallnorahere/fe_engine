@@ -13,6 +13,8 @@ namespace fe_engine {
 		void set_map(reference<map> m);
 		void set_domain(MonoDomain* domain);
 		// unit class
+		MonoString* FEEngine_Unit_GetName(uint64_t unit_index);
+		void FEEngine_Unit_SetName(uint64_t unit_index, MonoString* name);
 		void FEEngine_Unit_GetPosition(uint64_t unit_index, s32vec2* out_position);
 		void FEEngine_Unit_SetPosition(uint64_t unit_index, s32vec2 in_position);
 		uint32_t FEEngine_Unit_GetHP(uint64_t unit_index);

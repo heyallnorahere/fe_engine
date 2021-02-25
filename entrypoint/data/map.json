@@ -1,18 +1,108 @@
 {
   "items": [
     {
-      "name": "Generic sword",
+      "name": "Sublime Creator Sword",
       "is weapon": true,
       "data": {
-        "attack": 100,
-        "hit": 100,
-        "crit": 100,
-        "durability": 100,
+        "attack": 15,
+        "hit": 90,
+        "crit": 10,
+        "durability": 20,
+        "range": {
+          "x": 1,
+          "y": 2
+        },
+        "type": 1
+      }
+    },
+    {
+      "name": "Dark Creator Sword",
+      "is weapon": true,
+      "data": {
+        "attack": 16,
+        "hit": 85,
+        "crit": 0,
+        "durability": 30,
+        "range": {
+          "x": 1,
+          "y": 2
+        },
+        "type": 1
+      }
+    },
+    {
+      "name": "Failnaught",
+      "is weapon": true,
+      "data": {
+        "attack": 18,
+        "hit": 75,
+        "crit": 20,
+        "durability": 20,
+        "range": {
+          "x": 2,
+          "y": 3
+        },
+        "type": 4
+      }
+    },
+    {
+      "name": "Areadbhar",
+      "is weapon": true,
+      "data": {
+        "attack": 19,
+        "hit": 75,
+        "crit": 10,
+        "durability": 20,
         "range": {
           "x": 1,
           "y": 1
         },
-        "type": 1
+        "type": 2
+      }
+    },
+    {
+      "name": "Aymr",
+      "is weapon": true,
+      "data": {
+        "attack": 24,
+        "hit": 60,
+        "crit": 20,
+        "durability": 20,
+        "range": {
+          "x": 1,
+          "y": 1
+        },
+        "type": 3
+      }
+    },
+    {
+      "name": "Death",
+      "is weapon": true,
+      "data": {
+        "attack": 6,
+        "hit": 70,
+        "crit": 20,
+        "durability": 4,
+        "range": {
+          "x": 1,
+          "y": 3
+        },
+        "type": 6
+      }
+    },
+    {
+      "name": "Quake",
+      "is weapon": true,
+      "data": {
+        "attack": 8,
+        "hit": 50,
+        "crit": 0,
+        "durability": 1,
+        "range": {
+          "x": 1,
+          "y": 1000
+        },
+        "type": 6
       }
     },
     {
@@ -30,23 +120,142 @@
         "y": 0
       },
       "stats": {
-        "lvl": 50,
-        "hp": 109,
-        "str": 100,
-        "mag": 100,
-        "dex": 100,
-        "spd": 100,
-        "lck": 100,
-        "def": 100,
-        "res": 100,
-        "cha": 100,
-        "mv": 100
+        "lvl": 99,
+        "hp": 88,
+        "str": 77,
+        "mag": 55,
+        "dex": 66,
+        "spd": 66,
+        "lck": 66,
+        "def": 55,
+        "res": 55,
+        "cha": 99,
+        "mv": 99
       },
       "affiliation": 0,
+      "equipped": 0,
       "inventory": [
-        0,
-        1
-      ]
+        7
+      ],
+      "name": "Byleth"
+    },
+    {
+      "pos": {
+        "x": 1,
+        "y": 1
+      },
+      "stats": {
+        "lvl": 99,
+        "hp": 71,
+        "str": 61,
+        "mag": 40,
+        "dex": 89,
+        "spd": 76,
+        "lck": 63,
+        "def": 50,
+        "res": 42,
+        "cha": 76,
+        "mv": 99
+      },
+      "affiliation": 0,
+      "equipped": 2,
+      "inventory": [],
+      "name": "Claude"
+    },
+    {
+      "pos": {
+        "x": 1,
+        "y": 8
+      },
+      "stats": {
+        "lvl": 99,
+        "hp": 99,
+        "str": 87,
+        "mag": 38,
+        "dex": 69,
+        "spd": 69,
+        "lck": 42,
+        "def": 57,
+        "res": 36,
+        "cha": 77,
+        "mv": 99
+      },
+      "affiliation": 3,
+      "equipped": 3,
+      "inventory": [],
+      "name": "Dimitri"
+    },
+    {
+      "pos": {
+        "x": 18,
+        "y": 8
+      },
+      "stats": {
+        "lvl": 99,
+        "hp": 81,
+        "str": 81,
+        "mag": 72,
+        "dex": 61,
+        "spd": 57,
+        "lck": 42,
+        "def": 61,
+        "res": 47,
+        "cha": 85,
+        "mv": 99
+      },
+      "affiliation": 2,
+      "equipped": 4,
+      "inventory": [],
+      "name": "Edelgard"
+    },
+    {
+      "pos": {
+        "x": 18,
+        "y": 1
+      },
+      "stats": {
+        "lvl": 99,
+        "hp": 107,
+        "str": 37,
+        "mag": 11,
+        "dex": 35,
+        "spd": 21,
+        "lck": 25,
+        "def": 46,
+        "res": 42,
+        "cha": 21,
+        "mv": 99
+      },
+      "affiliation": 1,
+      "equipped": 1,
+      "inventory": [],
+      "name": "Nemesis",
+      "behavior": "Scripts.Enemy"
+    },
+    {
+      "pos": {
+        "x": 19,
+        "y": 0
+      },
+      "stats": {
+        "lvl": 99,
+        "hp": 49,
+        "str": 24,
+        "mag": 27,
+        "dex": 20,
+        "spd": 16,
+        "lck": 18,
+        "def": 16,
+        "res": 25,
+        "cha": 27,
+        "mv": 99
+      },
+      "affiliation": 1,
+      "equipped": 5,
+      "inventory": [
+        6
+      ],
+      "name": "Thales"
     }
   ]
 }

@@ -25,6 +25,7 @@ namespace Scripts
             {
                 delta += unit.Position - this.Parent.Position;
             }
+            delta /= units.Count;
             this.Parent.Move(delta);
             List<Unit> canAttack = new List<Unit>();
             if (this.Parent.HasWeaponEquipped())

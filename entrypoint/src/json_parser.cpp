@@ -33,8 +33,8 @@ namespace json_types {
 		unit_affiliation affiliation;
 		std::vector<size_t> inventory;
 		size_t equipped_weapon;
-		bool has_weapon, has_behavior;
-		std::string behavior_name;
+		bool has_weapon, has_behavior, has_name;
+		std::string behavior_name, unit_name;
 	};
 	struct item_data;
 	struct item_subdata : public ref_counted {
@@ -66,6 +66,8 @@ namespace json_types {
 		j["affiliation"].get_to(ud.affiliation);
 		ud.has_behavior = j.find("behavior") != j.end();
 		if (ud.has_behavior) j["behavior"].get_to(ud.behavior_name);
+		ud.has_name = j.find("name") != j.end();
+		if (ud.has_name) j["name"].get_to(ud.unit_name);
 	}
 	void from_json(const nlohmann::json& j, reference<item_subdata>& isd);
 	void from_json(const nlohmann::json& j, item_data& id) {
@@ -117,7 +119,11 @@ reference<unit> json_parser::make_unit_from_index(size_t index) {
 	std::vector<json_types::unit_data> data;
 	this->m_file["units"].get_to(data);
 	json_types::unit_data current_unit = data[index];
-	reference<unit> unit_object = reference<unit>::create(current_unit.stats, current_unit.pos, current_unit.affiliation, this->m_map.get());
+	std::string unit_name;
+	if (current_unit.has_name) {
+		unit_name = current_unit.unit_name;
+	}
+	reference<unit> unit_object = reference<unit>::create(current_unit.stats, current_unit.pos, current_unit.affiliation, this->m_map.get(), unit_name);
 	if (current_unit.has_behavior) {
 		std::string namespace_name, class_name;
 		parse_cs_classname(current_unit.behavior_name, namespace_name, class_name);
