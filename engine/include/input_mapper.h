@@ -10,7 +10,7 @@ namespace fe_engine {
 			bool up, down, left, right, ok, back, exit;
 		};
 
-		input_mapper(reference<controller> controller) : m_controller(controller) {}
+		input_mapper(reference<controller> controller);
 		void update();
 		commands get_state() const { return m_current; }
 

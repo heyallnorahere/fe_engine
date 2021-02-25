@@ -7,6 +7,7 @@
 #include <mono/jit/jit.h>
 #include "logger.h"
 static fe_engine::reference<fe_engine::map> script_wrapper_map;
+static fe_engine::reference<fe_engine::input_mapper> script_wrapper_imapper;
 static MonoDomain* domain;
 namespace fe_engine {
 	static renderer::color parse_cs_color_enum(int color) {
@@ -40,6 +41,9 @@ namespace fe_engine {
 	namespace script_wrappers {
 		void set_map(reference<map> m) {
 			script_wrapper_map = m;
+		}
+		void set_imapper(reference<input_mapper> im) {
+			script_wrapper_imapper = im;
 		}
 		void set_domain(MonoDomain* domain) {
 			::domain = domain;

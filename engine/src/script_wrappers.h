@@ -4,6 +4,7 @@
 #include "unit.h"
 #include "renderer.h"
 #include "weapon.h"
+#include "input_mapper.h"
 extern "C" {
 	typedef struct _MonoString MonoString;
 	typedef struct _MonoDomain MonoDomain;
@@ -11,6 +12,7 @@ extern "C" {
 namespace fe_engine {
 	namespace script_wrappers {
 		void set_map(reference<map> m);
+		void set_imapper(reference<input_mapper> im);
 		void set_domain(MonoDomain* domain);
 		// unit class
 		MonoString* FEEngine_Unit_GetName(uint64_t unit_index);

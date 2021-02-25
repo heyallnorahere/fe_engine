@@ -1,7 +1,12 @@
 #include "input_mapper.h"
 #include <memory>
+#include "script_wrappers.h"
 
 namespace fe_engine {
+	input_mapper::input_mapper(reference<controller> controller) {
+		m_controller = controller;
+		script_wrappers::set_imapper(reference<input_mapper>(this));
+	}
 	void input_mapper::update()
 	{
 		m_current = commands({ 0 });
