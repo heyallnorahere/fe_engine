@@ -2,6 +2,7 @@
 
 #include "reference.h"
 #include "controller.h"
+#include "keyboard.h"
 
 namespace fe_engine {
 	class input_mapper : public ref_counted {
@@ -16,6 +17,7 @@ namespace fe_engine {
 
 	private:
 		reference<controller> m_controller;
+		reference<keyboard> m_keyboard;
 		commands m_current;
 	};
 }
