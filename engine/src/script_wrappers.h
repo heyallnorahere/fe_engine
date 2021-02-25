@@ -49,5 +49,7 @@ namespace fe_engine {
 		void FEEngine_Weapon_SetStats(uint64_t unit, uint64_t index, weapon::weapon_stats stats);
 		// logger class
 		void FEEngine_Logger_Print(MonoString* message, int color);
+		// inputmapper class
+		input_mapper::commands FEEngine_InputMapper_GetState(input_mapper* address);
 	}
 }

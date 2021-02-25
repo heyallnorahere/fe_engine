@@ -9,7 +9,7 @@ namespace Scripts
 {
     class Enemy : Behavior
     {
-        public void OnUpdate()
+        public void OnUpdate(InputMapper inputMapper)
         {
             List<Unit> units = new List<Unit>();
             for (ulong i = 0; i < Map.GetUnitCount(); i++)

@@ -9,7 +9,6 @@ namespace fe_engine {
 		memset(&this->m_cursor_pos, 0, sizeof(u8vec2));
 	}
 	void player::update() {
-		this->m_imapper->update();
 		this->m_ui_controller->set_can_close(true);
 		if (!this->m_ui_controller->get_unit_menu_target() && this->m_phase_manager->get_current_phase() == unit_affiliation::player) {
 			auto input = this->m_imapper->get_state();

@@ -5,13 +5,14 @@
 #include <vector>
 #include "unit.h"
 #include "map.h"
+#include "input_mapper.h"
 namespace fe_engine {
 	class map : public ref_counted {
 	public:
 		map(size_t width, size_t height);
 		void add_unit(const reference<unit>& unit);
 		void update();
-		void update_units(unit_affiliation affiliation);
+		void update_units(unit_affiliation affiliation, reference<input_mapper> im);
 		void render(reference<renderer> r);
 		size_t get_unit_count() const;
 		reference<unit> get_unit(size_t index) const;

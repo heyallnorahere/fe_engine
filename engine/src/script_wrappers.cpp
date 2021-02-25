@@ -213,5 +213,9 @@ namespace fe_engine {
 		void FEEngine_Logger_Print(MonoString* message, int color) {
 			logger::print(from_mono(message), parse_cs_color_enum(color));
 		}
+		input_mapper::commands FEEngine_InputMapper_GetState(input_mapper* address) {
+			reference<input_mapper> im = address;
+			return im->get_state();
+		}
 	}
 }

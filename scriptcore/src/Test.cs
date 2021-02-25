@@ -20,13 +20,6 @@ namespace FEEngine
             this.unit.Position = pos;
         }
     }
-    class TestBehavior : Behavior
-    {
-        public void OnUpdate()
-        {
-            Console.WriteLine("whoa wacky");
-        }
-    }
     class TestItem : ItemBehavior
     {
         public void OnUse()

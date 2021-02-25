@@ -108,8 +108,9 @@ int main() {
 	// start the loop
 	while (true) {
 		// update the engine state
+		imapper->update();
 		map->update();
-		map->update_units(phase_manager->get_current_phase());
+		map->update_units(phase_manager->get_current_phase(), imapper);
 		player->update();
 		ui_controller->update();
 		if (imapper->get_state().exit) break;

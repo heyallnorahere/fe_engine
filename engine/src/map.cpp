@@ -18,10 +18,10 @@ namespace fe_engine {
 		}
 		this->m_units.remove_if([](const reference<unit>& u) { return u->get_current_hp() <= 0; });
 	}
-	void map::update_units(unit_affiliation affiliation) {
+	void map::update_units(unit_affiliation affiliation, reference<input_mapper> im) {
 		for (auto& u : this->m_units) {
 			if (u->get_affiliation() == affiliation) {
-				u->unit_update();
+				u->unit_update(im);
 			}
 		}
 	}

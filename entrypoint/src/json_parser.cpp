@@ -175,10 +175,15 @@ void json_parser::load_items() {
 		this->m_items.push_back(i);
 	}
 }
-fe_engine::reference<fe_engine::cs_class> json_parser::find_class(const std::string& namespace_name, const std::string& class_name) {
-	fe_engine::reference<fe_engine::cs_class> _class;
+reference<cs_class> json_parser::find_class(const std::string& namespace_name, const std::string& class_name) {
+	reference<cs_class> _class;
+	std::vector<reference<assembly>> assemblies;
+	assemblies.push_back(this->m_core);
 	for (auto assembly : this->m_assemblies) {
-		fe_engine::reference<fe_engine::cs_class> cls = assembly->get_class(namespace_name, class_name);
+		assemblies.push_back(assembly);
+	}
+	for (auto assembly : assemblies) {
+		reference<cs_class> cls = assembly->get_class(namespace_name, class_name);
 		if (cls->raw()) {
 			_class = cls;
 			break;

@@ -6,6 +6,7 @@
 #include "behavior.h"
 #include <list>
 #include <vector>
+#include "input_mapper.h"
 namespace fe_engine {
 	enum class unit_affiliation {
 		player,
@@ -38,7 +39,7 @@ namespace fe_engine {
 		void set_current_hp(int32_t hp);
 		unit_affiliation get_affiliation() const;
 		void update();
-		void unit_update();
+		void unit_update(reference<input_mapper> im);
 		void move(s8vec2 offset, int8_t consumption_multiplier = 1);
 		reference<weapon> get_equipped_weapon() const;
 		void set_equipped_weapon(const reference<weapon>& w);
