@@ -5,8 +5,10 @@
 namespace fe_engine {
 	input_mapper::input_mapper(reference<controller> controller) {
 		m_controller = controller;
+		m_keyboard = new keyboard();
 		script_wrappers::set_imapper(reference<input_mapper>(this));
 	}
+
 	void input_mapper::update()
 	{
 		m_current = commands({ 0 });
@@ -34,6 +36,36 @@ namespace fe_engine {
 			}
 			if (buttons.start.down) {
 				m_current.exit = true;
+			}
+		}
+
+		if (m_keyboard) {
+			m_keyboard->update();
+			auto chars = m_keyboard->get_input();
+			for (auto ch : chars) {
+				switch (ch) {
+				case 'w':
+					m_current.up = true;
+					break;
+				case 'a':
+					m_current.left = true;
+					break;
+				case 'd':
+					m_current.right = true;
+					break;
+				case 's':
+					m_current.down = true;
+					break;
+				case ' ':
+					m_current.ok = true;
+					break;
+				case 'q':
+					m_current.back = true;
+					break;
+				case 'z':
+					m_current.exit = true;
+					break;
+				}
 			}
 		}
 	}
