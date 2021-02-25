@@ -16,6 +16,14 @@ workspace "fe_engine"
         defines {
             "FEENGINE_MACOSX"
         }
+    filter "configurations:Debug"
+        defines {
+            "FEENGINE_DEBUG"
+        }
+    filter "configurations:Release"
+        defines {
+            "FEENGINE_RELEASE"
+        }
     startproject "entrypoint"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 project "engine"
@@ -91,9 +99,6 @@ project "entrypoint"
     }
     filter "configurations:Debug"
         symbols "On"
-        defines {
-            "DEBUG_ENABLED"
-        }
     filter "configurations:Release"
         optimize "On"
     filter "system:windows"
