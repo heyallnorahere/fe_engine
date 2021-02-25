@@ -31,4 +31,6 @@ fe_engine::controller::buttons get_controller_state(size_t index) {
 	b.select.held = state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK;
 	return b;
 }
+#else
+static void placeholder() { }
 #endif

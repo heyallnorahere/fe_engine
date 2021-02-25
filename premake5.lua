@@ -50,6 +50,10 @@ project "engine"
         links {
             "vendor/binaries/windows/%{cfg.buildcfg}/lib/*.lib"
         }
+    filter "system:macosx"
+        sysincludedirs {
+            "/usr/local/opt/ncurses/include"
+        }
     filter "configurations:Debug"
         symbols "On"
     filter "configurations:Release"
@@ -118,9 +122,11 @@ project "entrypoint"
     filter "system:macosx"
         links {
             "monosgen-2.0",
-            "z"
+            "z",
+            "curses"
         }
         syslibdirs {
             "/usr/local/lib",
-            "/usr/local/opt/zlib/lib"
+            "/usr/local/opt/zlib/lib",
+            "/usr/local/opt/ncurses/lib"
         }

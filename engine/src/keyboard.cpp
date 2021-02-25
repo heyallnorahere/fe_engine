@@ -2,13 +2,44 @@
 #include "buffer.h"
 #include <cassert>
 #include <memory>
+#include <sstream>
+#include "logger.h"
+#include <chrono>
+#include <future>
+#include <iostream>
 
 #ifdef FEENGINE_WINDOWS
 #include <Windows.h>
+#else
+#include <termios.h>
+#include <unistd.h>
+static std::string get_from_cin() {
+	char c;
+	std::cin.get(c);
+	return std::string(&c, 1);
+}
+static std::future<std::string> future;
+static void make_new_future() {
+	future = std::async(std::launch::async, get_from_cin);
+}
 #endif
-
 namespace fe_engine {
 	keyboard::keyboard() {
+#ifndef FEENGINE_WINDOWS
+		// todo: oh god please do not use system()
+		system("/bin/stty raw");
+		termios tios;
+		tcgetattr(STDIN_FILENO, &tios);
+		tios.c_oflag |= OPOST;
+		tcsetattr(STDIN_FILENO, TCSAFLUSH, &tios);
+		make_new_future();
+#endif
+	}
+	keyboard::~keyboard() {
+#ifndef FEENGINE_WINDOWS
+		// see constructor
+		system("/bin/stty cooked");
+#endif
 	}
 
 	void keyboard::update()
@@ -28,6 +59,14 @@ namespace fe_engine {
 					char c = event.Event.KeyEvent.uChar.AsciiChar;
 					this->m_input.push_back(c);
 				}
+			}
+		}
+#else
+		while (future.wait_for(std::chrono::milliseconds(1)) == std::future_status::ready) {
+			std::string line = future.get();
+			make_new_future();
+			for (char c : line) {
+				this->m_input.push_back(c);
 			}
 		}
 #endif
