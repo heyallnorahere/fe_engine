@@ -21,7 +21,7 @@ static std::vector<std::string> get_file_entries(const std::string& directory, c
 }
 // entrypoint
 int main() {
-	fe_engine::logger::print("Initializing...", fe_engine::renderer::color::white);
+	fe_engine::logger::print("Initializing...", fe_engine::renderer::color::green);
 	// all of the loaded assemblies
 	std::vector<fe_engine::reference<fe_engine::assembly>> script_assemblies;
 	// width and height of the map
@@ -61,50 +61,13 @@ int main() {
 	for (auto filename : script_assembly_names) {
 		script_assemblies.push_back(script_engine->load_assembly(filename));
 	}
-	// load test behaviors
-	fe_engine::reference<fe_engine::cs_class> enemy_script, vulnerary_script;
-	for (auto assembly : script_assemblies) {
-		fe_engine::reference<fe_engine::cs_class> cls = assembly->get_class("Scripts", "Enemy");
-		if (cls->raw()) {
-			enemy_script = cls;
-			break;
-		}
-	}
-	for (auto assembly : script_assemblies) {
-		fe_engine::reference<fe_engine::cs_class> cls = assembly->get_class("Scripts", "Vulnerary");
-		if (cls->raw()) {
-			vulnerary_script = cls;
-			break;
-		}
-	}
-
-	// load json files
+	// load json map file
 	fe_engine::reference<json_parser> parser = fe_engine::reference<json_parser>::create("data/map.json", script_assemblies, core, map.get());
 	for (size_t i = 0; i < parser->get_unit_count(); i++) {
 		auto unit = parser->make_unit_from_index(i);
 		map->add_unit(unit);
 	}
-	fe_engine::logger::print("Initialized!", fe_engine::renderer::color::green);
-	// add placeholder units of each affiliation
-	/*{
-		fe_engine::reference<fe_engine::unit> u = fe_engine::reference<fe_engine::unit>::create(stats, fe_engine::u8vec2{ 1, 1 }, fe_engine::unit_affiliation::player, map.get());
-		u->get_inventory().push_back(fe_engine::reference<fe_engine::item>::create("reserve", fe_engine::item::usable, fe_engine::reference<fe_engine::item_behavior>::create(test_item, core)));
-		u->set_equipped_weapon(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::sword, fe_engine::weapon::weapon_stats{ 5, 100, 0, 2, { 1, 1 } }));
-		u->get_inventory().push_back(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::axe));
-		map->add_unit(u);
-		u = fe_engine::reference<fe_engine::unit>::create(stats, fe_engine::u8vec2{ 18, 8 }, fe_engine::unit_affiliation::enemy, map.get());
-		u->get_inventory().push_back(fe_engine::reference<fe_engine::item>::create("Vulnerary", fe_engine::item::usable, fe_engine::reference<fe_engine::item_behavior>::create(vulnerary_script, core)));
-		u->set_equipped_weapon(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::bow, fe_engine::weapon::weapon_stats{ 10, 100, 10, 50, { 2, 2 } }, "Generic Bow"));
-		u->attach_behavior(fe_engine::reference<fe_engine::behavior>::create(enemy_script, core), map->get_unit_count());
-		map->add_unit(u);
-		u = fe_engine::reference<fe_engine::unit>::create(stats, fe_engine::u8vec2{ 1, 8 }, fe_engine::unit_affiliation::ally, map.get());
-		u->set_equipped_weapon(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::whitemagic));
-		map->add_unit(u);
-		u = fe_engine::reference<fe_engine::unit>::create(stats, fe_engine::u8vec2{ 18, 1 }, fe_engine::unit_affiliation::separate_enemy, map.get());
-		u->set_equipped_weapon(fe_engine::reference<fe_engine::weapon>::create(fe_engine::weapon::type::lance));
-		map->add_unit(u);
-	}*/
-	fe_engine::logger::print("Starting main loop...", fe_engine::renderer::color::white);
+	fe_engine::logger::print("Initialized! Starting main loop...", fe_engine::renderer::color::green);
 	// start the loop
 	while (true) {
 		// update the engine state

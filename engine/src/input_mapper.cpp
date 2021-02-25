@@ -96,45 +96,45 @@ template<typename T> static bool contains(const std::vector<T>& vector, const T&
 }
 namespace fe_engine {
 	input_mapper::input_mapper(reference<controller> controller) {
-		m_controller = controller;
-		m_keyboard = new keyboard();
+		this->m_controller = controller;
+		this->m_keyboard = new keyboard();
 		this->load_mappings_from_json("data/mappings.json");
 		script_wrappers::set_imapper(reference<input_mapper>(this));
 	}
 
 	void input_mapper::update()
 	{
-		m_current = commands({ 0 });
-		if (m_controller) {
-			m_controller->update();
-			auto buttons = m_controller->get_state();
+		memset(&this->m_current, 0, sizeof(commands));
+		if (this->m_controller) {
+			this->m_controller->update();
+			auto buttons = this->m_controller->get_state();
 
 			if (get_value(this->m_controller_mappings["up"], buttons)) {
-				m_current.up = true;
+				this->m_current.up = true;
 			}
 			if (get_value(this->m_controller_mappings["down"], buttons)) {
-				m_current.down = true;
+				this->m_current.down = true;
 			}
 			if (get_value(this->m_controller_mappings["left"], buttons)) {
-				m_current.left = true;
+				this->m_current.left = true;
 			}
 			if (get_value(this->m_controller_mappings["right"], buttons)) {
-				m_current.right = true;
+				this->m_current.right = true;
 			}
 			if (get_value(this->m_controller_mappings["ok"], buttons)) {
-				m_current.ok = true;
+				this->m_current.ok = true;
 			}
 			if (get_value(this->m_controller_mappings["back"], buttons)) {
-				m_current.back = true;
+				this->m_current.back = true;
 			}
 			if (get_value(this->m_controller_mappings["exit"], buttons)) {
-				m_current.exit = true;
+				this->m_current.exit = true;
 			}
 		}
 
-		if (m_keyboard) {
-			m_keyboard->update();
-			auto chars = m_keyboard->get_input();
+		if (this->m_keyboard) {
+			this->m_keyboard->update();
+			auto chars = this->m_keyboard->get_input();
 			if (contains(chars, this->m_keyboard_mappings["up"])) {
 				this->m_current.up = true;
 			}
@@ -159,15 +159,6 @@ namespace fe_engine {
 		}
 	}
 	
-	template<typename T> void get_mappings(const nlohmann::json& j, std::unordered_map<std::string, T>& m) {
-		j["up"].get_to(m["up"]);
-		j["down"].get_to(m["down"]);
-		j["left"].get_to(m["left"]);
-		j["right"].get_to(m["right"]);
-		j["ok"].get_to(m["ok"]);
-		j["back"].get_to(m["back"]);
-		j["exit"].get_to(m["exit"]);
-	}
 	void input_mapper::load_mappings_from_json(const std::string& path) {
 		std::ifstream file(path);
 		nlohmann::json json_data;
