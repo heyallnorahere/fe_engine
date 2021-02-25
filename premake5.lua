@@ -35,7 +35,8 @@ project "engine"
         "%{prj.name}/include"
     }
     sysincludedirs {
-        "vendor/include/%{cfg.system}"
+        "vendor/include/%{cfg.system}",
+        "vendor/submodules/json/include"
     }
     filter "system:windows"
         links {

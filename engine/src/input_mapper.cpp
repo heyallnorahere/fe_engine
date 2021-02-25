@@ -1,11 +1,104 @@
 #include "input_mapper.h"
 #include <memory>
+#include <fstream>
 #include "script_wrappers.h"
-
+#include <nlohmann/json.hpp>
+enum class controller_button {
+	a,
+	b,
+	x,
+	y,
+	lb,
+	rb,
+	ls,
+	rs,
+	up,
+	down,
+	left,
+	right,
+	start,
+	select,
+};
+using _button_map = std::unordered_map<std::string, controller_button>;
+static _button_map gen_button_map() {
+	_button_map button_map;
+	button_map["a"] = controller_button::a;
+	button_map["b"] = controller_button::b;
+	button_map["x"] = controller_button::x;
+	button_map["y"] = controller_button::y;
+	button_map["lb"] = controller_button::lb;
+	button_map["rb"] = controller_button::rb;
+	button_map["ls"] = controller_button::ls;
+	button_map["rs"] = controller_button::rs;
+	button_map["up"] = controller_button::up;
+	button_map["down"] = controller_button::down;
+	button_map["left"] = controller_button::left;
+	button_map["right"] = controller_button::right;
+	button_map["start"] = controller_button::start;
+	button_map["select"] = controller_button::select;
+	return button_map;
+}
+static _button_map button_map = gen_button_map();
+static bool get_value(const std::string& button_name, const fe_engine::controller::buttons& buttons) {
+	switch (button_map[button_name]) {
+	case controller_button::a:
+		return buttons.a.down;
+		break;
+	case controller_button::b:
+		return buttons.b.down;
+		break;
+	case controller_button::x:
+		return buttons.x.down;
+		break;
+	case controller_button::y:
+		return buttons.y.down;
+		break;
+	case controller_button::lb:
+		return buttons.lb.down;
+		break;
+	case controller_button::rb:
+		return buttons.rb.down;
+		break;
+	case controller_button::ls:
+		return buttons.ls.down;
+		break;
+	case controller_button::rs:
+		return buttons.rs.down;
+		break;
+	case controller_button::up:
+		return buttons.up.down;
+		break;
+	case controller_button::down:
+		return buttons.down.down;
+		break;
+	case controller_button::left:
+		return buttons.left.down;
+		break;
+	case controller_button::right:
+		return buttons.right.down;
+		break;
+	case controller_button::start:
+		return buttons.start.down;
+		break;
+	case controller_button::select:
+		return buttons.select.down;
+		break;
+	}
+	return false;
+}
+template<typename T> static bool contains(const std::vector<T>& vector, const T& value) {
+	for (const T& val : vector) {
+		if (val == value) {
+			return true;
+		}
+	}
+	return false;
+}
 namespace fe_engine {
 	input_mapper::input_mapper(reference<controller> controller) {
 		m_controller = controller;
 		m_keyboard = new keyboard();
+		this->load_mappings_from_json("data/mappings.json");
 		script_wrappers::set_imapper(reference<input_mapper>(this));
 	}
 
@@ -16,25 +109,25 @@ namespace fe_engine {
 			m_controller->update();
 			auto buttons = m_controller->get_state();
 
-			if (buttons.up.down) {
+			if (get_value(this->m_controller_mappings["up"], buttons)) {
 				m_current.up = true;
 			}
-			if (buttons.down.down) {
+			if (get_value(this->m_controller_mappings["down"], buttons)) {
 				m_current.down = true;
 			}
-			if (buttons.left.down) {
+			if (get_value(this->m_controller_mappings["left"], buttons)) {
 				m_current.left = true;
 			}
-			if (buttons.right.down) {
+			if (get_value(this->m_controller_mappings["right"], buttons)) {
 				m_current.right = true;
 			}
-			if (buttons.a.down) {
+			if (get_value(this->m_controller_mappings["ok"], buttons)) {
 				m_current.ok = true;
 			}
-			if (buttons.b.down) {
+			if (get_value(this->m_controller_mappings["back"], buttons)) {
 				m_current.back = true;
 			}
-			if (buttons.start.down) {
+			if (get_value(this->m_controller_mappings["exit"], buttons)) {
 				m_current.exit = true;
 			}
 		}
@@ -42,31 +135,71 @@ namespace fe_engine {
 		if (m_keyboard) {
 			m_keyboard->update();
 			auto chars = m_keyboard->get_input();
-			for (auto ch : chars) {
-				switch (ch) {
-				case 'w':
-					m_current.up = true;
-					break;
-				case 'a':
-					m_current.left = true;
-					break;
-				case 'd':
-					m_current.right = true;
-					break;
-				case 's':
-					m_current.down = true;
-					break;
-				case ' ':
-					m_current.ok = true;
-					break;
-				case 'q':
-					m_current.back = true;
-					break;
-				case 'z':
-					m_current.exit = true;
-					break;
-				}
+			if (contains(chars, this->m_keyboard_mappings["up"])) {
+				this->m_current.up = true;
 			}
+			if (contains(chars, this->m_keyboard_mappings["down"])) {
+				this->m_current.down = true;
+			}
+			if (contains(chars, this->m_keyboard_mappings["left"])) {
+				this->m_current.left = true;
+			}
+			if (contains(chars, this->m_keyboard_mappings["right"])) {
+				this->m_current.right = true;
+			}
+			if (contains(chars, this->m_keyboard_mappings["ok"])) {
+				this->m_current.ok = true;
+			}
+			if (contains(chars, this->m_keyboard_mappings["back"])) {
+				this->m_current.back = true;
+			}
+			if (contains(chars, this->m_keyboard_mappings["exit"])) {
+				this->m_current.exit = true;
+			}
+		}
+	}
+	
+	template<typename T> void get_mappings(const nlohmann::json& j, std::unordered_map<std::string, T>& m) {
+		j["up"].get_to(m["up"]);
+		j["down"].get_to(m["down"]);
+		j["left"].get_to(m["left"]);
+		j["right"].get_to(m["right"]);
+		j["ok"].get_to(m["ok"]);
+		j["back"].get_to(m["back"]);
+		j["exit"].get_to(m["exit"]);
+	}
+	void input_mapper::load_mappings_from_json(const std::string& path) {
+		std::ifstream file(path);
+		nlohmann::json json_data;
+		file >> json_data;
+		file.close();
+		if (json_data.find("controller mappings") != json_data.end()) {
+			json_data["controller mappings"].get_to(this->m_controller_mappings);
+		}
+		else {
+			this->m_controller_mappings["up"] = "up";
+			this->m_controller_mappings["down"] = "down";
+			this->m_controller_mappings["left"] = "left";
+			this->m_controller_mappings["right"] = "right";
+			this->m_controller_mappings["ok"] = "a";
+			this->m_controller_mappings["back"] = "b";
+			this->m_controller_mappings["exit"] = "start";
+		}
+		if (json_data.find("keyboard mappings") != json_data.end()) {
+			std::unordered_map<std::string, std::string> temp;
+			json_data["keyboard mappings"].get_to(temp);
+			for (const auto& m : temp) {
+				this->m_keyboard_mappings[m.first] = m.second[0];
+			}
+		}
+		else {
+			this->m_keyboard_mappings["up"] = 'w';
+			this->m_keyboard_mappings["down"] = 's';
+			this->m_keyboard_mappings["left"] = 'a';
+			this->m_keyboard_mappings["right"] = 'd';
+			this->m_keyboard_mappings["ok"] = 'x';
+			this->m_keyboard_mappings["back"] = 'z';
+			this->m_keyboard_mappings["exit"] = 'q';
 		}
 	}
 }
