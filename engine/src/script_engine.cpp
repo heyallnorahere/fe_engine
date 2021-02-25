@@ -154,6 +154,7 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.Unit::SetStats_Native", (void*)script_wrappers::FEEngine_Unit_SetStats);
 		mono_add_internal_call("FEEngine.Unit::Move_Native", (void*)script_wrappers::FEEngine_Unit_Move);
 		mono_add_internal_call("FEEngine.Unit::Attack_Native", (void*)script_wrappers::FEEngine_Unit_Attack);
+		mono_add_internal_call("FEEngine.Unit::Equip_Native", (void*)script_wrappers::FEEngine_Unit_Equip);
 		mono_add_internal_call("FEEngine.Unit::HasWeaponEquipped_Native", (void*)script_wrappers::FEEngine_Unit_HasWeaponEquipped);
 		mono_add_internal_call("FEEngine.Unit::GetUnitAt_Native", (void*)script_wrappers::FEEngine_Unit_GetUnitAt);
 		mono_add_internal_call("FEEngine.Map::GetUnitCount_Native", (void*)script_wrappers::FEEngine_Map_GetUnitCount);

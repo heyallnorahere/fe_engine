@@ -135,12 +135,21 @@ namespace fe_engine {
 		if (!this->m_info_panel_target) {
 			this->m_renderer->render_string_at(origin_x, origin_y + height - 1, "Empty tile", renderer::color::white);
 		} else {
-			std::stringstream hp_string, mv_string;
+			std::stringstream hp_string, mv_string, ew_string;
 			hp_string << "HP: " << (uint32_t)this->m_info_panel_target->get_current_hp() << "/" << (uint32_t)this->m_info_panel_target->get_stats().max_hp;
 			mv_string << "Movement: " << (uint32_t)this->m_info_panel_target->get_available_movement() << "/" << (uint32_t)this->m_info_panel_target->get_stats().movement;
+			ew_string << "E: ";
+			if (this->m_info_panel_target->get_equipped_weapon()) {
+				reference<weapon> equipped = this->m_info_panel_target->get_equipped_weapon();
+				ew_string << equipped->get_name() << " (" << equipped->get_current_durability() << "/" << equipped->get_stats().durability << ")";
+			}
+			else {
+				ew_string << "None";
+			}
 			this->m_renderer->render_string_at(origin_x, origin_y + height - 1, this->m_info_panel_target->get_name(), renderer::color::white);
 			this->m_renderer->render_string_at(origin_x, origin_y + height - 2, hp_string.str(), renderer::color::white);
 			this->m_renderer->render_string_at(origin_x, origin_y + height - 3, mv_string.str(), renderer::color::white);
+			this->m_renderer->render_string_at(origin_x, origin_y + height - 4, ew_string.str(), renderer::color::white);
 		}
 	}
 	void ui_controller::render_unit_menu(size_t origin_x, size_t origin_y, size_t width, size_t height) {
@@ -227,10 +236,7 @@ namespace fe_engine {
 		}
 		if ((i->get_item_flags() & item::equipable) && (i->get_item_flags() & item::weapon)) {
 			items.push_back({ "Equip", [](reference<ui_controller> controller) {
-				reference<item> equipped = controller->m_unit_menu_target->get_equipped_weapon();
-				controller->m_unit_menu_target->get_inventory().remove_if([&](reference<item> i) { return controller->m_unit_menu_state.selected_item.get() == i.get(); });
-				controller->m_unit_menu_target->set_equipped_weapon(controller->m_unit_menu_state.selected_item);
-				if (equipped) controller->m_unit_menu_target->get_inventory().push_back(equipped);
+				controller->m_unit_menu_target->equip(controller->m_unit_menu_state.selected_item);
 				controller->m_unit_menu_state.page = menu_page::item;
 				controller->m_unit_menu_index = 0;
 				controller->m_unit_menu_state.selected_item.reset();

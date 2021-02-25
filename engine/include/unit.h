@@ -55,6 +55,7 @@ namespace fe_engine {
 		std::string get_name();
 		bool initialized();
 		void init();
+		void equip(reference<item> to_equip);
 	private:
 		struct attack_packet {
 			int32_t might, hit, crit;

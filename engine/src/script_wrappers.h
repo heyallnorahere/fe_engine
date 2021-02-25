@@ -27,6 +27,7 @@ namespace fe_engine {
 		unit_affiliation FEEngine_Unit_GetAffiliation(uint64_t unit_index);
 		void FEEngine_Unit_Move(uint64_t unit_index, s32vec2 offset);
 		void FEEngine_Unit_Attack(uint64_t unit_index, uint64_t other_index);
+		void FEEngine_Unit_Equip(uint64_t unit_index, uint64_t item_index);
 		bool FEEngine_Unit_HasWeaponEquipped(uint64_t unit_index);
 		uint64_t FEEngine_Unit_GetUnitAt(s32vec2 position);
 		// map class

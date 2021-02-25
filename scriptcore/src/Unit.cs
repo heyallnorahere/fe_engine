@@ -137,6 +137,20 @@ namespace FEEngine {
         {
             return HasWeaponEquipped_Native(this.Index);
         }
+        // after calling, DO NOT keep the passed object. it will refer to a different item.
+        public Weapon EquipWeapon(Weapon weapon)
+        {
+            if (weapon.Parent.Index != this.Index)
+            {
+                throw new Exception("The passed weapon does not exist in this unit's inventory!");
+            }
+            if (!weapon.IsWeapon())
+            {
+                throw new Exception("The passed weapon is not a weapon!");
+            }
+            Equip_Native(this.Index, weapon.Index);
+            return this.GetEquippedWeapon();
+        }
         internal Unit(ulong index)
         {
             this.Index = index;
@@ -182,6 +196,8 @@ namespace FEEngine {
         private static extern void Move_Native(ulong index, Vec2 offset);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void Attack_Native(ulong index, ulong otherIndex);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void Equip_Native(ulong index, ulong itemIndex);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern bool HasWeaponEquipped_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]

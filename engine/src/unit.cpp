@@ -198,4 +198,11 @@ namespace fe_engine {
 		if (this->m_behavior) this->m_behavior->on_attach(this->m_map_index);
 		this->m_initialized = true;
 	}
+	void unit::equip(reference<item> to_equip) {
+		assert(to_equip->get_item_flags() & item::weapon);
+		this->get_inventory().remove_if([&](reference<item> _i) { return to_equip.get() == _i.get(); });
+		reference<weapon> equipped = this->m_equipped_weapon;
+		this->set_equipped_weapon(to_equip);
+		if (equipped) this->get_inventory().push_back(equipped);
+	}
 }

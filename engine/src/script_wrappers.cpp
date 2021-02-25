@@ -88,6 +88,12 @@ namespace fe_engine {
 		void FEEngine_Unit_Attack(uint64_t unit_index, uint64_t other_index) {
 			script_wrapper_map->get_unit(unit_index)->attack(script_wrapper_map->get_unit(other_index));
 		}
+		void FEEngine_Unit_Equip(uint64_t unit_index, uint64_t item_index) {
+			std::list<reference<item>>& inventory = script_wrapper_map->get_unit(unit_index)->get_inventory();
+			std::list<reference<item>>::iterator it = inventory.begin();
+			std::advance(it, item_index);
+			script_wrapper_map->get_unit(unit_index)->equip(*it);
+		}
 		bool FEEngine_Unit_HasWeaponEquipped(uint64_t unit_index) {
 			return script_wrapper_map->get_unit(unit_index)->get_equipped_weapon();
 		}
