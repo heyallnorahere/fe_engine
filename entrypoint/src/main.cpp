@@ -5,13 +5,19 @@
 #include <vector>
 #include <string>
 // recently added header (c++17 i think?)
+#ifdef FEENGINE_LINUX
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#else
 #include <filesystem>
+namespace fs = std::filesystem;
+#endif
 // json file parser
 #include "json_parser.h"
 // this function cycles through all of the files in a directory and returns the paths relative to cwd
 static std::vector<std::string> get_file_entries(const std::string& directory, const std::string& exclude = "") {
 	std::vector<std::string> filenames;
-	for (const auto& n : std::filesystem::directory_iterator(directory)) {
+	for (const auto& n : fs::directory_iterator(directory)) {
 		if (n.path().string() == exclude && !exclude.empty()) {
 			continue;
 		}

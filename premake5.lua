@@ -16,6 +16,10 @@ workspace "fe_engine"
         defines {
             "FEENGINE_MACOSX"
         }
+    filter "system:linux"
+        defines {
+            "FEENGINE_LINUX"
+        }
     filter "configurations:Debug"
         defines {
             "FEENGINE_DEBUG"
@@ -43,16 +47,12 @@ project "engine"
         "%{prj.name}/include"
     }
     sysincludedirs {
-        "vendor/include/%{cfg.system}",
+        "vendor/include",
         "vendor/submodules/json/include"
     }
     filter "system:windows"
         links {
             "vendor/binaries/windows/%{cfg.buildcfg}/lib/*.lib"
-        }
-    filter "system:macosx"
-        sysincludedirs {
-            "/usr/local/opt/ncurses/include"
         }
     filter "configurations:Debug"
         symbols "On"
@@ -119,14 +119,24 @@ project "entrypoint"
             '{COPY} "%{cfg.targetdir}/../scriptcore/scriptcore.dll" "script-assemblies/"',
             '{COPY} "%{cfg.targetdir}/../sample-scripts/sample-scripts.dll" "script-assemblies/"'
         }
-    filter "system:macosx"
+    filter "system:not windows"
         links {
-            "monosgen-2.0",
-            "z",
-            "curses"
+            "monosgen-2.0"
         }
         syslibdirs {
-            "/usr/local/lib",
-            "/usr/local/opt/zlib/lib",
-            "/usr/local/opt/ncurses/lib"
+            "/usr/local/lib"
+        }
+    filter "system:macosx"
+        links {
+            "z"
+        }
+        syslibdirs {
+            "/usr/local/opt/zlib/lib"
+        }
+    filter "system:linux"
+        linkoptions {
+            "-pthread"
+        }
+        links {
+            "stdc++fs"
         }

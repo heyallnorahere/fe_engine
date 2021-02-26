@@ -415,6 +415,7 @@ MigrationBackup/
 out/
 *.sln
 *.*proj*
+*.so*
 !vendor/**
 !**/mono/lib/**
 .NET*.cs
@@ -424,4 +425,4 @@ bin-int/
 *.xcworkspace/**
 Makefile
 .vscode/**
-!.vscode/launch.json
+!.vscode/launch.jsonwget https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb

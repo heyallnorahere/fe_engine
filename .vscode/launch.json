@@ -5,6 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "debug entrypoint (linux)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/Debug-linux-x86_64/entrypoint/entrypoint",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/entrypoint",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+        },
+        {
             "name": "debug entrypoint (mac)",
             "type": "cppdbg",
             "request": "launch",
@@ -13,6 +25,7 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/entrypoint",
             "environment": [],
+            "externalConsole": true,
             "MIMode": "lldb"
         }
     ]

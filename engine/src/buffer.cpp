@@ -1,6 +1,7 @@
 #include "buffer.h"
 #include <cstdlib>
 #include <memory>
+#include <cstring>
 namespace fe_engine {
 	namespace util {
 		buffer::buffer(size_t size) {

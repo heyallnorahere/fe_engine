@@ -9,6 +9,7 @@
 #include <string>
 #include <iostream>
 #include <cassert>
+#include <cstring>
 #include "script_wrappers.h"
 #include "buffer.h"
 #include "logger.h"
@@ -185,7 +186,9 @@ namespace fe_engine {
 		script_wrappers::set_domain(cleanup ? domain : this->m_domain);
 		register_wrappers();
 		if (cleanup) {
+			#ifndef FEENGINE_LINUX
 			mono_domain_unload(this->m_domain);
+			#endif
 			this->m_domain = domain;
 		}
 	}

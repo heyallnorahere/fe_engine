@@ -1,5 +1,6 @@
 #include "controller.h"
 #include <memory>
+#include <cstring>
 extern bool is_controller_connected(size_t index);
 extern fe_engine::controller::buttons get_controller_state(size_t index);
 namespace fe_engine {

@@ -1,5 +1,6 @@
 #include "player.h"
 #include "util.h"
+#include <cstring>
 namespace fe_engine {
 	player::player(reference<input_mapper> im, reference<map> m, reference<ui_controller> uc, reference<phase_manager> pm) {
 		this->m_imapper = im;

@@ -1,5 +1,6 @@
 #if !defined(FEENGINE_WINDOWS)
 #include "controller.h"
+#include <cstring>
 bool is_controller_connected(size_t index) {
     return true;
 }

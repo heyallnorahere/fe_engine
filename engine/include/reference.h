@@ -1,6 +1,7 @@
 #pragma once
 #include <utility>
 #include <type_traits>
+#include <cstdlib>
 namespace fe_engine {
 	class ref_counted {
 	public:
