@@ -31,6 +31,12 @@ namespace fe_engine {
 			this->m_instance->call_method(method);
 		}
 	}
+	reference<cs_object> item_behavior::get_object() {
+		return this->m_instance;
+	}
+	reference<assembly> item_behavior::get_core() {
+		return this->m_core;
+	}
 	void item_behavior::register_methods() {
 		std::string prefix = this->m_class->get_full_name();
 		this->m_methods["on_attach"] = this->m_class->get_method(prefix + ":OnAttach()");

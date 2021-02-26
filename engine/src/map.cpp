@@ -1,7 +1,31 @@
 #include "map.h"
 #include <iostream>
 #include "renderer.h"
+#ifdef max
+#undef max
+#endif
+#include <limits>
+#include <cassert>
 namespace fe_engine {
+	static void update_next_units(std::list<reference<unit>>& units, reference<unit> u) {
+		size_t index = std::numeric_limits<size_t>::max();
+		size_t i = 0;
+		for (auto _u : units) {
+			if (_u.get() == u.get()) {
+				index = i;
+				break;
+			}
+			i++;
+		}
+		assert(index != std::numeric_limits<size_t>::max());
+		i = 0;
+		for (auto _u : units) {
+			if (i > index) {
+				_u->update_index();
+			}
+			i++;
+		}
+	}
 	map::map(size_t width, size_t height) {
 		this->m_width = width;
 		this->m_height = height;
@@ -10,13 +34,20 @@ namespace fe_engine {
 		this->m_units.push_back(unit);
 	}
 	void map::update() {
+		this->m_units.remove_if([&](reference<unit> u) {
+			bool remove = u->get_current_hp() <= 0;
+			if (remove) {
+				u->attach_behavior(reference<behavior>(), 0);
+				update_next_units(this->m_units, u);
+			}
+			return remove;
+		});
 		for (auto& u : this->m_units) {
 			if (!u->initialized()) {
 				u->init();
 			}
 			u->update();
 		}
-		this->m_units.remove_if([](const reference<unit>& u) { return u->get_current_hp() <= 0; });
 	}
 	void map::update_units(unit_affiliation affiliation, reference<input_mapper> im) {
 		for (auto& u : this->m_units) {

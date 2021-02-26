@@ -158,6 +158,7 @@ namespace fe_engine {
 	void unit::attach_behavior(reference<behavior> b, uint64_t map_index) {
 		this->m_behavior = b;
 		this->m_map_index = map_index;
+		this->m_initialized = !this->m_behavior;
 	}
 	reference<behavior> unit::get_behavior() {
 		return this->m_behavior;
@@ -204,5 +205,49 @@ namespace fe_engine {
 		reference<weapon> equipped = this->m_equipped_weapon;
 		this->set_equipped_weapon(to_equip);
 		if (equipped) this->get_inventory().push_back(equipped);
+	}
+	void unit::update_index() {
+		reference<assembly> core;
+		reference<cs_class> item_class, item_behavior_class;
+		reference<cs_field> item_behavior_parent, item_parent_index;
+		if (this->m_behavior)  {
+			core = this->m_behavior->get_core();
+			assert(core);
+			reference<cs_class> unit_class = core->get_class("FEEngine", "Unit");
+			reference<cs_class> behavior_class = core->get_class("FEEngine", "Behavior");
+			reference<cs_field> behavior_parent = behavior_class->get_field("parent");
+			reference<cs_property> unit_index = unit_class->get_property("Index");
+			reference<cs_object> instance = this->m_behavior->get_object();
+			reference<cs_object> parent = instance->get_field(behavior_parent);
+			uint64_t index = *(uint64_t*)parent->get_property(unit_index)->unbox();
+			index--;
+			parent->set_property(unit_index, &index);
+		}
+		for (reference<item> i : this->m_inventory) {
+			reference<item_behavior> behavior;
+			if (behavior) {
+				if (!core) {
+					core = behavior->get_core();
+					assert(core);
+				}
+				if (!item_behavior_class) {
+					item_behavior_class = core->get_class("FEEngine", "ItemBehavior");
+				}
+				if (!item_class) {
+					item_class = core->get_class("FEEngine", "Item");
+				}
+				if (!item_behavior_parent) {
+					item_behavior_parent = item_behavior_class->get_field("parent");
+				}
+				if (!item_parent_index) {
+					item_parent_index = item_class->get_field("parentIndex");
+				}
+				reference<cs_object> instance = behavior->get_object();
+				reference<cs_object> parent = instance->get_field(item_behavior_parent);
+				uint64_t index = *(uint64_t*)parent->get_field(item_parent_index)->unbox();
+				index--;
+				parent->set_property(item_parent_index, &index);
+			}
+		}
 	}
 }

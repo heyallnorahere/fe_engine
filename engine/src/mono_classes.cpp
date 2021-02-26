@@ -76,6 +76,9 @@ namespace fe_engine {
 	void* cs_object::raw() {
 		return mono_gchandle_get_target(this->m_object);
 	}
+	void* cs_object::unbox() {
+		return mono_object_unbox((MonoObject*)this->raw());
+	}
 	cs_object::~cs_object() {
 		mono_gchandle_free(this->m_object);
 	}

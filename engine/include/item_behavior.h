@@ -7,6 +7,8 @@ namespace fe_engine {
 		item_behavior(reference<cs_class> _class, reference<assembly> core_assembly);
 		void on_attach(uint64_t unit_index, uint64_t item_index);
 		void on_use();
+		reference<cs_object> get_object();
+		reference<assembly> get_core();
 	private:
 		reference<cs_class> m_class;
 		reference<cs_object> m_instance;

@@ -10,6 +10,8 @@ namespace fe_engine {
 		void on_attach(uint64_t index);
 		void on_unit_update(reference<input_mapper> im);
 		void on_render(reference<renderer> r);
+		reference<cs_object> get_object();
+		reference<assembly> get_core();
 	private:
 		reference<cs_class> m_class;
 		reference<cs_object> m_instance;
