@@ -15,13 +15,26 @@ namespace fs = std::filesystem;
 // json file parser
 #include "json_parser.h"
 // this function cycles through all of the files in a directory and returns the paths relative to cwd
-static std::vector<std::string> get_file_entries(const std::string& directory, const std::string& exclude = "") {
+static std::vector<std::string> get_file_entries(const std::string& directory, const std::string& exclude = "", const std::string& extension = "") {
 	std::vector<std::string> filenames;
 	for (const auto& n : fs::directory_iterator(directory)) {
-		if (n.path().string() == exclude && !exclude.empty()) {
+		std::string path = n.path().string();
+		bool keep = true;
+		if (!extension.empty()) {
+			size_t spos = path.find_last_of('/');
+			size_t pos = path.find_last_of('.');
+			if (pos == std::string::npos || (pos < spos && spos != std::string::npos)) {
+				keep = false;
+			}
+			else {
+				std::string substr = path.substr(pos + 1);
+				keep = (substr == extension);
+			}
+		}
+		if (path == exclude && !exclude.empty()) {
 			continue;
 		}
-		filenames.push_back(n.path().string());
+		if (keep) filenames.push_back(n.path().string());
 	}
 	return filenames;
 }
@@ -63,7 +76,7 @@ int main() {
 	fe_engine::reference<fe_engine::cs_class> test_item = core->get_class("FEEngine", "TestItem");
 	// load all assemblies in the "script-assemblies" directory, excluding the core assembly
 	std::string directory = "script-assemblies/";
-	std::vector<std::string> script_assembly_names = get_file_entries(directory, directory + "scriptcore.dll");
+	std::vector<std::string> script_assembly_names = get_file_entries(directory, directory + "scriptcore.dll", "dll");
 	for (auto filename : script_assembly_names) {
 		script_assemblies.push_back(script_engine->load_assembly(filename));
 	}
@@ -74,6 +87,7 @@ int main() {
 		map->add_unit(unit);
 	}
 	fe_engine::logger::print("Initialized! Starting main loop...", fe_engine::renderer::color::green);
+	phase_manager->log_phase();
 	// start the loop
 	while (true) {
 		// update the engine state

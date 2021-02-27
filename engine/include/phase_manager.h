@@ -7,6 +7,7 @@ namespace fe_engine {
 		phase_manager();
 		unit_affiliation get_current_phase() const;
 		void cycle_phase(reference<map> m);
+		void log_phase();
 	private:
 		unit_affiliation m_current_phase; // why NOT use the affiliation enum
 		void cycle_enum();

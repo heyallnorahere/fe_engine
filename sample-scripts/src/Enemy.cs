@@ -37,7 +37,6 @@ namespace Scripts
                     if (distance >= range.X && distance <= range.Y)
                     {
                         canAttack.Add(unit);
-                        Logger.Print(this.Parent.Index + ": Can attack unit " + unit.Index);
                     }
                 }
             }
@@ -58,7 +57,6 @@ namespace Scripts
             if (closest.Index != this.Parent.Index)
             {
                 this.Parent.Attack(closest);
-                Logger.Print(this.Parent.Index + ": Attacked unit " + closest.Index, Renderer.Color.RED);
             }
         }
     }

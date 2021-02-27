@@ -1,10 +1,12 @@
 #include "unit.h"
 #include "_random.h"
 #include "map.h"
+#include "logger.h"
 #ifdef max
 #undef max
 #endif
 #include <limits>
+#include <sstream>
 #include <cassert>
 namespace fe_engine {
 	unit::unit(const unit_stats& stats, s8vec2 pos, unit_affiliation affiliation, map* m, const std::string& name) {
@@ -133,13 +135,26 @@ namespace fe_engine {
 		if (crit > 100)
 			crit = 100;
 		if (hit <= packet.hit) {
-			if (crit <= packet.crit) {
+			bool critical = crit <= packet.crit;
+			if (critical) {
+				logger::print("Critical Hit!", renderer::color::red);
 				packet.might *= 3;
 			}
 			if (packet.might > this->m_hp) {
 				packet.might = this->m_hp;
 			}
+			std::stringstream message;
+			message << sender->get_name() << " hit " << this->m_name << " for ";
+			message << packet.might;
+			message << " damage!";
+			if (critical) {
+				message << " (" << (packet.might / 3) << " * 3)";
+			}
+			logger::print(message.str());
 			this->m_hp -= packet.might;
+		}
+		else {
+			logger::print(sender->get_name() + " missed " + this->m_name + "!");
 		}
 	}
 	int32_t unit::get_available_movement() const {
