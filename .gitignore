@@ -426,3 +426,6 @@ bin-int/
 Makefile
 .vscode/**
 !.vscode/launch.json
+!fe_engine.net.sln
+!scriptcore/scriptcore.net.csproj
+!sample-scripts/sample-scripts.net.csproj
