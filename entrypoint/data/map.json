@@ -199,7 +199,8 @@
       "affiliation": 3,
       "equipped": 3,
       "inventory": [],
-      "name": "Dimitri"
+      "name": "Dimitri",
+      "behavior": "Scripts.UnitBehavior"
     },
     {
       "pos": {
@@ -222,7 +223,8 @@
       "affiliation": 2,
       "equipped": 4,
       "inventory": [],
-      "name": "Edelgard"
+      "name": "Edelgard",
+      "behavior": "Scripts.UnitBehavior"
     },
     {
       "pos": {
@@ -246,7 +248,7 @@
       "equipped": 1,
       "inventory": [],
       "name": "Nemesis",
-      "behavior": "Scripts.Enemy"
+      "behavior": "Scripts.UnitBehavior"
     },
     {
       "pos": {
@@ -272,7 +274,7 @@
         6
       ],
       "name": "Thales",
-      "behavior": "Scripts.Enemy"
+      "behavior": "Scripts.UnitBehavior"
     }
   ]
 }

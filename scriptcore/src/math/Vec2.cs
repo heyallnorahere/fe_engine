@@ -7,62 +7,71 @@ using System.Runtime.InteropServices;
 namespace FEEngine.Math
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct Vec2
+    public struct Vec2<T>
     {
-        public int X, Y;
-        public Vec2(int scalar)
+        public T X, Y;
+        public Vec2(T scalar)
         {
             this.X = this.Y = scalar;
         }
-        public Vec2(int x, int y)
+        public Vec2(T x, T y)
         {
             this.X = x;
             this.Y = y;
         }
-        public void Clamp(Vec2 min, Vec2 max)
+        public void Clamp(Vec2<T> min, Vec2<T> max)
         {
-            if (this.X < min.X)
+            if (Convert.ToDouble(this.X) < Convert.ToDouble(min.X))
             {
                 this.X = min.X;
             }
-            if (this.X > max.X)
+            if (Convert.ToDouble(this.X) > Convert.ToDouble(max.X))
             {
                 this.X = max.X;
             }
-            if (this.Y < min.Y)
+            if (Convert.ToDouble(this.Y) < Convert.ToDouble(min.Y))
             {
                 this.Y = min.Y;
             }
-            if (this.Y > max.Y)
+            if (Convert.ToDouble(this.Y) > Convert.ToDouble(max.Y))
             {
                 this.Y = max.Y;
             }
         }
-        public int TaxicabLength()
+        public Vec2<double> Normalize()
         {
-            int x = System.Math.Abs(this.X);
-            int y = System.Math.Abs(this.Y);
-            return x + y;
+            double x = Convert.ToDouble(this.X);
+            double y = Convert.ToDouble(this.Y);
+            double length = Convert.ToDouble(this.TaxicabLength());
+            return new Vec2<double>(x / length, y / length);
         }
-        public static Vec2 operator-(Vec2 vector)
+        public T TaxicabLength()
         {
-            return new Vec2(-vector.X, -vector.Y);
+            T x = (T)Convert.ChangeType(System.Math.Abs(Convert.ToDouble(this.X)), typeof(T));
+            T y = (T)Convert.ChangeType(System.Math.Abs(Convert.ToDouble(this.Y)), typeof(T));
+            return (T)Convert.ChangeType(Convert.ToDouble(x) + Convert.ToDouble(y), typeof(T));
         }
-        public static Vec2 operator+(Vec2 vec1, Vec2 vec2)
+        public static Vec2<T> operator-(Vec2<T> vector)
         {
-            return new Vec2(vec1.X + vec2.X, vec1.Y + vec2.Y);
+            double x = -Convert.ToDouble(vector.X);
+            double y = -Convert.ToDouble(vector.Y);
+            return new Vec2<T>((T)Convert.ChangeType(x, typeof(T)), (T)Convert.ChangeType(y, typeof(T)));
         }
-        public static Vec2 operator-(Vec2 vec1, Vec2 vec2)
+        public static Vec2<T> operator+(Vec2<T> vec1, Vec2<T> vec2)
+        {
+            return new Vec2<T>((T)Convert.ChangeType(Convert.ToDouble(vec1.X) + Convert.ToDouble(vec2.Y), typeof(T)), (T)Convert.ChangeType(Convert.ToDouble(vec1.Y) + Convert.ToDouble(vec2.Y), typeof(T)));
+        }
+        public static Vec2<T> operator-(Vec2<T> vec1, Vec2<T> vec2)
         {
             return vec1 + (-vec2);
         }
-        public static Vec2 operator*(Vec2 vec, int scalar)
+        public static Vec2<T> operator*(Vec2<T> vec, T scalar)
         {
-            return new Vec2(vec.X * scalar, vec.Y * scalar);
+            return new Vec2<T>((T)Convert.ChangeType(Convert.ToDouble(vec.X) * Convert.ToDouble(scalar), typeof(T)), (T)Convert.ChangeType(Convert.ToDouble(vec.Y) * Convert.ToDouble(scalar), typeof(T)));
         }
-        public static Vec2 operator/(Vec2 vec, int scalar)
+        public static Vec2<T> operator/(Vec2<T> vec, T scalar)
         {
-            return new Vec2(vec.X / scalar, vec.Y / scalar);
+            return new Vec2<T>((T)Convert.ChangeType(Convert.ToDouble(vec.X) / Convert.ToDouble(scalar), typeof(T)), (T)Convert.ChangeType(Convert.ToDouble(vec.Y) / Convert.ToDouble(scalar), typeof(T)));
         }
     }
 }

@@ -40,11 +40,11 @@ namespace FEEngine {
                 SetName_Native(this.Index, value);
             }
         }
-        public Vec2 Position
+        public Vec2<int> Position
         {
             get
             {
-                Vec2 pos;
+                Vec2<int> pos;
                 GetPosition_Native(this.Index, out pos);
                 return pos;
             }
@@ -93,15 +93,15 @@ namespace FEEngine {
                 return GetAffiliation_Native(this.Index);
             }
         }
-        public void Move(Vec2 offset)
+        public void Move(Vec2<int> offset)
         {
-            Vec2 to_move = offset;
+            Vec2<int> to_move = offset;
             int taxicab_length = to_move.TaxicabLength();
             if (taxicab_length > this.CurrentMovement)
             {
                 float x = (float)to_move.X / (float)taxicab_length;
                 float y = (float)to_move.Y / (float)taxicab_length;
-                to_move = new Vec2((int)(x * this.CurrentMovement), (int)(y * this.CurrentMovement));
+                to_move = new Vec2<int>((int)(x * this.CurrentMovement), (int)(y * this.CurrentMovement));
             }
             Move_Native(this.Index, to_move);
         }
@@ -112,6 +112,10 @@ namespace FEEngine {
                 throw new Exception("One of the units specified does not exist!");
             }
             Attack_Native(this.Index, other.Index);
+        }
+        public void Wait()
+        {
+            Wait_Native(this.Index);
         }
         public ulong GetInventorySize()
         {
@@ -159,10 +163,6 @@ namespace FEEngine {
         {
             this.Index = 0;
         }
-        public static Unit GetUnitAt(Vec2 position)
-        {
-            return new Unit(GetUnitAt_Native(position));
-        }
         public static Unit MakeFromIndex(ulong index)
         {
             return new Unit(index);
@@ -172,9 +172,9 @@ namespace FEEngine {
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void SetName_Native(ulong index, String name);
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void GetPosition_Native(ulong index, out Vec2 position);
+        private static extern void GetPosition_Native(ulong index, out Vec2<int> position);
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void SetPosition_Native(ulong index, Vec2 position);
+        private static extern void SetPosition_Native(ulong index, Vec2<int> position);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern uint GetHP_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -193,14 +193,14 @@ namespace FEEngine {
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern UnitAffiliation GetAffiliation_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void Move_Native(ulong index, Vec2 offset);
+        private static extern void Move_Native(ulong index, Vec2<int> offset);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void Attack_Native(ulong index, ulong otherIndex);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void Wait_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void Equip_Native(ulong index, ulong itemIndex);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern bool HasWeaponEquipped_Native(ulong index);
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern ulong GetUnitAt_Native(Vec2 position);
     }
 }

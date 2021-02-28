@@ -265,4 +265,7 @@ namespace fe_engine {
 			}
 		}
 	}
+	void unit::wait() {
+		this->m_can_move = false;
+	}
 }

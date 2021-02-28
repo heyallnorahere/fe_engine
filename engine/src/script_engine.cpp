@@ -7,6 +7,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <cassert>
 #include <cstring>
@@ -86,6 +87,25 @@ namespace fe_engine {
 		MonoProperty* id = get_property_id(_class, name);
 		return get_property(id, object);
 	}
+	static std::vector<std::string> parse_newlines(const std::string& string) {
+		std::vector<std::string> strings;
+		std::string find;
+#ifdef FEENGINE_WINDOWS
+		find = "\r\n";
+#else
+		find = "\n";
+#endif
+		size_t pos = string.find(find);
+		size_t begin = 0;
+		auto replace = [&]() {
+			begin = pos + find.length();
+			return pos = string.find(find, begin);
+		};
+		do {
+			strings.push_back(string.substr(begin, pos - begin));
+		} while (replace() != std::string::npos);
+		return strings;
+	}
 	MonoObject* call_method(MonoObject* object, MonoMethod* method, void** params = NULL) {
 		MonoObject* exception = NULL;
 		MonoObject* return_value = mono_runtime_invoke(method, object, params, &exception);
@@ -94,9 +114,22 @@ namespace fe_engine {
 			MonoDomain* domain = mono_object_get_domain(exception);
 			std::string message = from_mono((MonoString*)get_property(exception, exception_class, "Message"));
 			std::string src = from_mono((MonoString*)get_property(exception, exception_class, "Source"));
+			std::string stacktrace_str = from_mono((MonoString*)get_property(exception, exception_class, "StackTrace"));
 			logger::print("Exception occurred!", renderer::color::red);
 			logger::print("Message: " + message);
 			logger::print("Source assembly: " + src);
+			std::vector<std::string> stacktrace = parse_newlines(stacktrace_str);
+			for (size_t i = 0; i < stacktrace.size(); i++) {
+				std::stringstream ss;
+				if (i == 0) {
+					ss << "Stack Trace: ";
+				}
+				else {
+					ss << "	";
+				}
+				ss << stacktrace[i];
+				logger::print(ss.str());
+			}
 		}
 		return return_value;
 	}
@@ -155,11 +188,13 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.Unit::SetStats_Native", (void*)script_wrappers::FEEngine_Unit_SetStats);
 		mono_add_internal_call("FEEngine.Unit::Move_Native", (void*)script_wrappers::FEEngine_Unit_Move);
 		mono_add_internal_call("FEEngine.Unit::Attack_Native", (void*)script_wrappers::FEEngine_Unit_Attack);
+		mono_add_internal_call("FEEngine.Unit::Wait_Native", (void*)script_wrappers::FEEngine_Unit_Wait);
 		mono_add_internal_call("FEEngine.Unit::Equip_Native", (void*)script_wrappers::FEEngine_Unit_Equip);
 		mono_add_internal_call("FEEngine.Unit::HasWeaponEquipped_Native", (void*)script_wrappers::FEEngine_Unit_HasWeaponEquipped);
-		mono_add_internal_call("FEEngine.Unit::GetUnitAt_Native", (void*)script_wrappers::FEEngine_Unit_GetUnitAt);
 		mono_add_internal_call("FEEngine.Map::GetUnitCount_Native", (void*)script_wrappers::FEEngine_Map_GetUnitCount);
 		mono_add_internal_call("FEEngine.Map::GetSize_Native", (void*)script_wrappers::FEEngine_Map_GetSize);
+		mono_add_internal_call("FEEngine.Map::GetUnitAt_Native", (void*)script_wrappers::FEEngine_Map_GetUnitAt);
+		mono_add_internal_call("FEEngine.Map::IsTileOccupied_Native", (void*)script_wrappers::FEEngine_Map_IsTileOccupied);
 		mono_add_internal_call("FEEngine.Renderer::RenderCharAt_Native", (void*)script_wrappers::FEEngine_Renderer_RenderCharAt);
 		mono_add_internal_call("FEEngine.Renderer::RenderStringAt_Native", (void*)script_wrappers::FEEngine_Renderer_RenderStringAt);
 		mono_add_internal_call("FEEngine.Renderer::GetBufferSize_Native", (void*)script_wrappers::FEEngine_Renderer_GetBufferSize);
@@ -169,6 +204,7 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.Item::IsWeapon_Native", (void*)script_wrappers::FEEngine_Item_IsWeapon);
 		mono_add_internal_call("FEEngine.Weapon::GetStats_Native", (void*)script_wrappers::FEEngine_Weapon_GetStats);
 		mono_add_internal_call("FEEngine.Weapon::SetStats_Native", (void*)script_wrappers::FEEngine_Weapon_SetStats);
+		mono_add_internal_call("FEEngine.Weapon::GetType_Native", (void*)script_wrappers::FEEngine_Weapon_GetType);
 		mono_add_internal_call("FEEngine.Logger::Print_Native", (void*)script_wrappers::FEEngine_Logger_Print);
 		mono_add_internal_call("FEEngine.InputMapper::GetState_Native", (void*)script_wrappers::FEEngine_InputMapper_GetState);
 	}
@@ -186,9 +222,9 @@ namespace fe_engine {
 		script_wrappers::set_domain(cleanup ? domain : this->m_domain);
 		register_wrappers();
 		if (cleanup) {
-			#ifndef FEENGINE_LINUX
+#ifndef FEENGINE_LINUX
 			mono_domain_unload(this->m_domain);
-			#endif
+#endif
 			this->m_domain = domain;
 		}
 	}

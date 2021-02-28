@@ -15,7 +15,7 @@ namespace FEEngine
         }
         public void DoStuff()
         {
-            Math.Vec2 pos = this.unit.Position;
+            Vec2<int> pos = this.unit.Position;
             pos.Y++;
             this.unit.Position = pos;
         }
@@ -24,8 +24,8 @@ namespace FEEngine
     {
         public void OnUse()
         {
-            Vec2 pos = this.Parent.Parent.Position;
-            pos += new Vec2(1, 1);
+            Vec2<int> pos = this.Parent.Parent.Position;
+            pos += new Vec2<int>(1, 1);
             this.Parent.Parent.Position = pos;
         }
     }

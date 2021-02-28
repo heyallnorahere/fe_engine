@@ -21,13 +21,29 @@ namespace FEEngine
             }
             return Unit.MakeFromIndex(index);
         }
-        public static Vec2 GetSize()
+        public static Unit GetUnitAt(Vec2<int> position)
+        {
+            if (!IsTileOccupied(position))
+            {
+                throw new Exception("Specified tile was not occupied!");
+            }
+            return Unit.MakeFromIndex(GetUnitAt_Native(position));
+        }
+        public static Vec2<int> GetSize()
         {
             return GetSize_Native();
+        }
+        public static bool IsTileOccupied(Vec2<int> position)
+        {
+            return IsTileOccupied_Native(position);
         }
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern ulong GetUnitCount_Native();
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern Vec2 GetSize_Native();
+        private static extern Vec2<int> GetSize_Native();
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern ulong GetUnitAt_Native(Vec2<int> position);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsTileOccupied_Native(Vec2<int> position);
     }
 }

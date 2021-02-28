@@ -15,7 +15,18 @@ namespace FEEngine
             public uint Hit;
             public uint Crit;
             public uint MaxDurability;
-            public Vec2 Range;
+            public Vec2<int> Range;
+        }
+        public enum WeaponType
+        {
+            FISTS,
+            SWORD,
+            LANCE,
+            AXE,
+            BOW,
+            BLACKMAGIC,
+            DARKMAGIC,
+            WHITEMAGIC,
         }
         public WeaponStats Stats
         {
@@ -28,6 +39,13 @@ namespace FEEngine
                 SetStats_Native(this.parentIndex, this.Index, value);
             }
         }
+        public WeaponType Type
+        {
+            get
+            {
+                return GetType_Native(this.parentIndex, this.Index);
+            }
+        }
         private Weapon(ulong parent, ulong inventoryIndex) : base(parent, inventoryIndex) { }
         public static new Weapon MakeFromInventoryIndex(Unit parent, ulong inventoryIndex)
         {
@@ -37,5 +55,7 @@ namespace FEEngine
         private static extern WeaponStats GetStats_Native(ulong unit, ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void SetStats_Native(ulong unit, ulong index, WeaponStats stats);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern WeaponType GetType_Native(ulong unit, ulong index);
     }
 }

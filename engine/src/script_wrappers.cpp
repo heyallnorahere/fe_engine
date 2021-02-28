@@ -31,6 +31,7 @@ namespace fe_engine {
 			return renderer::color::black;
 			break;
 		}
+		return renderer::color::white;
 	}
 	std::string from_mono(MonoString* str) {
 		return std::string(mono_string_to_utf8(str));
@@ -92,6 +93,9 @@ namespace fe_engine {
 		void FEEngine_Unit_Attack(uint64_t unit_index, uint64_t other_index) {
 			script_wrapper_map->get_unit(unit_index)->attack(script_wrapper_map->get_unit(other_index));
 		}
+		void FEEngine_Unit_Wait(uint64_t unit_index) {
+			script_wrapper_map->get_unit(unit_index)->wait();
+		}
 		void FEEngine_Unit_Equip(uint64_t unit_index, uint64_t item_index) {
 			std::list<reference<item>>& inventory = script_wrapper_map->get_unit(unit_index)->get_inventory();
 			std::list<reference<item>>::iterator it = inventory.begin();
@@ -101,19 +105,23 @@ namespace fe_engine {
 		bool FEEngine_Unit_HasWeaponEquipped(uint64_t unit_index) {
 			return script_wrapper_map->get_unit(unit_index)->get_equipped_weapon();
 		}
-		uint64_t FEEngine_Unit_GetUnitAt(s32vec2 position) {
-			for (uint64_t i = 0; i < script_wrapper_map->get_unit_count(); i++) {
-				if (script_wrapper_map->get_unit(i)->get_pos() == (s8vec2)position) {
-					return i;
-				}
-			}
-			return std::numeric_limits<uint64_t>::max();
-		}
 		uint64_t FEEngine_Map_GetUnitCount() {
 			return script_wrapper_map->get_unit_count();
 		}
 		s32vec2 FEEngine_Map_GetSize() {
 			return { (int32_t)script_wrapper_map->get_width(), (int32_t)script_wrapper_map->get_height() };
+		}
+		uint64_t FEEngine_Map_GetUnitAt(s32vec2 position) {
+			for (uint64_t i = 0; i < script_wrapper_map->get_unit_count(); i++) {
+				if (script_wrapper_map->get_unit(i)->get_pos() == (s8vec2)position) {
+					return i;
+				}
+			}
+			assert(false);
+			return std::numeric_limits<uint64_t>::max();
+		}
+		bool FEEngine_Map_IsTileOccupied(s32vec2 position) {
+			return script_wrapper_map->get_unit_at(position);
 		}
 		void FEEngine_Renderer_RenderCharAt(renderer* address, s32vec2 position, char character, int color) {
 			renderer::color c = parse_cs_color_enum(color);
@@ -209,6 +217,21 @@ namespace fe_engine {
 			}
 			assert(w);
 			w->get_stats() = stats;
+		}
+		weapon::type FEEngine_Weapon_GetType(uint64_t unit, uint64_t index) {
+			reference<::fe_engine::unit> u = script_wrapper_map->get_unit(unit);
+			std::list<reference<item>>& inventory = u->get_inventory();
+			reference<weapon> w;
+			if (index != inventory.size()) {
+				std::list<reference<item>>::iterator it = inventory.begin();
+				std::advance(it, index);
+				w = *it;
+			}
+			else {
+				w = u->get_equipped_weapon();
+			}
+			assert(w);
+			return w->get_type();
 		}
 		void FEEngine_Logger_Print(MonoString* message, int color) {
 			logger::print(from_mono(message), parse_cs_color_enum(color));

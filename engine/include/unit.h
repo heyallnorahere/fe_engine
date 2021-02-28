@@ -50,6 +50,7 @@ namespace fe_engine {
 		void set_available_movement(int32_t mv);
 		void refresh_movement();
 		bool can_move() const;
+		void wait();
 		void attach_behavior(reference<behavior> b, uint64_t map_index);
 		reference<behavior> get_behavior();
 		void set_name(const std::string& name);
