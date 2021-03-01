@@ -55,9 +55,13 @@ namespace fe_engine {
 			INPUT_RECORD* ptr = util::buffer_cast<INPUT_RECORD>(buf.get());
 			INPUT_RECORD event = ptr[i];
 			if (event.EventType == KEY_EVENT) {
-				if ((event.Event.KeyEvent.wRepeatCount == 1) && event.Event.KeyEvent.bKeyDown) {
+				if (event.Event.KeyEvent.bKeyDown) {
+					int repeats = event.Event.KeyEvent.wRepeatCount;
 					char c = event.Event.KeyEvent.uChar.AsciiChar;
-					this->m_input.push_back(c);
+					while (repeats > 0) {
+						this->m_input.push_back(c);
+						repeats--;
+					}
 				}
 			}
 		}
