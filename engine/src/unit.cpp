@@ -101,12 +101,25 @@ namespace fe_engine {
 	}
 	void unit::attack(reference<unit> to_attack) {
 		to_attack->receive_attack_packet(this->generate_attack_packet(to_attack), reference<unit>(this));
-		if (to_attack->get_equipped_weapon()) {
+		if (to_attack->m_hp <= 0) return;
+		if (to_attack->get_equipped_weapon()->get_current_durability() > 0) {
 			s32vec2 range = to_attack->get_equipped_weapon()->get_stats().range;
 			int32_t length = (this->m_pos - to_attack->m_pos).taxicab();
 			if (length >= range.x && length <= range.y) {
 				this->receive_attack_packet(to_attack->generate_attack_packet(reference<unit>(this)), to_attack);
 			}
+		}
+		if (this->m_hp <= 0) {
+			return;
+		}
+		if (this->get_equipped_weapon()->get_current_durability() > 0 && this->m_stats.speed > to_attack->m_stats.speed) {
+			to_attack->receive_attack_packet(this->generate_attack_packet(to_attack), reference<unit>(this));
+		}
+		if (to_attack->m_hp <= 0) {
+			return;
+		}
+		if (to_attack->m_equipped_weapon->get_current_durability() > 0 && to_attack->m_stats.speed > this->m_stats.speed) {
+			this->receive_attack_packet(to_attack->generate_attack_packet(reference<unit>(this)), to_attack);
 		}
 	}
 	unit::attack_packet unit::generate_attack_packet(reference<unit> other) {
