@@ -77,10 +77,61 @@ namespace Scripts
             }
             return unit;
         }
-        private Vec2<int> CalcSurroundingTile(Vec2<int> position) {
+        private Vec2<int> CalcSurroundingTile(Vec2<int> target) {
             Vec2<int> size = Map.GetSize();
-            
-            return new Vec2<int>(0);
+
+            // Calculate all of the candidate positions
+            var candidates = new List<Vec2<int>>();
+            var weaponRange = this.Parent.GetEquippedWeapon().Stats.Range;
+
+            var maxDist = weaponRange.Y;
+            for (var dx = -maxDist; dx <= maxDist; dx++) {
+                for (var dy = -maxDist; dy <= maxDist; dy++) {
+                    var myDist = new Vec2<int>(dx, dy).TaxicabLength();
+                    if (myDist >= weaponRange.X && myDist <= weaponRange.Y) {
+                        // This is a good spot for us.
+                        var candidate = new Vec2<int>(dx, dy) + target;
+                        if (Map.IsTileOccupied(candidate)) { 
+                            continue; 
+                        }
+                        if (candidate.X < 0 || candidate.Y < 0 || candidate.X >= size.X || candidate.Y >= size.Y) {
+                            continue;
+                        }
+                        candidates.Add(candidate);
+                    }
+                }
+            }
+
+            if (candidates.Count == 0) {
+                return this.Parent.Position;
+            }
+
+            // Out of the positions we have, which is best? 
+            candidates.Sort((a, b) => {
+                // First, take the position furthest from the target;
+                var tDistA = (a - target).TaxicabLength();
+                var tDistB = (b - target).TaxicabLength();
+                if (tDistA < tDistB) {
+                    return 1;
+                } else if (tDistA > tDistB) {
+                    return -1;
+                }
+
+                // If those are equal, take the position closest to the parent.
+                var myDistA = (a - this.Parent.Position).TaxicabLength();
+                var myDistB = (b - this.Parent.Position).TaxicabLength();
+                if (myDistA < myDistB) {
+                    return -1;
+                } else if (myDistA > myDistB) {
+                    return 1;
+                }
+
+                // shrug
+                return 0;
+            });
+
+
+            return candidates[0];
         }
         public void OnUpdate(InputMapper inputMapper)
         {
@@ -91,7 +142,8 @@ namespace Scripts
                 return;
             }
             Unit weakestUnit = this.DetermineWeakestUnit(inRange);
-            Vec2<int> difference = this.CalcSurroundingTile(weakestUnit.Position) - this.Parent.Position;
+            Vec2<int> targetTile = this.CalcSurroundingTile(weakestUnit.Position);
+            Vec2<int> difference = targetTile - this.Parent.Position;
             this.Parent.Move(difference);
             this.Parent.Attack(weakestUnit);
             this.Parent.Wait();
