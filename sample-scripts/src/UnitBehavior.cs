@@ -77,6 +77,11 @@ namespace Scripts
             }
             return unit;
         }
+        private Vec2<int> CalcSurroundingTile(Vec2<int> position) {
+            Vec2<int> size = Map.GetSize();
+            
+            return new Vec2<int>(0);
+        }
         public void OnUpdate(InputMapper inputMapper)
         {
             List<Unit> inRange = this.GetUnitsInRange();
@@ -86,8 +91,9 @@ namespace Scripts
                 return;
             }
             Unit weakestUnit = this.DetermineWeakestUnit(inRange);
-            Vec2<int> offset = weakestUnit.Position - this.Parent.Position;
-
+            Vec2<int> difference = this.CalcSurroundingTile(weakestUnit.Position) - this.Parent.Position;
+            this.Parent.Move(difference);
+            this.Parent.Attack(weakestUnit);
             this.Parent.Wait();
         }
     }
