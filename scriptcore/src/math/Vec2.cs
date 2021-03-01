@@ -51,6 +51,13 @@ namespace FEEngine.Math
             T y = (T)Convert.ChangeType(System.Math.Abs(Convert.ToDouble(this.Y)), typeof(T));
             return (T)Convert.ChangeType(Convert.ToDouble(x) + Convert.ToDouble(y), typeof(T));
         }
+        public Vec2<U> ConvertTo<U>()
+        {
+            Vec2<U> vec = new Vec2<U>();
+            vec.X = (U)Convert.ChangeType(this.X, typeof(U));
+            vec.Y = (U)Convert.ChangeType(this.Y, typeof(U));
+            return vec;
+        }
         public static Vec2<T> operator-(Vec2<T> vector)
         {
             double x = -Convert.ToDouble(vector.X);

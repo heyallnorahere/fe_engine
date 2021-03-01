@@ -141,7 +141,29 @@ namespace Scripts
             List<Unit> inRange = this.GetUnitsInRange();
             if (inRange.Count == 0)
             {
-                this.Parent.Wait();
+                Vec2<int> delta = new Vec2<int>();
+                for (ulong i = 0; i < Map.GetUnitCount(); i++)
+                {
+                    Unit unit = Map.GetUnit(i);
+                    if (!this.IsAllied(unit))
+                    {
+                        delta += unit.Position - this.Parent.Position;
+                    }
+                }
+                if (delta.TaxicabLength() > this.Parent.CurrentMovement)
+                {
+                    Vec2<double> normal = delta.Normalize();
+                    normal *= this.Parent.CurrentMovement * 0.75;
+                    delta.X = (int)Math.Floor(normal.X);
+                    delta.Y = (int)Math.Floor(normal.Y);
+                }
+                if (Map.IsTileOccupied(this.Parent.Position + delta))
+                {
+                    Vec2<double> _delta = delta.ConvertTo<double>();
+                    _delta *= 0.75;
+                    delta = _delta.ConvertTo<int>();
+                }
+                this.Parent.Move(delta);
                 return;
             }
             Unit weakestUnit = this.DetermineWeakestUnit(inRange);
@@ -149,7 +171,6 @@ namespace Scripts
             Vec2<int> difference = targetTile - this.Parent.Position;
             this.Parent.Move(difference);
             this.Parent.Attack(weakestUnit);
-            this.Parent.Wait();
         }
     }
 }

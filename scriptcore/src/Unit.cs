@@ -95,15 +95,7 @@ namespace FEEngine {
         }
         public void Move(Vec2<int> offset)
         {
-            Vec2<int> to_move = offset;
-            int taxicab_length = to_move.TaxicabLength();
-            if (taxicab_length > this.CurrentMovement)
-            {
-                float x = (float)to_move.X / (float)taxicab_length;
-                float y = (float)to_move.Y / (float)taxicab_length;
-                to_move = new Vec2<int>((int)(x * this.CurrentMovement), (int)(y * this.CurrentMovement));
-            }
-            Move_Native(this.Index, to_move);
+            Move_Native(this.Index, offset);
         }
         public void Attack(Unit other)
         {

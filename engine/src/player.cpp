@@ -49,12 +49,20 @@ namespace fe_engine {
 			}
 			if (input.ok) {
 				if (this->m_selected) {
-					s8vec2 original_position = this->m_selected->get_pos();
-					this->m_selected->move(this->m_cursor_pos - this->m_selected->get_pos());
-					this->m_ui_controller->set_info_panel_target(this->m_selected);
-					this->m_ui_controller->set_unit_menu_target(this->m_selected, original_position);
-					this->m_ui_controller->set_can_close(false);
-					this->m_selected.reset();
+					bool occupied = false;
+					if (this->m_map->get_unit_at(this->m_cursor_pos)) {
+						if (this->m_map->get_unit_at(this->m_cursor_pos).get() != this->m_selected.get()) {
+							occupied = true;
+						}
+					}
+					if (!occupied) {
+						s8vec2 original_position = this->m_selected->get_pos();
+						this->m_selected->move(this->m_cursor_pos - this->m_selected->get_pos());
+						this->m_ui_controller->set_info_panel_target(this->m_selected);
+						this->m_ui_controller->set_unit_menu_target(this->m_selected, original_position);
+						this->m_ui_controller->set_can_close(false);
+						this->m_selected.reset();
+					}
 				}
 				else {
 					reference<unit> u = this->m_map->get_unit_at(this->m_cursor_pos);
@@ -98,7 +106,7 @@ namespace fe_engine {
 						color = renderer::color::black;
 					}
 				}
-				r->render_char_at(this->m_cursor_pos.x, this->m_cursor_pos.y + 1 + (height - this->m_map->get_height()), 'v', color);
+				r->render_char_at(this->m_cursor_pos.x, (size_t)this->m_cursor_pos.y + 1 + (height - this->m_map->get_height()), 'v', color);
 			}
 		}
 	}
