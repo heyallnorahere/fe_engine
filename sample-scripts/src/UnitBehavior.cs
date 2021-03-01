@@ -91,6 +91,9 @@ namespace Scripts
                     if (myDist >= weaponRange.X && myDist <= weaponRange.Y) {
                         // This is a good spot for us.
                         var candidate = new Vec2<int>(dx, dy) + target;
+                        if ((candidate - this.Parent.Position).TaxicabLength() > this.Parent.CurrentMovement) {
+                            continue;
+                        }
                         if (Map.IsTileOccupied(candidate)) { 
                             continue; 
                         }
