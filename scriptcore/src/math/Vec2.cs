@@ -59,7 +59,7 @@ namespace FEEngine.Math
         }
         public static Vec2<T> operator+(Vec2<T> vec1, Vec2<T> vec2)
         {
-            return new Vec2<T>((T)Convert.ChangeType(Convert.ToDouble(vec1.X) + Convert.ToDouble(vec2.Y), typeof(T)), (T)Convert.ChangeType(Convert.ToDouble(vec1.Y) + Convert.ToDouble(vec2.Y), typeof(T)));
+            return new Vec2<T>((T)Convert.ChangeType(Convert.ToDouble(vec1.X) + Convert.ToDouble(vec2.X), typeof(T)), (T)Convert.ChangeType(Convert.ToDouble(vec1.Y) + Convert.ToDouble(vec2.Y), typeof(T)));
         }
         public static Vec2<T> operator-(Vec2<T> vec1, Vec2<T> vec2)
         {

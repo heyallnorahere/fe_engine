@@ -107,7 +107,7 @@ project "entrypoint"
         optimize "On"
     filter "system:windows"
         prelinkcommands {
-            'del /q "script-assemblies\\*"',
+            'del /q "script-assemblies\\*.dll"',
         }
         postbuildcommands {
             '{COPY} "../vendor/binaries/windows/%{cfg.buildcfg}/bin/*.dll" "%{cfg.targetdir}\\"',
