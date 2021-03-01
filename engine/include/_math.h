@@ -1,6 +1,7 @@
 #pragma once
 #include <cmath>
 #include <cstdint>
+#include <typeinfo>
 namespace fe_engine {
 	// basic vec2 struct, good enough for our purposes
 	template<typename T> struct vec2t {
@@ -57,10 +58,20 @@ namespace fe_engine {
 			vec2t<double> normal = static_cast<vec2t<double>>(*this) / this->length();
 			return normal;
 		}
+		T taxicab() {
+			auto _abs = [](T x) -> T {
+				if (typeid(T).hash_code() == typeid(float).hash_code() || typeid(T).hash_code() == typeid(double).hash_code()) {
+					return fabs(x);
+				} else {
+					return abs(x);
+				}
+			};
+			return _abs(this->x) + _abs(this->y);
+		}
 	};
 	using u8vec2 = vec2t<uint8_t>;
 	using s8vec2 = vec2t<int8_t>;
 	using u32vec2 = vec2t<uint32_t>;
-	using s32vec2 = vec2t<int>;
+	using s32vec2 = vec2t<int32_t>;
 	using vec2 = vec2t<double>;
 }
