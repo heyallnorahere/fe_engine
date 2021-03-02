@@ -57,6 +57,13 @@ namespace fe_engine {
 		}
 	}
 	void map::render(reference<renderer> r) {
+		size_t width, height;
+		r->get_buffer_size(width, height);
+		for (size_t x = 0; x < this->m_width; x++) {
+			for (size_t y = 0; y < this->m_height; y++) {
+				r->render_char_at(x, y + (height - this->m_height), ' ', renderer::color::none, renderer::background_color::green);
+			}
+		}
 		for (auto& u : this->m_units) {
 			renderer::color color = renderer::color::white;
 			switch (u->get_affiliation()) {
@@ -77,8 +84,6 @@ namespace fe_engine {
 			if (u->get_equipped_weapon()) {
 				type = u->get_equipped_weapon()->get_type();
 			}
-			size_t width, height;
-			r->get_buffer_size(width, height);
 			r->render_char_at(u->get_pos().x, u->get_pos().y + (height - this->m_height), weapon::get_char_from_type(type), color);
 			reference<behavior> b = u->get_behavior();
 			if (b) b->on_render(r);
