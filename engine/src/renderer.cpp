@@ -8,18 +8,31 @@
 #include <Windows.h>
 #else
 using color_map = std::unordered_map<fe_engine::renderer::color, std::string>;
+using background_color_map = std::unordered_map<fe_engine::renderer::background_color, std::string>;
 static color_map gen_color_map() {
 	color_map cm;
-	using clr = fe_engine::renderer::color;
-	cm[clr::red] = "\033[31m";
-	cm[clr::green] = "\033[32m";
-	cm[clr::blue] = "\033[34m";
-	cm[clr::yellow] = "\033[33m";
-	cm[clr::white] = "\033[37m";
-	cm[clr::black] = "\033[30m";
+	using color = fe_engine::renderer::color;
+	cm[color::red] = "\033[31m";
+	cm[color::green] = "\033[32m";
+	cm[color::blue] = "\033[34m";
+	cm[color::yellow] = "\033[33m";
+	cm[color::white] = "\033[37m";
+	cm[color::black] = "\033[30m";
 	return cm;
 }
+static background_color_map gen_bg_color_map() {
+	background_color_map bcm;
+	using color = fe_engine::renderer::background_color;
+	bcm[color::red] = "\033[41m";
+	bcm[color::green] = "\033[42m";
+	bcm[color::blue] = "\033[44m";
+	bcm[color::yellow] = "\033[43m";
+	bcm[color::white] = "\033[47m";
+	bcm[color::black] = "\033[40m";
+	return bcm;
+}
 color_map _color_map = gen_color_map();
+background_color_map bg_color_map = gen_bg_color_map();
 #endif
 static void set_cursor_pos(int x, int y) {
 #ifdef FEENGINE_WINDOWS
@@ -34,7 +47,13 @@ static void print_char(char c, fe_engine::renderer::color _c, fe_engine::rendere
 	SetConsoleTextAttribute(console, (WORD)_c | (WORD)bg);
 	WriteConsoleA(console, &c, 1, NULL, NULL);
 #else
-	std::cout << _color_map[_c] << c << std::flush;
+	if (_c != fe_engine::renderer::color::none) {
+		std::cout << _color_map[_c];
+	}
+	if (bg != fe_engine::renderer::background_color::none) {
+		std::cout << bg_color_map[bg];
+	}
+	std::cout << c << std::flush;
 #endif
 }
 static void disable_console_cursor() {

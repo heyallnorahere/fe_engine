@@ -25,7 +25,7 @@
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/entrypoint",
             "environment": [],
-            "externalConsole": true,
+            "externalConsole": false,
             "MIMode": "lldb"
         }
     ]
