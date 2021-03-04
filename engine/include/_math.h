@@ -6,10 +6,10 @@ namespace fe_engine {
 	// basic vec2 struct, good enough for our purposes
 	template<typename T> struct vec2t {
 		T x, y;
-		bool operator==(const vec2t<T>& other) {
+		bool operator==(const vec2t<T>& other) const {
 			return (this->x == other.x) && (this->y == other.y);
 		}
-		template<typename U> bool operator==(const vec2t<U>& other) {
+		template<typename U> bool operator==(const vec2t<U>& other) const {
 			return (this->x == (T)other.x) && (this->y == (T)other.y);
 		}
 		vec2t<T> operator+(const vec2t<T>& other) {
@@ -67,6 +67,13 @@ namespace fe_engine {
 				}
 			};
 			return _abs(this->x) + _abs(this->y);
+		}
+	};
+	template<typename T> struct hash_vec2t {
+		using vec2 = vec2t<T>;
+		size_t operator()(const vec2& key) const {
+			std::hash<T> hasher;
+			return hasher(key.x) ^ (hasher(key.y) << 1);
 		}
 	};
 	using u8vec2 = vec2t<uint8_t>;

@@ -34,6 +34,15 @@ namespace fe_engine {
 		this->m_units.push_back(unit);
 	}
 	void map::update() {
+		if (this->m_tiles.size() != this->m_width * this->m_height) {
+			for (int8_t x = 0; (int8_t)x < this->m_width; x++) {
+				for (int8_t y = 0; (int8_t)y < this->m_height; y++) {
+					if (this->m_tiles.find({ x, y }) == this->m_tiles.end()) {
+						this->m_tiles[{ x, y }] = reference<tile>::create(tile::passing_properties{ true });
+					}
+				}
+			}
+		}
 		this->m_units.remove_if([&](reference<unit> u) {
 			bool remove = u->get_current_hp() <= 0;
 			if (remove) {
@@ -61,7 +70,8 @@ namespace fe_engine {
 		r->get_buffer_size(width, height);
 		for (size_t x = 0; x < this->m_width; x++) {
 			for (size_t y = 0; y < this->m_height; y++) {
-				r->render_char_at(x, y + (height - this->m_height), ' ', renderer::color::none, renderer::background_color::green);
+				reference<tile> tile = this->m_tiles[{ (int8_t)x, (int8_t)y }];
+				r->render_char_at(x, y + (height - this->m_height), ' ', renderer::color::none, tile->get_color());
 			}
 		}
 		for (auto& u : this->m_units) {
@@ -104,6 +114,12 @@ namespace fe_engine {
 			}
 		}
 		return reference<unit>();
+	}
+	reference<tile> map::get_tile(s8vec2 pos) {
+		return this->m_tiles[pos];
+	}
+	void map::set_tile(s8vec2 pos, reference<tile> tile) {
+		this->m_tiles[pos] = tile;
 	}
 	std::vector<reference<unit>> map::get_all_units_of_affiliation(unit_affiliation affiliation) {
 		std::vector<reference<unit>> units;
