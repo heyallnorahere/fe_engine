@@ -16,16 +16,17 @@ namespace FEEngine
             BLUE,
             YELLOW,
             WHITE,
-            BLACK
+            BLACK,
+            NONE
         }
         private ulong memoryAddress;
-        public void RenderCharAt(Vec2<int> position, char character, Color color)
+        public void RenderCharAt(Vec2<int> position, char character, Color color = Color.NONE, Color backgroundColor = Color.NONE)
         {
-            RenderCharAt_Native(this.memoryAddress, position, character, color);
+            RenderCharAt_Native(this.memoryAddress, position, character, color, backgroundColor);
         }
-        public void RenderStringAt(Vec2<int> position, String text, Color color)
+        public void RenderStringAt(Vec2<int> position, String text, Color color = Color.NONE, Color backgroundColor = Color.NONE)
         {
-            RenderStringAt_Native(this.memoryAddress, position, text, color);
+            RenderStringAt_Native(this.memoryAddress, position, text, color, backgroundColor);
         }
         public Vec2<int> GetBufferSize()
         {
@@ -42,9 +43,9 @@ namespace FEEngine
             return r;
         }
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void RenderCharAt_Native(ulong address, Vec2<int> position, char character, Color color);
+        private static extern void RenderCharAt_Native(ulong address, Vec2<int> position, char character, Color color, Color backgroundColor);
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void RenderStringAt_Native(ulong address, Vec2<int> position, String text, Color color);
+        private static extern void RenderStringAt_Native(ulong address, Vec2<int> position, String text, Color color, Color backgroundColor);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern Vec2<int> GetBufferSize_Native(ulong address);
     }

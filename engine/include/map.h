@@ -4,6 +4,7 @@
 #include <list>
 #include <vector>
 #include "unit.h"
+#include "tile.h"
 #include "map.h"
 #include "input_mapper.h"
 namespace fe_engine {
@@ -22,6 +23,7 @@ namespace fe_engine {
 		size_t get_height() const;
 	private:
 		std::list<reference<unit>> m_units;
+		std::vector<reference<tile>> m_tiles;
 		size_t m_width, m_height;
 	};
 }

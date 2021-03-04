@@ -30,8 +30,35 @@ namespace fe_engine {
 		case 5: // black
 			return renderer::color::black;
 			break;
+		default:
+			return renderer::color::none;
+			break;
 		}
-		return renderer::color::white;
+	}
+	static renderer::background_color parse_cs_bg_color_enum(int color) {
+		switch (color) {
+		case 0: // red
+			return renderer::background_color::red;
+			break;
+		case 1: // green
+			return renderer::background_color::green;
+			break;
+		case 2: // blue
+			return renderer::background_color::blue;
+			break;
+		case 3: // yellow
+			return renderer::background_color::yellow;
+			break;
+		case 4: // white
+			return renderer::background_color::white;
+			break;
+		case 5: // black
+			return renderer::background_color::black;
+			break;
+		default:
+			return renderer::background_color::none;
+			break;
+		}
 	}
 	std::string from_mono(MonoString* str) {
 		return std::string(mono_string_to_utf8(str));
@@ -123,16 +150,18 @@ namespace fe_engine {
 		bool FEEngine_Map_IsTileOccupied(s32vec2 position) {
 			return script_wrapper_map->get_unit_at(position);
 		}
-		void FEEngine_Renderer_RenderCharAt(renderer* address, s32vec2 position, char character, int color) {
+		void FEEngine_Renderer_RenderCharAt(renderer* address, s32vec2 position, char character, int color, int background) {
 			renderer::color c = parse_cs_color_enum(color);
+			renderer::background_color bg = parse_cs_bg_color_enum(background);
 			reference<renderer> r = reference<renderer>(address);
-			r->render_char_at(position.x, position.y, character, c);
+			r->render_char_at(position.x, position.y, character, c, bg);
 		}
-		void FEEngine_Renderer_RenderStringAt(renderer* address, s32vec2 position, MonoString* text, int color) {
+		void FEEngine_Renderer_RenderStringAt(renderer* address, s32vec2 position, MonoString* text, int color, int background) {
 			std::string str = from_mono(text);
 			renderer::color c = parse_cs_color_enum(color);
+			renderer::background_color bg = parse_cs_bg_color_enum(background);
 			reference<renderer> r = reference<renderer>(address);
-			r->render_string_at(position.x, position.y, str, c);
+			r->render_string_at(position.x, position.y, str, c, bg);
 		}
 		s32vec2 FEEngine_Renderer_GetBufferSize(renderer* address) {
 			reference<renderer> r = reference<renderer>(address);

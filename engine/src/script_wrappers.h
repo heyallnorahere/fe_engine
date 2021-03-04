@@ -38,8 +38,8 @@ namespace fe_engine {
 		uint64_t FEEngine_Map_GetUnitAt(s32vec2 position);
 		bool FEEngine_Map_IsTileOccupied(s32vec2 position);
 		// renderer class
-		void FEEngine_Renderer_RenderCharAt(renderer* address, s32vec2 position, char character, int color);
-		void FEEngine_Renderer_RenderStringAt(renderer* address, s32vec2 position, MonoString* text, int color);
+		void FEEngine_Renderer_RenderCharAt(renderer* address, s32vec2 position, char character, int color, int background);
+		void FEEngine_Renderer_RenderStringAt(renderer* address, s32vec2 position, MonoString* text, int color, int background);
 		s32vec2 FEEngine_Renderer_GetBufferSize(renderer* address);
 		// item class
 		MonoString* FEEngine_Item_GetName(uint64_t unit_index, uint64_t item_index);
