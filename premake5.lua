@@ -8,6 +8,7 @@ workspace "fe_engine"
     flags {
         "MultiProcessorCompile"
     }
+    startproject "entrypoint"
     filter "system:windows"
         defines {
             "FEENGINE_WINDOWS"
@@ -28,7 +29,6 @@ workspace "fe_engine"
         defines {
             "FEENGINE_RELEASE"
         }
-    startproject "entrypoint"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 project "engine"
     location "engine"
