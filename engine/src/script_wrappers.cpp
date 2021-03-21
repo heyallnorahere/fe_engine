@@ -6,8 +6,7 @@
 #include <cassert>
 #include <mono/jit/jit.h>
 #include "logger.h"
-static fe_engine::reference<fe_engine::map> script_wrapper_map;
-static fe_engine::reference<fe_engine::input_mapper> script_wrapper_imapper;
+#include "object_register.h"
 static MonoDomain* domain;
 namespace fe_engine {
 	static renderer::color parse_cs_color_enum(int color) {
@@ -60,6 +59,11 @@ namespace fe_engine {
 			break;
 		}
 	}
+	static reference<map> get_map() {
+		auto map_register = object_registry::get_register<map>();
+		assert(map_register->size() > 0);
+		return map_register->get(0);
+	}
 	std::string from_mono(MonoString* str) {
 		return std::string(mono_string_to_utf8(str));
 	}
@@ -67,80 +71,74 @@ namespace fe_engine {
 		return mono_string_new(domain, str.c_str());
 	}
 	namespace script_wrappers {
-		void set_map(reference<map> m) {
-			script_wrapper_map = m;
-		}
-		void set_imapper(reference<input_mapper> im) {
-			script_wrapper_imapper = im;
-		}
 		void set_domain(MonoDomain* domain) {
 			::domain = domain;
 		}
 		MonoString* FEEngine_Unit_GetName(uint64_t unit_index) {
-			return to_mono(script_wrapper_map->get_unit(unit_index)->get_name());
+			return to_mono(get_map()->get_unit(unit_index)->get_name());
 		}
 		void FEEngine_Unit_SetName(uint64_t unit_index, MonoString* name) {
-			script_wrapper_map->get_unit(unit_index)->set_name(from_mono(name));
+			get_map()->get_unit(unit_index)->set_name(from_mono(name));
 		}
 		void FEEngine_Unit_GetPosition(uint64_t unit_index, s32vec2* out_position) {
-			*out_position = script_wrapper_map->get_unit(unit_index)->get_pos();
+			*out_position = get_map()->get_unit(unit_index)->get_pos();
 		}
 		void FEEngine_Unit_SetPosition(uint64_t unit_index, s32vec2 in_position) {
-			reference<unit> u = script_wrapper_map->get_unit(unit_index);
+			reference<unit> u = get_map()->get_unit(unit_index);
 			s8vec2 pos = u->get_pos();
 			u->move(static_cast<s8vec2>(in_position) - pos, 0);
 		}
 		uint32_t FEEngine_Unit_GetHP(uint64_t unit_index) {
-			return (uint32_t)script_wrapper_map->get_unit(unit_index)->get_current_hp();
+			return (uint32_t)get_map()->get_unit(unit_index)->get_current_hp();
 		}
 		void FEEngine_Unit_SetHP(uint64_t unit_index, uint32_t hp) {
-			script_wrapper_map->get_unit(unit_index)->set_current_hp((int32_t)hp);
+			get_map()->get_unit(unit_index)->set_current_hp((int32_t)hp);
 		}
 		uint32_t FEEngine_Unit_GetCurrentMovement(uint64_t unit_index) {
-			return (uint32_t)script_wrapper_map->get_unit(unit_index)->get_available_movement();
+			return (uint32_t)get_map()->get_unit(unit_index)->get_available_movement();
 		}
 		void FEEngine_Unit_SetCurrentMovement(uint64_t unit_index, uint32_t mv) {
-			script_wrapper_map->get_unit(unit_index)->set_available_movement((int32_t)mv);
+			get_map()->get_unit(unit_index)->set_available_movement((int32_t)mv);
 		}
 		uint64_t FEEngine_Unit_GetInventorySize(uint64_t unit_index) {
-			return script_wrapper_map->get_unit(unit_index)->get_inventory().size();
+			return get_map()->get_unit(unit_index)->get_inventory().size();
 		}
 		unit_affiliation FEEngine_Unit_GetAffiliation(uint64_t unit_index) {
-			return script_wrapper_map->get_unit(unit_index)->get_affiliation();
+			return get_map()->get_unit(unit_index)->get_affiliation();
 		}
 		unit::unit_stats FEEngine_Unit_GetStats(uint64_t unit_index) {
-			return script_wrapper_map->get_unit(unit_index)->get_stats();
+			return get_map()->get_unit(unit_index)->get_stats();
 		}
 		void FEEngine_Unit_SetStats(uint64_t unit_index, unit::unit_stats stats) {
-			script_wrapper_map->get_unit(unit_index)->get_stats() = stats;
+			get_map()->get_unit(unit_index)->get_stats() = stats;
 		}
 		void FEEngine_Unit_Move(uint64_t unit_index, s32vec2 offset) {
-			script_wrapper_map->get_unit(unit_index)->move(offset);
+			get_map()->get_unit(unit_index)->move(offset);
 		}
 		void FEEngine_Unit_Attack(uint64_t unit_index, uint64_t other_index) {
-			script_wrapper_map->get_unit(unit_index)->attack(script_wrapper_map->get_unit(other_index));
+			get_map()->get_unit(unit_index)->attack(get_map()->get_unit(other_index));
 		}
 		void FEEngine_Unit_Wait(uint64_t unit_index) {
-			script_wrapper_map->get_unit(unit_index)->wait();
+			get_map()->get_unit(unit_index)->wait();
 		}
 		void FEEngine_Unit_Equip(uint64_t unit_index, uint64_t item_index) {
-			std::list<reference<item>>& inventory = script_wrapper_map->get_unit(unit_index)->get_inventory();
+			std::list<reference<item>>& inventory = get_map()->get_unit(unit_index)->get_inventory();
 			std::list<reference<item>>::iterator it = inventory.begin();
 			std::advance(it, item_index);
-			script_wrapper_map->get_unit(unit_index)->equip(*it);
+			get_map()->get_unit(unit_index)->equip(*it);
 		}
 		bool FEEngine_Unit_HasWeaponEquipped(uint64_t unit_index) {
-			return script_wrapper_map->get_unit(unit_index)->get_equipped_weapon();
+			return get_map()->get_unit(unit_index)->get_equipped_weapon();
 		}
 		uint64_t FEEngine_Map_GetUnitCount() {
-			return script_wrapper_map->get_unit_count();
+			return get_map()->get_unit_count();
 		}
 		s32vec2 FEEngine_Map_GetSize() {
-			return { (int32_t)script_wrapper_map->get_width(), (int32_t)script_wrapper_map->get_height() };
+			return { (int32_t)get_map()->get_width(), (int32_t)get_map()->get_height() };
 		}
 		uint64_t FEEngine_Map_GetUnitAt(s32vec2 position) {
-			for (uint64_t i = 0; i < script_wrapper_map->get_unit_count(); i++) {
-				if (script_wrapper_map->get_unit(i)->get_pos() == (s8vec2)position) {
+			for (uint64_t i = 0; i < get_map()->get_unit_count(); i++) {
+				if (get_map()->get_unit(i)->get_pos() == (s8vec2)position) {
 					return i;
 				}
 			}
@@ -148,7 +146,7 @@ namespace fe_engine {
 			return std::numeric_limits<uint64_t>::max();
 		}
 		bool FEEngine_Map_IsTileOccupied(s32vec2 position) {
-			return script_wrapper_map->get_unit_at(position);
+			return get_map()->get_unit_at(position);
 		}
 		void FEEngine_Renderer_RenderCharAt(renderer* address, s32vec2 position, char character, int color, int background) {
 			renderer::color c = parse_cs_color_enum(color);
@@ -170,7 +168,7 @@ namespace fe_engine {
 			return { (int32_t)width, (int32_t)height };
 		}
 		MonoString* FEEngine_Item_GetName(uint64_t unit_index, uint64_t item_index) {
-			std::list<reference<item>>& inventory = script_wrapper_map->get_unit(unit_index)->get_inventory();
+			std::list<reference<item>>& inventory = get_map()->get_unit(unit_index)->get_inventory();
 			reference<item> i;
 			if (item_index != inventory.size()) {
 				std::list<reference<item>>::iterator it = inventory.begin();
@@ -178,12 +176,12 @@ namespace fe_engine {
 				i = *it;
 			}
 			else {
-				i = script_wrapper_map->get_unit(unit_index)->get_equipped_weapon();
+				i = get_map()->get_unit(unit_index)->get_equipped_weapon();
 			}
 			return to_mono(i->get_name());
 		}
 		void FEEngine_Item_SetName(uint64_t unit_index, uint64_t item_index, MonoString* name) {
-			std::list<reference<item>>& inventory = script_wrapper_map->get_unit(unit_index)->get_inventory();
+			std::list<reference<item>>& inventory = get_map()->get_unit(unit_index)->get_inventory();
 			reference<item> i;
 			if (item_index != inventory.size()) {
 				std::list<reference<item>>::iterator it = inventory.begin();
@@ -191,12 +189,12 @@ namespace fe_engine {
 				i = *it;
 			}
 			else {
-				i = script_wrapper_map->get_unit(unit_index)->get_equipped_weapon();
+				i = get_map()->get_unit(unit_index)->get_equipped_weapon();
 			}
 			i->set_name(from_mono(name));
 		}
 		void FEEngine_Item_Use(uint64_t unit_index, uint64_t item_index) {
-			reference<unit> u = script_wrapper_map->get_unit(unit_index);
+			reference<unit> u = get_map()->get_unit(unit_index);
 			std::list<reference<item>>& inventory = u->get_inventory();
 			std::list<reference<item>>::iterator it = inventory.begin();
 			std::advance(it, item_index);
@@ -210,7 +208,7 @@ namespace fe_engine {
 			inventory.remove_if([&](reference<item> _i) { return _i.get() == i.get(); });
 		}
 		bool FEEngine_Item_IsWeapon(uint64_t unit_index, uint64_t item_index) {
-			reference<unit> u = script_wrapper_map->get_unit(unit_index);
+			reference<unit> u = get_map()->get_unit(unit_index);
 			std::list<reference<item>>& inventory = u->get_inventory();
 			std::list<reference<item>>::iterator it = inventory.begin();
 			std::advance(it, item_index);
@@ -218,7 +216,7 @@ namespace fe_engine {
 			return i->get_item_flags() & item::weapon;
 		}
 		weapon::weapon_stats FEEngine_Weapon_GetStats(uint64_t unit, uint64_t index) {
-			reference<::fe_engine::unit> u = script_wrapper_map->get_unit(unit);
+			reference<::fe_engine::unit> u = get_map()->get_unit(unit);
 			std::list<reference<item>>& inventory = u->get_inventory();
 			reference<weapon> w;
 			if (index != inventory.size()) {
@@ -233,7 +231,7 @@ namespace fe_engine {
 			return w->get_stats();
 		}
 		void FEEngine_Weapon_SetStats(uint64_t unit, uint64_t index, weapon::weapon_stats stats) {
-			reference<::fe_engine::unit> u = script_wrapper_map->get_unit(unit);
+			reference<::fe_engine::unit> u = get_map()->get_unit(unit);
 			std::list<reference<item>>& inventory = u->get_inventory();
 			reference<weapon> w;
 			if (index != inventory.size()) {
@@ -248,7 +246,7 @@ namespace fe_engine {
 			w->get_stats() = stats;
 		}
 		weapon::type FEEngine_Weapon_GetType(uint64_t unit, uint64_t index) {
-			reference<::fe_engine::unit> u = script_wrapper_map->get_unit(unit);
+			reference<::fe_engine::unit> u = get_map()->get_unit(unit);
 			std::list<reference<item>>& inventory = u->get_inventory();
 			reference<weapon> w;
 			if (index != inventory.size()) {

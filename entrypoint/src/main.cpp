@@ -74,7 +74,6 @@ int main() {
 	fe_engine::object_registry::get_register<fe_engine::controller>()->add(controller);
 	// make the input mapper object
 	fe_engine::reference<fe_engine::input_mapper> imapper = fe_engine::reference<fe_engine::input_mapper>::create(controller);
-	fe_engine::object_registry::get_register<fe_engine::input_mapper>()->add(imapper);
 	// make a ui controller
 	fe_engine::reference<fe_engine::ui_controller> ui_controller = fe_engine::reference<fe_engine::ui_controller>::create(renderer, map, imapper);
 	// make a phase manager
@@ -82,7 +81,7 @@ int main() {
 	// make the player (cursor, etc.)
 	fe_engine::reference<fe_engine::player> player = fe_engine::reference<fe_engine::player>::create(imapper, map, ui_controller, phase_manager);
 	// instantiate the script engine and load the core assembly
-	fe_engine::reference<fe_engine::script_engine> script_engine = fe_engine::reference<fe_engine::script_engine>::create("script-assemblies/scriptcore.dll", map);
+	fe_engine::reference<fe_engine::script_engine> script_engine = fe_engine::reference<fe_engine::script_engine>::create("script-assemblies/scriptcore.dll");
 	fe_engine::reference<fe_engine::assembly> core = script_engine->get_core();
 	fe_engine::reference<fe_engine::cs_class> test_class = core->get_class("FEEngine", "Test");
 	// load a test item script

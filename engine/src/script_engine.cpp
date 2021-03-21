@@ -151,8 +151,8 @@ namespace fe_engine {
 	void set_property(MonoProperty* property, MonoObject* object, void* value) {
 		mono_property_set_value(property, object, &value, NULL);
 	}
-	script_engine::script_engine(const std::string& core_assembly_path, reference<map> m) {
-		this->init_engine(core_assembly_path, m);
+	script_engine::script_engine(const std::string& core_assembly_path) {
+		this->init_engine(core_assembly_path);
 	}
 	script_engine::~script_engine() {
 		this->shutdown_engine();
@@ -208,7 +208,7 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.Logger::Print_Native", (void*)script_wrappers::FEEngine_Logger_Print);
 		mono_add_internal_call("FEEngine.InputMapper::GetState_Native", (void*)script_wrappers::FEEngine_InputMapper_GetState);
 	}
-	void script_engine::init_engine(const std::string& core_assembly_path, reference<map> m) {
+	void script_engine::init_engine(const std::string& core_assembly_path) {
 		this->init_mono();
 		MonoDomain* domain = NULL;
 		bool cleanup = false;
@@ -218,7 +218,6 @@ namespace fe_engine {
 			cleanup = true;
 		}
 		this->m_core = load_assembly_from_file(core_assembly_path.c_str());
-		script_wrappers::set_map(m);
 		script_wrappers::set_domain(cleanup ? domain : this->m_domain);
 		register_wrappers();
 		if (cleanup) {

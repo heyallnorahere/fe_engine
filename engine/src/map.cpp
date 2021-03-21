@@ -6,32 +6,15 @@
 #endif
 #include <limits>
 #include <cassert>
+#include "object_register.h"
 namespace fe_engine {
-	static void update_next_units(std::list<reference<unit>>& units, reference<unit> u) {
-		size_t index = std::numeric_limits<size_t>::max();
-		size_t i = 0;
-		for (auto _u : units) {
-			if (_u.get() == u.get()) {
-				index = i;
-				break;
-			}
-			i++;
-		}
-		assert(index != std::numeric_limits<size_t>::max());
-		i = 0;
-		for (auto _u : units) {
-			if (i > index) {
-				_u->update_index();
-			}
-			i++;
-		}
-	}
 	map::map(size_t width, size_t height) {
 		this->m_width = width;
 		this->m_height = height;
 	}
 	void map::add_unit(const reference<unit>& unit) {
-		this->m_units.push_back(unit);
+		auto unit_register = object_registry::get_register<::fe_engine::unit>();
+		this->m_units.push_back(unit_register->add(unit));
 	}
 	void map::update() {
 		if (this->m_tiles.size() != this->m_width * this->m_height) {
@@ -43,15 +26,17 @@ namespace fe_engine {
 				}
 			}
 		}
-		this->m_units.remove_if([&](reference<unit> u) {
+		auto unit_register = object_registry::get_register<unit>();
+		this->m_units.remove_if([&](size_t index) {
+			auto u = unit_register->get(index);
 			bool remove = u->get_current_hp() <= 0;
 			if (remove) {
 				u->attach_behavior(reference<behavior>(), 0);
-				update_next_units(this->m_units, u);
 			}
 			return remove;
 		});
-		for (auto& u : this->m_units) {
+		for (size_t index : this->m_units) {
+			auto u = unit_register->get(index);
 			if (!u->initialized()) {
 				u->init();
 			}
@@ -59,7 +44,9 @@ namespace fe_engine {
 		}
 	}
 	void map::update_units(unit_affiliation affiliation, reference<input_mapper> im) {
-		for (auto& u : this->m_units) {
+		auto unit_register = object_registry::get_register<unit>();
+		for (size_t index : this->m_units) {
+			auto u = unit_register->get(index);
 			if (u->get_affiliation() == affiliation) {
 				u->unit_update(im);
 			}
@@ -74,7 +61,9 @@ namespace fe_engine {
 				r->render_char_at(x, y + (height - this->m_height), ' ', renderer::color::none, tile->get_color());
 			}
 		}
-		for (auto& u : this->m_units) {
+		auto unit_register = object_registry::get_register<unit>();
+		for (size_t index : this->m_units) {
+			auto u = unit_register->get(index);
 			renderer::color color = renderer::color::white;
 			switch (u->get_affiliation()) {
 			case unit_affiliation::enemy:
@@ -105,10 +94,13 @@ namespace fe_engine {
 	reference<unit> map::get_unit(size_t index) const {
 		auto it = this->m_units.begin();
 		std::advance(it, index);
-		return *it;
+		auto unit_register = object_registry::get_register<unit>();
+		return unit_register->get(*it);
 	}
 	reference<unit> map::get_unit_at(s8vec2 pos) const {
-		for (const auto& u : this->m_units) {
+		auto unit_register = object_registry::get_register<unit>();
+		for (size_t index : this->m_units) {
+			auto u = unit_register->get(index);
 			if (u->get_pos() == pos) {
 				return u;
 			}
@@ -123,7 +115,9 @@ namespace fe_engine {
 	}
 	std::vector<reference<unit>> map::get_all_units_of_affiliation(unit_affiliation affiliation) {
 		std::vector<reference<unit>> units;
-		for (reference<unit> u : this->m_units) {
+		auto unit_register = object_registry::get_register<unit>();
+		for (size_t index : this->m_units) {
+			auto u = unit_register->get(index);
 			if (u->get_affiliation() == affiliation) {
 				units.push_back(u);
 			}

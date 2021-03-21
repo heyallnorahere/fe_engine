@@ -99,7 +99,6 @@ namespace fe_engine {
 		this->m_controller = controller;
 		this->m_keyboard = new keyboard();
 		this->load_mappings_from_json("data/mappings.json");
-		script_wrappers::set_imapper(reference<input_mapper>(this));
 	}
 
 	void input_mapper::update()
