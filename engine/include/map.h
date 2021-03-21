@@ -25,7 +25,6 @@ namespace fe_engine {
 		size_t get_width() const;
 		size_t get_height() const;
 	private:
-		
 		std::list<reference<unit>> m_units;
 		std::unordered_map<s8vec2, reference<tile>, hash_vec2t<int8_t>> m_tiles;
 		size_t m_width, m_height;

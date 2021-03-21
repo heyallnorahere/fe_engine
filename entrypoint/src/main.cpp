@@ -42,6 +42,9 @@ static void add_registers() {
 	using namespace fe_engine;
 	object_registry::add_register<unit>();
 	object_registry::add_register<item>();
+	object_registry::add_register<map>();
+	object_registry::add_register<controller>();
+	object_registry::add_register<input_mapper>();
 }
 // entrypoint
 int main() {
@@ -55,6 +58,7 @@ int main() {
 	constexpr size_t height = 10;
 	// create a map object
 	fe_engine::reference<fe_engine::map> map = fe_engine::reference<fe_engine::map>::create(width, height);
+	fe_engine::object_registry::get_register<fe_engine::map>()->add(map);
 	// create a renderer
 	fe_engine::reference<fe_engine::renderer> renderer = fe_engine::reference<fe_engine::renderer>::create();
 	// resize the buffer
@@ -67,8 +71,10 @@ int main() {
 	stats.movement = 5;
 	// make a controller object
 	fe_engine::reference<fe_engine::controller> controller = fe_engine::reference<fe_engine::controller>::create(0);
+	fe_engine::object_registry::get_register<fe_engine::controller>()->add(controller);
 	// make the input mapper object
 	fe_engine::reference<fe_engine::input_mapper> imapper = fe_engine::reference<fe_engine::input_mapper>::create(controller);
+	fe_engine::object_registry::get_register<fe_engine::input_mapper>()->add(imapper);
 	// make a ui controller
 	fe_engine::reference<fe_engine::ui_controller> ui_controller = fe_engine::reference<fe_engine::ui_controller>::create(renderer, map, imapper);
 	// make a phase manager

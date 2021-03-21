@@ -7,7 +7,7 @@ namespace fe_engine {
 	public:
 		size_t size() const;
 		reference<T> get(size_t index) const;
-		void add(reference<T> object);
+		size_t add(reference<T> object);
 		void remove(size_t index);
 	private:
 		std::list<reference<T>> m;
@@ -28,8 +28,10 @@ namespace fe_engine {
 		std::advance(it, index);
 		return *it;
 	}
-	template<typename T> inline void object_register<T>::add(reference<T> object) {
+	template<typename T> inline size_t object_register<T>::add(reference<T> object) {
+		size_t index = this->m.size();
 		this->m.push_back(object);
+		return index;
 	}
 	template<typename T> inline void object_register<T>::remove(size_t index) {
 		auto element = this->get(index);
