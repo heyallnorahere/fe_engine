@@ -38,9 +38,16 @@ static std::vector<std::string> get_file_entries(const std::string& directory, c
 	}
 	return filenames;
 }
+static void add_registers() {
+	using namespace fe_engine;
+	object_registry::add_register<unit>();
+	object_registry::add_register<item>();
+}
 // entrypoint
 int main() {
 	fe_engine::logger::print("Initializing...", fe_engine::renderer::color::green);
+	// add registers
+	add_registers();
 	// all of the loaded assemblies
 	std::vector<fe_engine::reference<fe_engine::assembly>> script_assemblies;
 	// width and height of the map

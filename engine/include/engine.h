@@ -16,3 +16,4 @@
 #include "behavior.h"
 #include "item_behavior.h"
 #include "logger.h"
+#include "object_register.h"

@@ -1,6 +1,8 @@
 #include "util.h"
 #include <chrono>
+#include "object_register.h"
 namespace fe_engine {
+	std::unordered_map<size_t, reference<ref_counted>> object_registry::m;
 	namespace util {
 		double start_time = 0;
 		bool time_initialized = false;
