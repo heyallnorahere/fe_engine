@@ -2,7 +2,17 @@
 #include <sstream>
 #include <cassert>
 #include "logger.h"
+#include "object_register.h"
 namespace fe_engine {
+	template<typename T> static size_t get_register_index(reference<T> element) {
+		auto obj_register = object_registry::get_register<T>();
+		for (size_t i = 0; i < obj_register->size(); i++) {
+			if (obj_register->get(i).get() == element.get()) {
+				return i;
+			}
+		}
+		return (size_t)-1;
+	}
 	ui_controller::ui_controller(reference<renderer> r, reference<map> m, reference<input_mapper> im) {
 		this->m_renderer = r;
 		this->m_map = m;
@@ -20,6 +30,7 @@ namespace fe_engine {
 		this->m_unit_menu_state.original_position = original_position;
 	}
 	void ui_controller::update() {
+		auto item_register = object_registry::get_register<item>();
 		if (this->m_unit_menu_target) {
 			auto input = this->m_imapper->get_state();
 			if (input.up && this->m_unit_menu_index > 0) {
@@ -41,14 +52,14 @@ namespace fe_engine {
 				break;
 			case menu_page::item:
 			{
-				std::list<reference<item>> inventory = this->m_unit_menu_target->get_inventory();
+				std::list<size_t> inventory = this->m_unit_menu_target->get_inventory();
 				if (input.down && this->m_unit_menu_index < inventory.size() - 1) {
 					this->m_unit_menu_index++;
 				}
 				if (input.ok && this->m_can_close && inventory.size() > 0) {
 					auto it = inventory.begin();
 					std::advance(it, this->m_unit_menu_index);
-					this->m_unit_menu_state.selected_item = *it;
+					this->m_unit_menu_state.selected_item = item_register->get(*it);
 					this->m_unit_menu_state.page = menu_page::item_select;
 					this->m_unit_menu_index = 0;
 				}
@@ -81,7 +92,7 @@ namespace fe_engine {
 					this->m_unit_menu_index++;
 				}
 				if (input.ok && this->m_can_close) {
-					this->m_unit_menu_target->attack(units[this->m_unit_menu_index]);
+					this->m_unit_menu_target->attack(get_register_index(units[this->m_unit_menu_index]));
 					this->close_unit_menu();
 				}
 				if (input.back && this->m_can_close) {
@@ -132,6 +143,7 @@ namespace fe_engine {
 		}
 	}
 	void ui_controller::render_info_panel(size_t origin_x, size_t origin_y, size_t width, size_t height) {
+		auto item_register = object_registry::get_register<item>();
 		if (!this->m_info_panel_target) {
 			this->m_renderer->render_string_at(origin_x, origin_y + height - 1, "Empty tile", renderer::color::white);
 		} else {
@@ -139,8 +151,8 @@ namespace fe_engine {
 			hp_string << "HP: " << (uint32_t)this->m_info_panel_target->get_current_hp() << "/" << (uint32_t)this->m_info_panel_target->get_stats().max_hp;
 			mv_string << "Movement: " << (uint32_t)this->m_info_panel_target->get_available_movement() << "/" << (uint32_t)this->m_info_panel_target->get_stats().movement;
 			ew_string << "E: ";
-			if (this->m_info_panel_target->get_equipped_weapon()) {
-				reference<weapon> equipped = this->m_info_panel_target->get_equipped_weapon();
+			if (this->m_info_panel_target->get_equipped_weapon() != (size_t)-1) {
+				reference<weapon> equipped = item_register->get(this->m_info_panel_target->get_equipped_weapon());
 				ew_string << equipped->get_name() << " (" << equipped->get_current_durability() << "/" << equipped->get_stats().durability << ")";
 			}
 			else {
@@ -153,6 +165,7 @@ namespace fe_engine {
 		}
 	}
 	void ui_controller::render_unit_menu(size_t origin_x, size_t origin_y, size_t width, size_t height) {
+		auto item_register = object_registry::get_register<item>();
 		if (this->m_unit_menu_target) {
 			switch (this->m_unit_menu_state.page) {
 			case menu_page::base:
@@ -167,7 +180,7 @@ namespace fe_engine {
 				break;
 			case menu_page::item:
 			{
-				std::list<reference<item>> inventory = this->m_unit_menu_target->get_inventory();
+				std::list<size_t> inventory = this->m_unit_menu_target->get_inventory();
 				for (size_t i = 0; i < inventory.size(); i++) {
 					bool selected = (this->m_unit_menu_index == i);
 					size_t y = origin_y + height - (1 + (i * 2));
@@ -176,7 +189,7 @@ namespace fe_engine {
 					}
 					auto it = inventory.begin();
 					std::advance(it, i);
-					this->m_renderer->render_string_at(origin_x + 2, y, (*it)->get_name(), selected ? renderer::color::red : renderer::color::white);
+					this->m_renderer->render_string_at(origin_x + 2, y, item_register->get(*it)->get_name(), selected ? renderer::color::red : renderer::color::white);
 				}
 				if (inventory.size() == 0) {
 					this->m_renderer->render_string_at(origin_x, origin_y + height - 1, "No items available", renderer::color::white);
@@ -230,7 +243,7 @@ namespace fe_engine {
 				controller->m_unit_menu_state.selected_item->set_used(true);
 				reference<item_behavior> behavior = controller->m_unit_menu_state.selected_item->get_behavior();
 				if (behavior) behavior->on_use();
-				controller->m_unit_menu_target->get_inventory().remove_if([&](reference<item> i) { return controller->m_unit_menu_state.selected_item.get() == i.get(); });
+				controller->m_unit_menu_target->get_inventory().remove_if([&](size_t index) { return controller->m_unit_menu_state.selected_item.get() == object_registry::get_register<item>()->get(index).get(); });
 				controller->close_unit_menu();
 			} });
 		}
@@ -248,9 +261,10 @@ namespace fe_engine {
 		return items;
 	}
 	std::vector<reference<unit>> ui_controller::get_attackable_units(reference<unit> u) {
+		auto item_register = object_registry::get_register<item>();
 		std::vector<reference<unit>> units;
-		if (!u->get_equipped_weapon()) return units;
-		u8vec2 range = u->get_equipped_weapon()->get_stats().range;
+		if (u->get_equipped_weapon() == (size_t)-1) return units;
+		u8vec2 range = reference<weapon>(item_register->get(u->get_equipped_weapon()))->get_stats().range;
 		for (size_t i = 0; i < this->m_map->get_unit_count(); i++) {
 			reference<unit> _u = this->m_map->get_unit(i);
 			s8vec2 delta = u->get_pos() - _u->get_pos();

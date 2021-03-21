@@ -8,6 +8,7 @@
 #include <limits>
 #include <sstream>
 #include <cassert>
+#include "object_register.h"
 namespace fe_engine {
 	unit::unit(const unit_stats& stats, s8vec2 pos, unit_affiliation affiliation, map* m, const std::string& name) {
 		this->m_stats = stats;
@@ -44,16 +45,19 @@ namespace fe_engine {
 		return this->m_affiliation;
 	}
 	void unit::update() {
-		this->m_inventory.remove_if([](reference<item> i) {
+		auto item_register = object_registry::get_register<item>();
+		this->m_inventory.remove_if([&](size_t index) {
+			reference<item> i = item_register->get(index);
 			if (i->get_item_flags() & item::weapon) {
 				return reference<weapon>(i)->get_current_durability() <= 0;
 			}
 			return false;
 		});
 		for (size_t i = 0; i < this->m_inventory.size(); i++) {
-			std::list<reference<item>>::iterator it = this->m_inventory.begin();
+			std::list<size_t>::iterator it = this->m_inventory.begin();
 			std::advance(it, i);
-			reference<item> _i = *it;
+			size_t index = *it;
+			reference<item> _i = item_register->get(index);
 			if (!_i->initialized()) {
 				size_t unit_index = std::numeric_limits<size_t>::max();
 				for (size_t j = 0; j < this->m_map->get_unit_count(); j++) {
@@ -66,9 +70,10 @@ namespace fe_engine {
 				_i->init(i, unit_index);
 			}
 		}
-		if (this->m_equipped_weapon) {
-			if (this->m_equipped_weapon->get_current_durability() <= 0) {
-				this->m_equipped_weapon.reset();
+		if (this->m_equipped_weapon != (size_t)-1) {
+			reference<weapon> equipped_weapon = item_register->get(this->m_equipped_weapon);
+			if (equipped_weapon->get_current_durability() <= 0) {
+				this->m_equipped_weapon = (size_t)-1;
 			}
 		}
 	}
@@ -87,44 +92,50 @@ namespace fe_engine {
 		this->m_movement -= (abs(offset.x) + abs(offset.y)) * consumption_multiplier;
 		this->m_can_move = (consumption_multiplier <= 0);
 	}
-	reference<weapon> unit::get_equipped_weapon() const {
+	size_t unit::get_equipped_weapon() const {
 		return this->m_equipped_weapon;
 	}
-	void unit::set_equipped_weapon(const reference<weapon>& w) {
-		this->m_equipped_weapon = w;
+	void unit::set_equipped_weapon(size_t register_index) {
+		this->m_equipped_weapon = register_index;
 	}
-	const std::list<reference<item>>& unit::get_inventory() const {
+	const std::list<size_t>& unit::get_inventory() const {
 		return this->m_inventory;
 	}
-	std::list<reference<item>>& unit::get_inventory() {
+	std::list<size_t>& unit::get_inventory() {
 		return this->m_inventory;
 	}
-	void unit::attack(reference<unit> to_attack) {
-		to_attack->receive_attack_packet(this->generate_attack_packet(to_attack), reference<unit>(this));
-		if (to_attack->m_hp <= 0) return;
-		if (to_attack->get_equipped_weapon()->get_current_durability() > 0) {
-			s32vec2 range = to_attack->get_equipped_weapon()->get_stats().range;
-			int32_t length = (this->m_pos - to_attack->m_pos).taxicab();
+	void unit::attack(size_t to_attack) {
+		auto unit_register = object_registry::get_register<unit>();
+		auto item_register = object_registry::get_register<item>();
+		reference<unit> _to_attack = unit_register->get(to_attack);
+		reference<weapon> m_equipped_weapon = item_register->get(this->m_equipped_weapon);
+		reference<weapon> other_equipped_weapon = item_register->get(_to_attack->get_equipped_weapon());
+		_to_attack->receive_attack_packet(this->generate_attack_packet(_to_attack), reference<unit>(this));
+		if (_to_attack->m_hp <= 0) return;
+		if (other_equipped_weapon->get_current_durability() > 0) {
+			s32vec2 range = other_equipped_weapon->get_stats().range;
+			int32_t length = (this->m_pos - _to_attack->m_pos).taxicab();
 			if (length >= range.x && length <= range.y) {
-				this->receive_attack_packet(to_attack->generate_attack_packet(reference<unit>(this)), to_attack);
+				this->receive_attack_packet(_to_attack->generate_attack_packet(reference<unit>(this)), _to_attack);
 			}
 		}
 		if (this->m_hp <= 0) {
 			return;
 		}
-		if (this->get_equipped_weapon()->get_current_durability() > 0 && this->m_stats.speed > to_attack->m_stats.speed) {
-			to_attack->receive_attack_packet(this->generate_attack_packet(to_attack), reference<unit>(this));
+		if (m_equipped_weapon->get_current_durability() > 0 && this->m_stats.speed > _to_attack->m_stats.speed) {
+			_to_attack->receive_attack_packet(this->generate_attack_packet(_to_attack), reference<unit>(this));
 		}
-		if (to_attack->m_hp <= 0) {
+		if (_to_attack->m_hp <= 0) {
 			return;
 		}
-		if (to_attack->m_equipped_weapon->get_current_durability() > 0 && to_attack->m_stats.speed > this->m_stats.speed) {
-			this->receive_attack_packet(to_attack->generate_attack_packet(reference<unit>(this)), to_attack);
+		if (other_equipped_weapon->get_current_durability() > 0 && _to_attack->m_stats.speed > this->m_stats.speed) {
+			this->receive_attack_packet(_to_attack->generate_attack_packet(reference<unit>(this)), _to_attack);
 		}
 	}
 	unit::attack_packet unit::generate_attack_packet(reference<unit> other) {
-		weapon::weapon_stats weapon_stats = this->m_equipped_weapon->get_stats();
-		weapon::type weapon_type = this->m_equipped_weapon->get_type();
+		reference<weapon> equipped_weapon = object_registry::get_register<item>()->get(this->m_equipped_weapon);
+		weapon::weapon_stats weapon_stats = equipped_weapon->get_stats();
+		weapon::type weapon_type = equipped_weapon->get_type();
 		attack_packet packet;
 		bool magic = false;
 		bool white_magic = false;
@@ -139,7 +150,7 @@ namespace fe_engine {
 		packet.might = (int32_t)weapon_stats.attack + (magic ? this->m_stats.magic : this->m_stats.strength) - defense;
 		packet.hit = (int32_t)weapon_stats.hit_rate + this->m_stats.dexterity - other->m_stats.dexterity;
 		packet.crit = (int32_t)weapon_stats.critical_rate;
-		this->m_equipped_weapon->consume_durability();
+		equipped_weapon->consume_durability();
 		return packet;
 	}
 	void unit::receive_attack_packet(attack_packet packet, reference<unit> sender) {
@@ -234,10 +245,11 @@ namespace fe_engine {
 		if (this->m_behavior) this->m_behavior->on_attach(this->m_map_index);
 		this->m_initialized = true;
 	}
-	void unit::equip(reference<item> to_equip) {
-		assert(to_equip->get_item_flags() & item::weapon);
-		this->get_inventory().remove_if([&](reference<item> _i) { return to_equip.get() == _i.get(); });
-		reference<weapon> equipped = this->m_equipped_weapon;
+	void unit::equip(size_t to_equip) {
+		auto item_register = object_registry::get_register<item>();
+		assert(item_register->get(to_equip)->get_item_flags() & item::weapon);
+		this->get_inventory().remove_if([&](size_t index) { return index == to_equip; });
+		reference<weapon> equipped = item_register->get(this->m_equipped_weapon);
 		this->set_equipped_weapon(to_equip);
 		if (equipped) this->get_inventory().push_back(equipped);
 	}
@@ -258,8 +270,10 @@ namespace fe_engine {
 			index--;
 			parent->set_property(unit_index, &index);
 		}
-		for (reference<item> i : this->m_inventory) {
-			reference<item_behavior> behavior;
+		auto item_register = object_registry::get_register<item>();
+		for (size_t index : this->m_inventory) {
+			reference<item> i = item_register->get(index);
+			reference<item_behavior> behavior = i->get_behavior();
 			if (behavior) {
 				if (!core) {
 					core = behavior->get_core();

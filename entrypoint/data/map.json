@@ -68,7 +68,7 @@
       "affiliation": 0,
       "equipped": 0,
       "inventory": [],
-      "name": "Soldier"
+      "name": "Soldier A"
     },
     {
       "pos": {
@@ -91,12 +91,12 @@
       "affiliation": 0,
       "equipped": 1,
       "inventory": [],
-      "name": "Soldier"
+      "name": "Soldier B"
     },
     {
       "pos": {
-        "x": 18,
-        "y": 8
+        "x": 1,
+        "y": 2
       },
       "stats": {
         "lvl": 10,
@@ -114,7 +114,7 @@
       "affiliation": 1,
       "equipped": 2,
       "inventory": [],
-      "name": "Soldier",
+      "name": "Soldier C",
       "behavior": "Scripts.UnitBehavior"
     }
   ]

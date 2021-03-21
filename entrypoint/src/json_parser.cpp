@@ -131,9 +131,9 @@ reference<unit> json_parser::make_unit_from_index(size_t index) {
 		assert(script);
 		unit_object->attach_behavior(reference<behavior>::create(script, this->m_core), this->m_map->get_unit_count());
 	}
-	if (current_unit.has_weapon) unit_object->set_equipped_weapon((reference<weapon>)this->m_items[current_unit.equipped_weapon]);
+	if (current_unit.has_weapon) unit_object->set_equipped_weapon(current_unit.equipped_weapon);
 	for (size_t index : current_unit.inventory) {
-		unit_object->get_inventory().push_back(this->m_items[index]);
+		unit_object->get_inventory().push_back(index);
 	}
 	return unit_object;
 }
@@ -147,6 +147,8 @@ json_parser::json_parser(const std::string& json_path, std::vector<fe_engine::re
 	this->load_items();
 }
 void json_parser::load_items() {
+	assert(object_registry::register_exists<item>());
+	auto item_register = object_registry::get_register<item>();
 	std::vector<json_types::item_data> data;
 	this->m_file["items"].get_to(data);
 	for (auto& id : data) {
@@ -172,7 +174,7 @@ void json_parser::load_items() {
 			}
 			i = reference<item>::create(id.name, item::usable, itembehavior);
 		}
-		this->m_items.push_back(i);
+		item_register->add(i);
 	}
 }
 reference<cs_class> json_parser::find_class(const std::string& namespace_name, const std::string& class_name) {

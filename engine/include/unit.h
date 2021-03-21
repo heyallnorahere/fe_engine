@@ -41,11 +41,11 @@ namespace fe_engine {
 		void update();
 		void unit_update(reference<input_mapper> im);
 		void move(s8vec2 offset, int8_t consumption_multiplier = 1);
-		reference<weapon> get_equipped_weapon() const;
-		void set_equipped_weapon(const reference<weapon>& w);
-		const std::list<reference<item>>& get_inventory() const;
-		std::list<reference<item>>& get_inventory();
-		void attack(reference<unit> to_attack);
+		size_t get_equipped_weapon() const;
+		void set_equipped_weapon(size_t register_index);
+		const std::list<size_t>& get_inventory() const;
+		std::list<size_t>& get_inventory();
+		void attack(size_t to_attack);
 		int32_t get_available_movement() const;
 		void set_available_movement(int32_t mv);
 		void refresh_movement();
@@ -57,7 +57,7 @@ namespace fe_engine {
 		std::string get_name();
 		bool initialized();
 		void init();
-		void equip(reference<item> to_equip);
+		void equip(size_t to_equip);
 		void update_index();
 	private:
 		struct attack_packet {
@@ -69,8 +69,8 @@ namespace fe_engine {
 		int32_t m_hp, m_movement;
 		uint64_t m_map_index;
 		unit_affiliation m_affiliation;
-		reference<weapon> m_equipped_weapon;
-		std::list<reference<item>> m_inventory;
+		size_t m_equipped_weapon;
+		std::list<size_t> m_inventory;
 		reference<behavior> m_behavior;
 		map* m_map = NULL;
 		bool m_can_move, m_initialized;

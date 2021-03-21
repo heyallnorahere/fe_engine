@@ -62,6 +62,7 @@ namespace fe_engine {
 			}
 		}
 		auto unit_register = object_registry::get_register<unit>();
+		auto item_register = object_registry::get_register<item>();
 		for (size_t index : this->m_units) {
 			auto u = unit_register->get(index);
 			renderer::color color = renderer::color::white;
@@ -80,8 +81,8 @@ namespace fe_engine {
 				break;
 			}
 			weapon::type type = weapon::type::fists;
-			if (u->get_equipped_weapon()) {
-				type = u->get_equipped_weapon()->get_type();
+			if (u->get_equipped_weapon() != (size_t)-1) {
+				type = reference<weapon>(item_register->get(u->get_equipped_weapon()))->get_type();
 			}
 			r->render_char_at(u->get_pos().x, u->get_pos().y + (height - this->m_height), weapon::get_char_from_type(type), color);
 			reference<behavior> b = u->get_behavior();
