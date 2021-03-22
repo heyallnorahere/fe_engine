@@ -49,9 +49,11 @@ namespace FEEngine
         }
         private Weapon(ulong index) : base(index) { }
         public Weapon() : base() { }
-        public static new Weapon MakeFromRegistryIndex(ulong index)
+        public static new Weapon MakeFromRegistryIndex(ulong index, ulong parent)
         {
-            return new Weapon(index);
+            Weapon weapon = new Weapon(index);
+            weapon.parentIndex = parent;
+            return weapon;
         }
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern WeaponStats GetStats_Native(ulong unit, ulong index);

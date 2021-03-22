@@ -44,6 +44,13 @@
         "durability": 50,
         "type": 2
       }
+    },
+    {
+      "name": "Test Item",
+      "is weapon": false,
+      "data": {
+        "behavior": "FEEngine.TestItem"
+      }
     }
   ],
   "units": [
@@ -67,7 +74,9 @@
       },
       "affiliation": 0,
       "equipped": 0,
-      "inventory": [],
+      "inventory": [
+        3
+      ],
       "name": "Soldier A"
     },
     {

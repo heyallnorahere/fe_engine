@@ -47,9 +47,11 @@ namespace FEEngine
         {
             this.Index = 0;
         }
-        public static Item MakeFromRegistryIndex(ulong index)
+        public static Item MakeFromRegistryIndex(ulong index, ulong parent)
         {
-            return new Item(index);
+            Item item = new Item(index);
+            item.parentIndex = parent;
+            return item;
         }
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern String GetName_Native(ulong index);

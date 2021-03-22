@@ -117,11 +117,11 @@ namespace FEEngine {
         }
         public Item GetInventoryItem(ulong index)
         {
-            return Item.MakeFromRegistryIndex(index);
+            return Item.MakeFromRegistryIndex(index, this.Index);
         }
         public Weapon GetInventoryWeapon(ulong index)
         {
-            return Weapon.MakeFromRegistryIndex(index);
+            return Weapon.MakeFromRegistryIndex(index, this.Index);
         }
         public Weapon GetEquippedWeapon()
         {
@@ -129,7 +129,7 @@ namespace FEEngine {
             {
                 throw new Exception("No weapon has been equipped!");
             }
-            return Weapon.MakeFromRegistryIndex(GetEquippedWeapon_Native(this.Index));
+            return Weapon.MakeFromRegistryIndex(GetEquippedWeapon_Native(this.Index), this.Index);
         }
         public bool HasWeaponEquipped()
         {

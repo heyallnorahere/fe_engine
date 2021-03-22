@@ -9,14 +9,10 @@ namespace fe_engine {
 	}
 	void item_behavior::on_attach(uint64_t unit_index, uint64_t item_index) {
 		reference<cs_class> item_class = this->m_core->get_class("FEEngine", "Item");
-		reference<cs_method> item_creation_method = item_class->get_method("FEEngine.Item:MakeFromInventoryIndex(Unit,ulong)");
-		reference<cs_class> unit_class = this->m_core->get_class("FEEngine", "Unit");
-		reference<cs_method> unit_creation_method = unit_class->get_method("FEEngine.Unit:MakeFromIndex(ulong)");
-		std::vector<void*> args(1);
-		args[0] = &unit_index;
-		reference<cs_object> unit_object = reference<cs_object>(cs_method::call_function(unit_creation_method, args.data()));
-		args[0] = unit_object->raw();
+		reference<cs_method> item_creation_method = item_class->get_method("FEEngine.Item:MakeFromRegistryIndex(ulong,ulong)");
+		std::vector<void*> args;
 		args.push_back(&item_index);
+		args.push_back(&unit_index);
 		reference<cs_object> item_object = reference<cs_object>(cs_method::call_function(item_creation_method, args.data()));
 		reference<cs_field> parent_field = this->m_class->get_field("parent");
 		this->m_instance->set_field(parent_field, item_object->raw());
