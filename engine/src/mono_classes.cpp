@@ -12,6 +12,8 @@ namespace fe_engine {
 	extern MonoProperty* get_property_id(MonoClass* _class, const std::string& name);
 	extern MonoObject* get_property(MonoProperty* property, MonoObject* object);
 	extern void set_property(MonoProperty* property, MonoObject* object, void* value);
+	extern void* unbox_object(MonoObject* object);
+	extern void check_exception(MonoObject* exception);
 	reference<cs_class> assembly::get_class(const std::string& namespace_name, const std::string& class_name) {
 		MonoImage* image = mono_assembly_get_image(this->m_assembly);
 		MonoClass* _class = ::fe_engine::get_class(image, namespace_name, class_name);
@@ -77,14 +79,17 @@ namespace fe_engine {
 		return mono_gchandle_get_target(this->m_object);
 	}
 	void* cs_object::unbox() {
-		return mono_object_unbox((MonoObject*)this->raw());
+		return unbox_object((MonoObject*)this->raw());
 	}
 	cs_object::~cs_object() {
-		mono_gchandle_free(this->m_object);
+		if (this->m_object) mono_gchandle_free(this->m_object);
 	}
 	cs_object::cs_object(uint32_t object, MonoDomain* domain) {
 		this->m_object = object;
 		this->m_domain = domain;
+	}
+	reference<cs_object> cs_object::make_null() {
+		return reference<cs_object>(new cs_object(0, (MonoDomain*)NULL));
 	}
 	cs_object* cs_method::call_function(reference<cs_method> method, void** params) {
 		MonoObject* object = ::fe_engine::call_method(NULL, (MonoMethod*)method->m_method, params);
@@ -103,5 +108,22 @@ namespace fe_engine {
 	}
 	cs_field::cs_field(void* field) {
 		this->m_field = field;
+	}
+	cs_delegate::cs_delegate(reference<cs_object> object) {
+		this->m_object = mono_gchandle_new((MonoObject*)object->raw(), false);
+		this->m_domain = object->m_domain;
+	}
+	cs_delegate::~cs_delegate() {
+		mono_gchandle_free(this->m_object);
+	}
+	void* cs_delegate::raw() {
+		return mono_gchandle_get_target(this->m_object);
+	}
+	reference<cs_object> cs_delegate::invoke(void** params) {
+		MonoObject* exception = NULL;
+		MonoObject* object = mono_runtime_delegate_invoke((MonoObject*)this->raw(), params, &exception);
+		check_exception(exception);
+		uint32_t handle = mono_gchandle_new(object, false);
+		return reference<cs_object>(new cs_object(handle, this->m_domain));
 	}
 }

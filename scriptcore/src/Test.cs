@@ -8,6 +8,7 @@ namespace FEEngine
 {
     class Test
     {
+        public delegate int TestCallback(int a, int b);
         private Unit unit;
         public void Init()
         {
@@ -18,6 +19,14 @@ namespace FEEngine
             Vec2<int> pos = this.unit.Position;
             pos.Y++;
             this.unit.Position = pos;
+        }
+        private static int CallbackInstance(int a, int b)
+        {
+            return a + b;
+        }
+        public static TestCallback GetCallback()
+        {
+            return CallbackInstance;
         }
     }
     class TestItem : ItemBehavior

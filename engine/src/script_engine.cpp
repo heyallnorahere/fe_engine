@@ -106,9 +106,7 @@ namespace fe_engine {
 		} while (replace() != std::string::npos);
 		return strings;
 	}
-	MonoObject* call_method(MonoObject* object, MonoMethod* method, void** params = NULL) {
-		MonoObject* exception = NULL;
-		MonoObject* return_value = mono_runtime_invoke(method, object, params, &exception);
+	void check_exception(MonoObject* exception) {
 		if (exception) {
 			MonoClass* exception_class = mono_get_exception_class();
 			MonoDomain* domain = mono_object_get_domain(exception);
@@ -131,7 +129,15 @@ namespace fe_engine {
 				logger::print(ss.str());
 			}
 		}
+	}
+	MonoObject* call_method(MonoObject* object, MonoMethod* method, void** params = NULL) {
+		MonoObject* exception = NULL;
+		MonoObject* return_value = mono_runtime_invoke(method, object, params, &exception);
+		check_exception(exception);
 		return return_value;
+	}
+	void* unbox_object(MonoObject* object) {
+		return mono_object_unbox(object);
 	}
 	MonoClassField* get_field_id(MonoClass* _class, const std::string& name) {
 		return mono_class_get_field_from_name(_class, name.c_str());

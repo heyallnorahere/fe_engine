@@ -34,6 +34,7 @@ namespace fe_engine {
 	};
 	class cs_object : public ref_counted {
 	public:
+		static reference<cs_object> make_null();
 		reference<cs_object> call_method(reference<cs_method> method, void** params = NULL);
 		reference<cs_object> get_property(reference<cs_property> property);
 		void set_property(reference<cs_property> property, void* value);
@@ -48,6 +49,17 @@ namespace fe_engine {
 		MonoDomain* m_domain;
 		friend class cs_class;
 		friend class cs_method;
+		friend class cs_delegate;
+	};
+	class cs_delegate : public ref_counted {
+	public:
+		cs_delegate(reference<cs_object> object);
+		~cs_delegate();
+		void* raw();
+		reference<cs_object> invoke(void** params = NULL);
+	private:
+		uint32_t m_object;
+		MonoDomain* m_domain;
 	};
 	class cs_class : public ref_counted {
 	public:
