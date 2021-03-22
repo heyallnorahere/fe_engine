@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
+using FEEngine.Util;
 
 namespace FEEngine
 {
-    public class InputMapper
+    public class InputMapper : RegisteredObject<InputMapper>
     {
         public struct Commands
         {
@@ -23,10 +24,11 @@ namespace FEEngine
             return GetState_Native(this.memoryAddress);
         }
         private ulong memoryAddress;
-        private InputMapper()
+        public InputMapper()
         {
             this.memoryAddress = 0;
         }
+        public void SetRegisterIndex(ulong index) { }
         public static InputMapper MakeFromMemoryAddress(ulong address)
         {
             InputMapper im = new InputMapper();

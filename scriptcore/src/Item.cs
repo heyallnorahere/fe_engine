@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
+using FEEngine.Util;
+
 namespace FEEngine
 {
-    public class Item
+    public class Item : RegisteredObject<Item>
     {
         public ulong Index { get; private set; }
         public Unit Parent { get { return Unit.MakeFromIndex(this.parentIndex); } }
@@ -33,14 +35,21 @@ namespace FEEngine
         {
             return IsWeapon_Native(this.Index);
         }
-        protected Item(ulong parent, ulong inventoryIndex)
+        public void SetRegisterIndex(ulong index)
         {
-            this.Index = inventoryIndex;
-            this.parentIndex = parent;
+            this.Index = index;
         }
-        public static Item MakeFromInventoryIndex(Unit parent, ulong inventoryIndex)
+        protected Item(ulong index)
         {
-            return new Item(parent.Index, inventoryIndex);
+            this.Index = index;
+        }
+        public Item()
+        {
+            this.Index = 0;
+        }
+        public static Item MakeFromRegistryIndex(ulong index)
+        {
+            return new Item(index);
         }
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern String GetName_Native(ulong index);

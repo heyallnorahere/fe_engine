@@ -62,6 +62,7 @@ project "scriptcore"
     location "scriptcore"
     kind "SharedLib"
     language "C#"
+    csversion ("8.0")
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
     files {
@@ -71,7 +72,8 @@ project "sample-scripts"
     location "sample-scripts"
     kind "SharedLib"
     language "C#"
-        targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    csversion ("8.0")
+    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
     files {
         "%{prj.name}/src/**.cs"

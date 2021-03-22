@@ -4,9 +4,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using FEEngine.Math;
+using FEEngine.Util;
 
 namespace FEEngine {
-    public class Unit {
+    public class Unit : RegisteredObject<Unit>
+    {
         public enum UnitAffiliation
         {
             PLAYER,
@@ -115,11 +117,11 @@ namespace FEEngine {
         }
         public Item GetInventoryItem(ulong index)
         {
-            return Item.MakeFromInventoryIndex(this, index);
+            return Item.MakeFromRegistryIndex(index);
         }
         public Weapon GetInventoryWeapon(ulong index)
         {
-            return Weapon.MakeFromInventoryIndex(this, index);
+            return Weapon.MakeFromRegistryIndex(index);
         }
         public Weapon GetEquippedWeapon()
         {
@@ -127,31 +129,29 @@ namespace FEEngine {
             {
                 throw new Exception("No weapon has been equipped!");
             }
-            return Weapon.MakeFromInventoryIndex(this, GetEquippedWeapon_Native(this.Index));
+            return Weapon.MakeFromRegistryIndex(GetEquippedWeapon_Native(this.Index));
         }
         public bool HasWeaponEquipped()
         {
             return HasWeaponEquipped_Native(this.Index);
         }
-        // after calling, DO NOT keep the passed object. it will refer to a different item.
-        public Weapon EquipWeapon(Weapon weapon)
+        public void EquipWeapon(Weapon weapon)
         {
-            if (weapon.Parent.Index != this.Index)
-            {
-                throw new Exception("The passed weapon does not exist in this unit's inventory!");
-            }
             if (!weapon.IsWeapon())
             {
                 throw new Exception("The passed weapon is not a weapon!");
             }
             Equip_Native(this.Index, weapon.Index);
-            return this.GetEquippedWeapon();
+        }
+        public void SetRegisterIndex(ulong index)
+        {
+            this.Index = index;
         }
         internal Unit(ulong index)
         {
             this.Index = index;
         }
-        protected Unit()
+        public Unit()
         {
             this.Index = 0;
         }

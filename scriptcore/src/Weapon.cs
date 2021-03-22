@@ -4,10 +4,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using FEEngine.Math;
+using FEEngine.Util;
 
 namespace FEEngine
 {
-    public class Weapon : Item
+    public class Weapon : Item, RegisteredObject<Weapon>
     {
         public struct WeaponStats
         {
@@ -46,10 +47,11 @@ namespace FEEngine
                 return GetType_Native(this.parentIndex, this.Index);
             }
         }
-        private Weapon(ulong parent, ulong inventoryIndex) : base(parent, inventoryIndex) { }
-        public static new Weapon MakeFromInventoryIndex(Unit parent, ulong inventoryIndex)
+        private Weapon(ulong index) : base(index) { }
+        public Weapon() : base() { }
+        public static new Weapon MakeFromRegistryIndex(ulong index)
         {
-            return new Weapon(parent.Index, inventoryIndex);
+            return new Weapon(index);
         }
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern WeaponStats GetStats_Native(ulong unit, ulong index);

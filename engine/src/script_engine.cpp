@@ -209,6 +209,8 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.Weapon::GetType_Native", (void*)script_wrappers::FEEngine_Weapon_GetType);
 		mono_add_internal_call("FEEngine.Logger::Print_Native", (void*)script_wrappers::FEEngine_Logger_Print);
 		mono_add_internal_call("FEEngine.InputMapper::GetState_Native", (void*)script_wrappers::FEEngine_InputMapper_GetState);
+		mono_add_internal_call("FEEngine.Util.ObjectRegistry::RegisterExists_Native", (void*)script_wrappers::FEEngine_Util_ObjectRegistry_RegisterExists);
+		mono_add_internal_call("FEEngine.Util.ObjectRegister`1::GetCount_Native", (void*)script_wrappers::FEEngine_Util_ObjectRegister_GetCount);
 	}
 	void script_engine::init_engine(const std::string& core_assembly_path) {
 		this->init_mono();
@@ -220,7 +222,7 @@ namespace fe_engine {
 			cleanup = true;
 		}
 		this->m_core = load_assembly_from_file(core_assembly_path.c_str());
-		script_wrappers::init_wrappers(cleanup ? domain : this->m_domain);
+		script_wrappers::init_wrappers(cleanup ? domain : this->m_domain, mono_assembly_get_image(this->m_core));
 		register_wrappers();
 		if (cleanup) {
 #ifndef FEENGINE_LINUX

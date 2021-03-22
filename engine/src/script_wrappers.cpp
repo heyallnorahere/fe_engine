@@ -4,10 +4,12 @@
 #endif
 #include <limits>
 #include <cassert>
+#include <functional>
 #include <mono/jit/jit.h>
 #include "logger.h"
 #include "object_register.h"
 static MonoDomain* domain;
+static MonoImage* image;
 namespace fe_engine {
 	static renderer::color parse_cs_color_enum(int color) {
 		switch (color) {
@@ -73,8 +75,27 @@ namespace fe_engine {
 			assert(map_register->size() > 0);
 			return map_register->get(0);
 		}
-		void init_wrappers(MonoDomain* domain) {
+		static std::unordered_map<MonoType*, std::function<bool()>> registerexists_map;
+		static std::unordered_map<MonoType*, std::function<uint64_t()>> size_map;
+		template<typename T> static uint64_t get_register_size() {
+			return object_registry::get_register<T>()->size();
+		}
+		template<typename T> void register_registeredobject_type(const std::string& class_name) {
+			MonoType* type = mono_reflection_type_from_name((char*)class_name.c_str(), image);
+			assert(type);
+			registerexists_map[type] = object_registry::register_exists<T>;
+			size_map[type] = get_register_size<T>;
+		}
+		void init_registeredobject_types() {
+			register_registeredobject_type<unit>("FEEngine.Unit");
+			register_registeredobject_type<item>("FEEngine.Item");
+			register_registeredobject_type<map>("FEEngine.Map");
+			register_registeredobject_type<input_mapper>("FEEngine.InputMapper");
+		}
+		void init_wrappers(MonoDomain* domain, MonoImage* image) {
 			::domain = domain;
+			::image = image;
+			init_registeredobject_types();
 			assert(object_registry::register_exists<unit>());
 			assert(object_registry::register_exists<item>());
 			assert(object_registry::register_exists<map>());
@@ -124,16 +145,13 @@ namespace fe_engine {
 			unit_register->get(unit_index)->move(offset);
 		}
 		void FEEngine_Unit_Attack(uint64_t unit_index, uint64_t other_index) {
-			unit_register->get(unit_index)->attack(get_map()->get_unit(other_index));
+			unit_register->get(unit_index)->attack(unit_register->get(other_index));
 		}
 		void FEEngine_Unit_Wait(uint64_t unit_index) {
 			unit_register->get(unit_index)->wait();
 		}
 		void FEEngine_Unit_Equip(uint64_t unit_index, uint64_t item_index) {
-			std::list<size_t>& inventory = unit_register->get(unit_index)->get_inventory();
-			std::list<size_t>::iterator it = inventory.begin();
-			std::advance(it, item_index);
-			unit_register->get(unit_index)->equip(*it);
+			unit_register->get(unit_index)->equip(item_index);
 		}
 		uint64_t FEEngine_Unit_GetEquippedWeapon(uint64_t unit_index) {
 			reference<unit> u = unit_register->get(unit_index);
@@ -229,6 +247,14 @@ namespace fe_engine {
 		input_mapper::commands FEEngine_InputMapper_GetState(input_mapper* address) {
 			reference<input_mapper> im = address;
 			return im->get_state();
+		}
+		bool FEEngine_Util_ObjectRegistry_RegisterExists(MonoReflectionType* type) {
+			MonoType* _type = mono_reflection_type_get_type(type);
+			return registerexists_map[_type]();
+		}
+		uint64_t FEEngine_Util_ObjectRegister_GetCount(MonoReflectionType* type) {
+			MonoType* _type = mono_reflection_type_get_type(type);
+			return size_map[_type]();
 		}
 	}
 }

@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FEEngine;
 using FEEngine.Math;
+using FEEngine.Util;
 
 namespace Scripts
 {
@@ -16,6 +17,7 @@ namespace Scripts
             {
                 allied = allied || (unit.Affiliation == Unit.UnitAffiliation.PLAYER);
             }
+            // player units should never have a behavior, but just in case
             if (this.Parent.Affiliation == Unit.UnitAffiliation.PLAYER)
             {
                 allied = allied || (unit.Affiliation == Unit.UnitAffiliation.ALLY);
@@ -25,6 +27,11 @@ namespace Scripts
         private List<Unit> GetUnitsInRange()
         {
             List<Unit> units = new List<Unit>();
+            // unit cant attack
+            if (!this.Parent.HasWeaponEquipped())
+            {
+                return units;
+            }
             for (ulong i = 0; i < Map.GetUnitCount(); i++)
             {
                 Unit unit = Map.GetUnit(i);
@@ -38,11 +45,7 @@ namespace Scripts
             {
                 Vec2<int> difference = unit.Position - this.Parent.Position;
                 int distance = difference.TaxicabLength();
-                int maxRange = 0;
-                if (this.Parent.HasWeaponEquipped())
-                {
-                    maxRange = this.Parent.GetEquippedWeapon().Stats.Range.Y;
-                }
+                int maxRange = this.Parent.GetEquippedWeapon().Stats.Range.Y;
                 if (distance <= this.Parent.CurrentMovement + maxRange)
                 {
                     inRange.Add(unit);
@@ -77,7 +80,7 @@ namespace Scripts
             }
             return unit;
         }
-        private Vec2<int> CalcSurroundingTile(Vec2<int> target) {
+        private Vec2<int> CalcSurroundingTile(Vec2<int> target, bool isCandidate = false, bool farthest = true) {
             Vec2<int> size = Map.GetSize();
 
             // Calculate all of the candidate positions
@@ -94,8 +97,8 @@ namespace Scripts
                         if ((candidate - this.Parent.Position).TaxicabLength() > this.Parent.CurrentMovement) {
                             continue;
                         }
-                        if (Map.IsTileOccupied(candidate)) { 
-                            continue; 
+                        if (Map.IsTileOccupied(candidate) && !isCandidate) { 
+                            continue;
                         }
                         if (candidate.X < 0 || candidate.Y < 0 || candidate.X >= size.X || candidate.Y >= size.Y) {
                             continue;
@@ -111,22 +114,28 @@ namespace Scripts
 
             // Out of the positions we have, which is best? 
             candidates.Sort((a, b) => {
-                // First, take the position furthest from the target;
+                // First, take the position furthest from/closest to the target;
                 var tDistA = (a - target).TaxicabLength();
                 var tDistB = (b - target).TaxicabLength();
-                if (tDistA < tDistB) {
-                    return 1;
-                } else if (tDistA > tDistB) {
-                    return -1;
+                if (tDistA < tDistB)
+                {
+                    return farthest ? 1 : -1;
+                }
+                else if (tDistA > tDistB)
+                {
+                    return farthest ? -1 : 1;
                 }
 
-                // If those are equal, take the position closest to the parent.
+                // If those are equal, take the position closest to/farthest from the parent.
                 var myDistA = (a - this.Parent.Position).TaxicabLength();
                 var myDistB = (b - this.Parent.Position).TaxicabLength();
-                if (myDistA < myDistB) {
-                    return -1;
-                } else if (myDistA > myDistB) {
-                    return 1;
+                if (myDistA < myDistB)
+                {
+                    return farthest ? -1 : 1;
+                }
+                else if (myDistA > myDistB)
+                {
+                    return farthest ? 1 : -1;
                 }
 
                 // shrug
@@ -157,11 +166,11 @@ namespace Scripts
                     delta.X = (int)Math.Floor(normal.X);
                     delta.Y = (int)Math.Floor(normal.Y);
                 }
-                if (Map.IsTileOccupied(this.Parent.Position + delta))
+                if (Map.IsTileOccupied(this.Parent.Position))
                 {
-                    Vec2<double> _delta = delta.ConvertTo<double>();
-                    _delta *= 0.75;
-                    delta = _delta.ConvertTo<int>();
+                    Vec2<int> destination = this.Parent.Position + delta;
+                    Vec2<int> pos = this.CalcSurroundingTile(destination, true, false);
+                    delta = pos - this.Parent.Position;
                 }
                 this.Parent.Move(delta);
                 return;

@@ -8,10 +8,12 @@
 extern "C" {
 	typedef struct _MonoString MonoString;
 	typedef struct _MonoDomain MonoDomain;
+	typedef struct _MonoImage MonoImage;
+	typedef struct _MonoReflectionType MonoReflectionType;
 }
 namespace fe_engine {
 	namespace script_wrappers {
-		void init_wrappers(MonoDomain* domain);
+		void init_wrappers(MonoDomain* domain, MonoImage* image);
 		// unit class
 		MonoString* FEEngine_Unit_GetName(uint64_t unit_index);
 		void FEEngine_Unit_SetName(uint64_t unit_index, MonoString* name);
@@ -54,5 +56,8 @@ namespace fe_engine {
 		void FEEngine_Logger_Print(MonoString* message, int color);
 		// inputmapper class
 		input_mapper::commands FEEngine_InputMapper_GetState(input_mapper* address);
+		// objectregistry/objectregister class
+		bool FEEngine_Util_ObjectRegistry_RegisterExists(MonoReflectionType* type);
+		uint64_t FEEngine_Util_ObjectRegister_GetCount(MonoReflectionType* type);
 	}
 }
