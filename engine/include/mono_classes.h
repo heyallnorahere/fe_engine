@@ -54,6 +54,7 @@ namespace fe_engine {
 	class cs_delegate : public ref_counted {
 	public:
 		cs_delegate(reference<cs_object> object);
+		cs_delegate(void* object, void* domain);
 		~cs_delegate();
 		void* raw();
 		reference<cs_object> invoke(void** params = NULL);

@@ -244,6 +244,7 @@ namespace fe_engine {
 				reference<item_behavior> behavior = controller->m_unit_menu_state.selected_item->get_behavior();
 				if (behavior) behavior->on_use();
 				controller->m_unit_menu_target->get_inventory().remove_if([&](size_t index) { return controller->m_unit_menu_state.selected_item.get() == object_registry::get_register<item>()->get(index).get(); });
+				controller->m_unit_menu_target->wait();
 				controller->close_unit_menu();
 			} });
 		}

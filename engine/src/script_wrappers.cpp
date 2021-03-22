@@ -211,16 +211,15 @@ namespace fe_engine {
 		void FEEngine_Item_Use(uint64_t unit_index, uint64_t item_index) {
 			reference<unit> u = unit_register->get(unit_index);
 			std::list<size_t>& inventory = u->get_inventory();
-			std::list<size_t>::iterator it = inventory.begin();
-			std::advance(it, item_index);
-			reference<item> i = item_register->get(*it);
+			reference<item> i = item_register->get(item_index);
 			assert(!i->used());
 			i->set_used(true);
 			reference<item_behavior> ib = i->get_behavior();
 			if (ib) {
 				ib->on_use();
 			}
-			inventory.remove_if([&](size_t index) { return index == *it; });
+			inventory.remove_if([&](size_t index) { return index == item_index; });
+			if (u->can_move()) u->wait();
 		}
 		bool FEEngine_Item_IsWeapon(uint64_t item_index) {
 			reference<item> i = item_register->get(item_index);

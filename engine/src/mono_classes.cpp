@@ -113,6 +113,10 @@ namespace fe_engine {
 		this->m_object = mono_gchandle_new((MonoObject*)object->raw(), false);
 		this->m_domain = object->m_domain;
 	}
+	cs_delegate::cs_delegate(void* object, void* domain) {
+		this->m_object = mono_gchandle_new((MonoObject*)object, false);
+		this->m_domain = (MonoDomain*)domain;
+	}
 	cs_delegate::~cs_delegate() {
 		mono_gchandle_free(this->m_object);
 	}
