@@ -98,6 +98,11 @@ namespace fe_engine {
 		auto unit_register = object_registry::get_register<unit>();
 		return unit_register->get(*it);
 	}
+	size_t map::get_unit_register_index(size_t index) const {
+		auto it = this->m_units.begin();
+		std::advance(it, index);
+		return *it;
+	}
 	reference<unit> map::get_unit_at(s8vec2 pos) const {
 		auto unit_register = object_registry::get_register<unit>();
 		for (size_t index : this->m_units) {

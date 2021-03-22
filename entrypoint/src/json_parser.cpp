@@ -129,7 +129,7 @@ reference<unit> json_parser::make_unit_from_index(size_t index) {
 		parse_cs_classname(current_unit.behavior_name, namespace_name, class_name);
 		reference<cs_class> script = this->find_class(namespace_name, class_name);
 		assert(script);
-		unit_object->attach_behavior(reference<behavior>::create(script, this->m_core), this->m_map->get_unit_count());
+		unit_object->attach_behavior(reference<behavior>::create(script, this->m_core), object_registry::get_register<unit>()->size());
 	}
 	if (current_unit.has_weapon) unit_object->set_equipped_weapon(current_unit.equipped_weapon);
 	for (size_t index : current_unit.inventory) {

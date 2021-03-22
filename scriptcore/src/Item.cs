@@ -14,11 +14,11 @@ namespace FEEngine
         {
             get
             {
-                return GetName_Native(this.parentIndex, this.Index);
+                return GetName_Native(this.Index);
             }
             set
             {
-                SetName_Native(this.parentIndex, this.Index, value);
+                SetName_Native(this.Index, value);
             }
         }
         public void Use()
@@ -31,7 +31,7 @@ namespace FEEngine
         }
         public bool IsWeapon()
         {
-            return IsWeapon_Native(this.parentIndex, this.Index);
+            return IsWeapon_Native(this.Index);
         }
         protected Item(ulong parent, ulong inventoryIndex)
         {
@@ -43,12 +43,12 @@ namespace FEEngine
             return new Item(parent.Index, inventoryIndex);
         }
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern String GetName_Native(ulong unit, ulong index);
+        private static extern String GetName_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void SetName_Native(ulong unit, ulong index, String name);
+        private static extern void SetName_Native(ulong index, String name);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void Use_Native(ulong unit, ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern bool IsWeapon_Native(ulong unit, ulong index);
+        private static extern bool IsWeapon_Native(ulong index);
     }
 }

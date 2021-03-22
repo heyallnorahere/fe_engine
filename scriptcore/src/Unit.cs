@@ -127,7 +127,7 @@ namespace FEEngine {
             {
                 throw new Exception("No weapon has been equipped!");
             }
-            return Weapon.MakeFromInventoryIndex(this, this.GetInventorySize());
+            return Weapon.MakeFromInventoryIndex(this, GetEquippedWeapon_Native(this.Index));
         }
         public bool HasWeaponEquipped()
         {
@@ -192,6 +192,8 @@ namespace FEEngine {
         private static extern void Wait_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void Equip_Native(ulong index, ulong itemIndex);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern ulong GetEquippedWeapon_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern bool HasWeaponEquipped_Native(ulong index);
     }

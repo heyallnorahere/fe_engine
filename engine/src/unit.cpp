@@ -46,6 +46,7 @@ namespace fe_engine {
 	}
 	void unit::update() {
 		auto item_register = object_registry::get_register<item>();
+		auto unit_register = object_registry::get_register<unit>();
 		this->m_inventory.remove_if([&](size_t index) {
 			reference<item> i = item_register->get(index);
 			if (i->get_item_flags() & item::weapon) {
@@ -60,14 +61,14 @@ namespace fe_engine {
 			reference<item> _i = item_register->get(index);
 			if (!_i->initialized()) {
 				size_t unit_index = std::numeric_limits<size_t>::max();
-				for (size_t j = 0; j < this->m_map->get_unit_count(); j++) {
-					if (this->m_map->get_unit(j).get() == this) {
+				for (size_t j = 0; j < unit_register->size(); j++) {
+					if (unit_register->get(j).get() == this) {
 						unit_index = j;
 						break;
 					}
 				}
 				assert(unit_index != std::numeric_limits<size_t>::max());
-				_i->init(i, unit_index);
+				_i->init(index, unit_index);
 			}
 		}
 		if (this->m_equipped_weapon != (size_t)-1) {

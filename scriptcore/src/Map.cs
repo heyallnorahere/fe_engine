@@ -19,7 +19,7 @@ namespace FEEngine
             {
                 throw new Exception("Index exceeded unit count!");
             }
-            return Unit.MakeFromIndex(index);
+            return Unit.MakeFromIndex(GetUnit_Native(index));
         }
         public static Unit GetUnitAt(Vec2<int> position)
         {
@@ -41,6 +41,8 @@ namespace FEEngine
         private static extern ulong GetUnitCount_Native();
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern Vec2<int> GetSize_Native();
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern ulong GetUnit_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern ulong GetUnitAt_Native(Vec2<int> position);
         [MethodImpl(MethodImplOptions.InternalCall)]

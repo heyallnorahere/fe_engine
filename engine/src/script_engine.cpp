@@ -190,7 +190,9 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.Unit::Attack_Native", (void*)script_wrappers::FEEngine_Unit_Attack);
 		mono_add_internal_call("FEEngine.Unit::Wait_Native", (void*)script_wrappers::FEEngine_Unit_Wait);
 		mono_add_internal_call("FEEngine.Unit::Equip_Native", (void*)script_wrappers::FEEngine_Unit_Equip);
+		mono_add_internal_call("FEEngine.Unit::GetEquippedWeapon_Native", (void*)script_wrappers::FEEngine_Unit_GetEquippedWeapon);
 		mono_add_internal_call("FEEngine.Unit::HasWeaponEquipped_Native", (void*)script_wrappers::FEEngine_Unit_HasWeaponEquipped);
+		mono_add_internal_call("FEEngine.Map::GetUnit_Native", (void*)script_wrappers::FEEngine_Map_GetUnit);
 		mono_add_internal_call("FEEngine.Map::GetUnitCount_Native", (void*)script_wrappers::FEEngine_Map_GetUnitCount);
 		mono_add_internal_call("FEEngine.Map::GetSize_Native", (void*)script_wrappers::FEEngine_Map_GetSize);
 		mono_add_internal_call("FEEngine.Map::GetUnitAt_Native", (void*)script_wrappers::FEEngine_Map_GetUnitAt);
@@ -218,7 +220,7 @@ namespace fe_engine {
 			cleanup = true;
 		}
 		this->m_core = load_assembly_from_file(core_assembly_path.c_str());
-		script_wrappers::set_domain(cleanup ? domain : this->m_domain);
+		script_wrappers::init_wrappers(cleanup ? domain : this->m_domain);
 		register_wrappers();
 		if (cleanup) {
 #ifndef FEENGINE_LINUX

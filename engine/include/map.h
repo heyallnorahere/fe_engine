@@ -18,6 +18,7 @@ namespace fe_engine {
 		void render(reference<renderer> r);
 		size_t get_unit_count() const;
 		reference<unit> get_unit(size_t index) const;
+		size_t get_unit_register_index(size_t index) const;
 		reference<unit> get_unit_at(s8vec2 pos) const;
 		reference<tile> get_tile(s8vec2 pos);
 		void set_tile(s8vec2 pos, reference<tile> tile);
