@@ -8,45 +8,64 @@ using FEEngine.Util;
 
 namespace FEEngine
 {
-    public class Map
+    public class Map : RegisteredObject<Map>
     {
-        public static ulong GetUnitCount()
+        public ulong Index { get; private set; }
+        public ulong GetUnitCount()
         {
-            return GetUnitCount_Native();
+            return GetUnitCount_Native(this.Index);
         }
-        public static Unit GetUnit(ulong index)
+        public Unit GetUnit(ulong index)
         {
-            if (index >= GetUnitCount())
+            if (index >= this.GetUnitCount())
             {
                 throw new Exception("Index exceeded unit count!");
             }
-            return Unit.MakeFromIndex(GetUnit_Native(index));
+            return Unit.MakeFromIndex(GetUnit_Native(this.Index, index));
         }
-        public static Unit GetUnitAt(Vec2<int> position)
+        public Unit GetUnitAt(Vec2<int> position)
         {
             if (!IsTileOccupied(position))
             {
                 throw new Exception("Specified tile was not occupied!");
             }
-            return Unit.MakeFromIndex(GetUnitAt_Native(position));
+            return Unit.MakeFromIndex(GetUnitAt_Native(this.Index, position));
         }
-        public static Vec2<int> GetSize()
+        public Vec2<int> GetSize()
         {
-            return GetSize_Native();
+            return GetSize_Native(this.Index);
         }
-        public static bool IsTileOccupied(Vec2<int> position)
+        public bool IsTileOccupied(Vec2<int> position)
         {
-            return IsTileOccupied_Native(position);
+            return IsTileOccupied_Native(this.Index, position);
+        }
+        public Map()
+        {
+            this.Index = 0;
+        }
+        public void SetRegisterIndex(ulong index)
+        {
+            this.Index = index;
+        }
+        public static Map MakeFromRegisterIndex(ulong index)
+        {
+            Map map = new Map();
+            map.Index = index;
+            return map;
+        }
+        public static Map GetMap()
+        {
+            return ObjectRegistry.GetRegister<Map>().Get(0);
         }
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern ulong GetUnitCount_Native();
+        private static extern ulong GetUnitCount_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern Vec2<int> GetSize_Native();
+        private static extern Vec2<int> GetSize_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern ulong GetUnit_Native(ulong index);
+        private static extern ulong GetUnit_Native(ulong index, ulong unitIndex);
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern ulong GetUnitAt_Native(Vec2<int> position);
+        private static extern ulong GetUnitAt_Native(ulong index, Vec2<int> position);
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern bool IsTileOccupied_Native(Vec2<int> position);
+        private static extern bool IsTileOccupied_Native(ulong index, Vec2<int> position);
     }
 }

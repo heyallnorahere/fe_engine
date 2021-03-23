@@ -71,10 +71,6 @@ namespace fe_engine {
 		static reference<object_register<unit>> unit_register;
 		static reference<object_register<item>> item_register;
 		static reference<object_register<map>> map_register;
-		static reference<map> get_map() {
-			assert(map_register->size() > 0);
-			return map_register->get(0);
-		}
 		static std::unordered_map<MonoType*, std::function<bool()>> registerexists_map;
 		static std::unordered_map<MonoType*, std::function<uint64_t()>> size_map;
 		template<typename T> static uint64_t get_register_size() {
@@ -145,7 +141,7 @@ namespace fe_engine {
 			unit_register->get(unit_index)->move(offset);
 		}
 		void FEEngine_Unit_Attack(uint64_t unit_index, uint64_t other_index) {
-			unit_register->get(unit_index)->attack(unit_register->get(other_index));
+			unit_register->get(unit_index)->attack(other_index);
 		}
 		void FEEngine_Unit_Wait(uint64_t unit_index) {
 			unit_register->get(unit_index)->wait();
@@ -160,16 +156,16 @@ namespace fe_engine {
 		bool FEEngine_Unit_HasWeaponEquipped(uint64_t unit_index) {
 			return unit_register->get(unit_index)->get_equipped_weapon() != (size_t)-1;
 		}
-		uint64_t FEEngine_Map_GetUnitCount() {
-			return get_map()->get_unit_count();
+		uint64_t FEEngine_Map_GetUnitCount(uint64_t index) {
+			return map_register->get(index)->get_unit_count();
 		}
-		s32vec2 FEEngine_Map_GetSize() {
-			return { (int32_t)get_map()->get_width(), (int32_t)get_map()->get_height() };
+		s32vec2 FEEngine_Map_GetSize(uint64_t index) {
+			return { (int32_t)map_register->get(index)->get_width(), (int32_t)map_register->get(index)->get_height() };
 		}
-		uint64_t FEEngine_Map_GetUnit(uint64_t index) {
-			return get_map()->get_unit_register_index(index);
+		uint64_t FEEngine_Map_GetUnit(uint64_t index, uint64_t unit_index) {
+			return map_register->get(index)->get_unit_register_index(unit_index);
 		}
-		uint64_t FEEngine_Map_GetUnitAt(s32vec2 position) {
+		uint64_t FEEngine_Map_GetUnitAt(uint64_t index, s32vec2 position) {
 			for (uint64_t i = 0; i < unit_register->size(); i++) {
 				if (unit_register->get(i)->get_pos() == (s8vec2)position) {
 					return i;
@@ -178,8 +174,8 @@ namespace fe_engine {
 			assert(false);
 			return std::numeric_limits<uint64_t>::max();
 		}
-		bool FEEngine_Map_IsTileOccupied(s32vec2 position) {
-			return get_map()->get_unit_at(position);
+		bool FEEngine_Map_IsTileOccupied(uint64_t index, s32vec2 position) {
+			return map_register->get(index)->get_unit_at(position);
 		}
 		void FEEngine_Renderer_RenderCharAt(renderer* address, s32vec2 position, char character, int color, int background) {
 			renderer::color c = parse_cs_color_enum(color);

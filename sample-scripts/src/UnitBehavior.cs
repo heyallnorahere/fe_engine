@@ -32,9 +32,9 @@ namespace Scripts
             {
                 return units;
             }
-            for (ulong i = 0; i < Map.GetUnitCount(); i++)
+            for (ulong i = 0; i < Map.GetMap().GetUnitCount(); i++)
             {
-                Unit unit = Map.GetUnit(i);
+                Unit unit = Map.GetMap().GetUnit(i);
                 if (!this.IsAllied(unit))
                 {
                     units.Add(unit);
@@ -81,7 +81,7 @@ namespace Scripts
             return unit;
         }
         private Vec2<int> CalcSurroundingTile(Vec2<int> target, bool isCandidate = false, bool farthest = true) {
-            Vec2<int> size = Map.GetSize();
+            Vec2<int> size = Map.GetMap().GetSize();
 
             // Calculate all of the candidate positions
             var candidates = new List<Vec2<int>>();
@@ -97,7 +97,7 @@ namespace Scripts
                         if ((candidate - this.Parent.Position).TaxicabLength() > this.Parent.CurrentMovement) {
                             continue;
                         }
-                        if (Map.IsTileOccupied(candidate) && !isCandidate) { 
+                        if (Map.GetMap().IsTileOccupied(candidate) && !isCandidate) { 
                             continue;
                         }
                         if (candidate.X < 0 || candidate.Y < 0 || candidate.X >= size.X || candidate.Y >= size.Y) {
@@ -151,9 +151,9 @@ namespace Scripts
             if (inRange.Count == 0)
             {
                 Vec2<int> delta = new Vec2<int>();
-                for (ulong i = 0; i < Map.GetUnitCount(); i++)
+                for (ulong i = 0; i < Map.GetMap().GetUnitCount(); i++)
                 {
-                    Unit unit = Map.GetUnit(i);
+                    Unit unit = Map.GetMap().GetUnit(i);
                     if (!this.IsAllied(unit))
                     {
                         delta += unit.Position - this.Parent.Position;
@@ -166,7 +166,7 @@ namespace Scripts
                     delta.X = (int)Math.Floor(normal.X);
                     delta.Y = (int)Math.Floor(normal.Y);
                 }
-                if (Map.IsTileOccupied(this.Parent.Position))
+                if (Map.GetMap().IsTileOccupied(this.Parent.Position))
                 {
                     Vec2<int> destination = this.Parent.Position + delta;
                     Vec2<int> pos = this.CalcSurroundingTile(destination, true, false);

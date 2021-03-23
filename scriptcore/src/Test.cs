@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using FEEngine.Math;
+using FEEngine.Util;
 
 namespace FEEngine
 {
@@ -12,7 +13,7 @@ namespace FEEngine
         private Unit unit;
         public void Init()
         {
-            this.unit = Map.GetUnit(0);
+            this.unit = Map.GetMap().GetUnit(0);
         }
         public void DoStuff()
         {

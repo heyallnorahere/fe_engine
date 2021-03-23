@@ -34,11 +34,11 @@ namespace fe_engine {
 		uint64_t FEEngine_Unit_GetEquippedWeapon(uint64_t unit_index);
 		bool FEEngine_Unit_HasWeaponEquipped(uint64_t unit_index);
 		// map class
-		uint64_t FEEngine_Map_GetUnitCount();
-		s32vec2 FEEngine_Map_GetSize();
-		uint64_t FEEngine_Map_GetUnit(uint64_t index);
-		uint64_t FEEngine_Map_GetUnitAt(s32vec2 position);
-		bool FEEngine_Map_IsTileOccupied(s32vec2 position);
+		uint64_t FEEngine_Map_GetUnitCount(uint64_t index);
+		s32vec2 FEEngine_Map_GetSize(uint64_t index);
+		uint64_t FEEngine_Map_GetUnit(uint64_t index, uint64_t unit_index);
+		uint64_t FEEngine_Map_GetUnitAt(uint64_t index, s32vec2 position);
+		bool FEEngine_Map_IsTileOccupied(uint64_t index, s32vec2 position);
 		// renderer class
 		void FEEngine_Renderer_RenderCharAt(renderer* address, s32vec2 position, char character, int color, int background);
 		void FEEngine_Renderer_RenderStringAt(renderer* address, s32vec2 position, MonoString* text, int color, int background);
