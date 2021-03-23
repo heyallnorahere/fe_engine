@@ -59,5 +59,8 @@ namespace fe_engine {
 		// objectregistry/objectregister class
 		bool FEEngine_Util_ObjectRegistry_RegisterExists(MonoReflectionType* type);
 		uint64_t FEEngine_Util_ObjectRegister_GetCount(MonoReflectionType* type);
+		// uicontroller class
+		uint64_t FEEngine_UI_UIController_GetUnitMenuTarget(uint64_t index);
+		bool FEEngine_UI_UIController_HasUnitSelected(uint64_t index);
 	}
 }

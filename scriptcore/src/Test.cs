@@ -34,6 +34,11 @@ namespace FEEngine
     {
         public void OnUse()
         {
+            UI.UIController uiController = ObjectRegistry.GetRegister<UI.UIController>().Get(0);
+            if (uiController.HasUnitSelected())
+            {
+                Logger.Print("Selected unit: " + uiController.GetUnitMenuTarget().Name, Renderer.Color.GREEN);
+            }
             Vec2<int> pos = this.Parent.Parent.Position;
             pos += new Vec2<int>(1, 1);
             this.Parent.Parent.Position = pos;

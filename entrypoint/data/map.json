@@ -51,7 +51,15 @@
       "data": {
         "behavior": "FEEngine.TestItem"
       }
+    },
+    {
+      "name": "Test Item",
+      "is weapon": false,
+      "data": {
+        "behavior": "FEEngine.TestItem"
+      }
     }
+
   ],
   "units": [
     {
@@ -99,7 +107,9 @@
       },
       "affiliation": 0,
       "equipped": 1,
-      "inventory": [],
+      "inventory": [
+        4
+      ],
       "name": "Soldier B"
     },
     {

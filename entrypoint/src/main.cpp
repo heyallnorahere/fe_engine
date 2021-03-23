@@ -45,6 +45,7 @@ static void add_registers() {
 	object_registry::add_register<map>();
 	object_registry::add_register<controller>();
 	object_registry::add_register<input_mapper>();
+	object_registry::add_register<ui_controller>();
 }
 // entrypoint
 int main() {
@@ -77,6 +78,7 @@ int main() {
 	fe_engine::object_registry::get_register<fe_engine::input_mapper>()->add(imapper);
 	// make a ui controller
 	fe_engine::reference<fe_engine::ui_controller> ui_controller = fe_engine::reference<fe_engine::ui_controller>::create(renderer, map, imapper);
+	fe_engine::object_registry::get_register<fe_engine::ui_controller>()->add(ui_controller);
 	// make a phase manager
 	fe_engine::reference<fe_engine::phase_manager> phase_manager = fe_engine::reference<fe_engine::phase_manager>::create();
 	// make the player (cursor, etc.)

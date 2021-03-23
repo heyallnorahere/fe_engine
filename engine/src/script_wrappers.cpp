@@ -8,6 +8,7 @@
 #include <mono/jit/jit.h>
 #include "logger.h"
 #include "object_register.h"
+#include "ui_controller.h"
 static MonoDomain* domain;
 static MonoImage* image;
 namespace fe_engine {
@@ -72,6 +73,7 @@ namespace fe_engine {
 		static reference<object_register<item>> item_register;
 		static reference<object_register<map>> map_register;
 		static reference<object_register<input_mapper>> im_register;
+		static reference<object_register<ui_controller>> uc_register;
 		static std::unordered_map<MonoType*, std::function<bool()>> registerexists_map;
 		static std::unordered_map<MonoType*, std::function<uint64_t()>> size_map;
 		template<typename T> static uint64_t get_register_size() {
@@ -88,18 +90,21 @@ namespace fe_engine {
 			register_registeredobject_type<item>("FEEngine.Item");
 			register_registeredobject_type<map>("FEEngine.Map");
 			register_registeredobject_type<input_mapper>("FEEngine.InputMapper");
+			register_registeredobject_type<ui_controller>("FEEngine.UI.UIController");
+		}
+		template<typename T> void get_register(reference<object_register<T>>& ref) {
+			assert(object_registry::register_exists<T>());
+			ref = object_registry::get_register<T>();
 		}
 		void init_wrappers(MonoDomain* domain, MonoImage* image) {
 			::domain = domain;
 			::image = image;
 			init_registeredobject_types();
-			assert(object_registry::register_exists<unit>());
-			assert(object_registry::register_exists<item>());
-			assert(object_registry::register_exists<map>());
-			unit_register = object_registry::get_register<unit>();
-			item_register = object_registry::get_register<item>();
-			map_register = object_registry::get_register<map>();
-			im_register = object_registry::get_register<input_mapper>();
+			get_register(unit_register);
+			get_register(item_register);
+			get_register(map_register);
+			get_register(im_register);
+			get_register(uc_register);
 		}
 		MonoString* FEEngine_Unit_GetName(uint64_t unit_index) {
 			return to_mono(unit_register->get(unit_index)->get_name());
@@ -252,6 +257,19 @@ namespace fe_engine {
 		uint64_t FEEngine_Util_ObjectRegister_GetCount(MonoReflectionType* type) {
 			MonoType* _type = mono_reflection_type_get_type(type);
 			return size_map[_type]();
+		}
+		uint64_t FEEngine_UI_UIController_GetUnitMenuTarget(uint64_t index) {
+			reference<ui_controller> uc = uc_register->get(index);
+			reference<unit> selected = uc->get_unit_menu_target();
+			for (size_t i = 0; i < unit_register->size(); i++) {
+				if (unit_register->get(i).get() == selected.get()) {
+					return i;
+				}
+			}
+			return std::numeric_limits<uint64_t>::max();
+		}
+		bool FEEngine_UI_UIController_HasUnitSelected(uint64_t index) {
+			return uc_register->get(index)->get_unit_menu_target();
 		}
 	}
 }

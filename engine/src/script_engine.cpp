@@ -217,6 +217,8 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.InputMapper::GetState_Native", (void*)script_wrappers::FEEngine_InputMapper_GetState);
 		mono_add_internal_call("FEEngine.Util.ObjectRegistry::RegisterExists_Native", (void*)script_wrappers::FEEngine_Util_ObjectRegistry_RegisterExists);
 		mono_add_internal_call("FEEngine.Util.ObjectRegister`1::GetCount_Native", (void*)script_wrappers::FEEngine_Util_ObjectRegister_GetCount);
+		mono_add_internal_call("FEEngine.UI.UIController::GetUnitMenuTarget_Native", (void*)script_wrappers::FEEngine_UI_UIController_GetUnitMenuTarget);
+		mono_add_internal_call("FEEngine.UI.UIController::HasUnitSelected_Native", (void*)script_wrappers::FEEngine_UI_UIController_HasUnitSelected);
 	}
 	void script_engine::init_engine(const std::string& core_assembly_path) {
 		this->init_mono();
