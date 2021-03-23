@@ -78,14 +78,14 @@ namespace fe_engine {
 			}
 		}
 	}
-	void unit::unit_update(reference<input_mapper> im) {
+	void unit::unit_update() {
 		if (this->m_affiliation != unit_affiliation::player) {
 			if (!this->m_behavior) {
 				this->m_can_move = false;
 			}
 		}
 		if (this->m_behavior) {
-			this->m_behavior->on_unit_update(im);
+			this->m_behavior->on_unit_update();
 		}
 	}
 	void unit::move(s8vec2 offset, int8_t consumption_multiplier) {

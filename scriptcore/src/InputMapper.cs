@@ -21,21 +21,24 @@ namespace FEEngine
         }
         public Commands GetState()
         {
-            return GetState_Native(this.memoryAddress);
+            return GetState_Native(this.Index);
         }
-        private ulong memoryAddress;
+        public ulong Index { get; private set; }
         public InputMapper()
         {
-            this.memoryAddress = 0;
+            this.Index = 0;
         }
-        public void SetRegisterIndex(ulong index) { }
-        public static InputMapper MakeFromMemoryAddress(ulong address)
+        public void SetRegisterIndex(ulong index)
+        {
+            this.Index = index;
+        }
+        public static InputMapper MakeFromRegisterIndex(ulong index)
         {
             InputMapper im = new InputMapper();
-            im.memoryAddress = address;
+            im.Index = index;
             return im;
         }
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern Commands GetState_Native(ulong memoryAddress);
+        private static extern Commands GetState_Native(ulong index);
     }
 }

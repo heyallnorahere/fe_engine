@@ -74,6 +74,7 @@ int main() {
 	fe_engine::object_registry::get_register<fe_engine::controller>()->add(controller);
 	// make the input mapper object
 	fe_engine::reference<fe_engine::input_mapper> imapper = fe_engine::reference<fe_engine::input_mapper>::create(controller);
+	fe_engine::object_registry::get_register<fe_engine::input_mapper>()->add(imapper);
 	// make a ui controller
 	fe_engine::reference<fe_engine::ui_controller> ui_controller = fe_engine::reference<fe_engine::ui_controller>::create(renderer, map, imapper);
 	// make a phase manager
@@ -116,7 +117,7 @@ int main() {
 		// update the engine state
 		imapper->update();
 		map->update();
-		map->update_units(phase_manager->get_current_phase(), imapper);
+		map->update_units(phase_manager->get_current_phase());
 		player->update();
 		ui_controller->update();
 		if (imapper->get_state().exit) break;

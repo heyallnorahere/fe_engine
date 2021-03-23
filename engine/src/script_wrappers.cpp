@@ -71,6 +71,7 @@ namespace fe_engine {
 		static reference<object_register<unit>> unit_register;
 		static reference<object_register<item>> item_register;
 		static reference<object_register<map>> map_register;
+		static reference<object_register<input_mapper>> im_register;
 		static std::unordered_map<MonoType*, std::function<bool()>> registerexists_map;
 		static std::unordered_map<MonoType*, std::function<uint64_t()>> size_map;
 		template<typename T> static uint64_t get_register_size() {
@@ -98,6 +99,7 @@ namespace fe_engine {
 			unit_register = object_registry::get_register<unit>();
 			item_register = object_registry::get_register<item>();
 			map_register = object_registry::get_register<map>();
+			im_register = object_registry::get_register<input_mapper>();
 		}
 		MonoString* FEEngine_Unit_GetName(uint64_t unit_index) {
 			return to_mono(unit_register->get(unit_index)->get_name());
@@ -239,8 +241,8 @@ namespace fe_engine {
 		void FEEngine_Logger_Print(MonoString* message, int color) {
 			logger::print(from_mono(message), parse_cs_color_enum(color));
 		}
-		input_mapper::commands FEEngine_InputMapper_GetState(input_mapper* address) {
-			reference<input_mapper> im = address;
+		input_mapper::commands FEEngine_InputMapper_GetState(uint64_t index) {
+			reference<input_mapper> im = im_register->get(index);
 			return im->get_state();
 		}
 		bool FEEngine_Util_ObjectRegistry_RegisterExists(MonoReflectionType* type) {

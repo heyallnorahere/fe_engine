@@ -55,7 +55,7 @@ namespace fe_engine {
 		// logger class
 		void FEEngine_Logger_Print(MonoString* message, int color);
 		// inputmapper class
-		input_mapper::commands FEEngine_InputMapper_GetState(input_mapper* address);
+		input_mapper::commands FEEngine_InputMapper_GetState(uint64_t index);
 		// objectregistry/objectregister class
 		bool FEEngine_Util_ObjectRegistry_RegisterExists(MonoReflectionType* type);
 		uint64_t FEEngine_Util_ObjectRegister_GetCount(MonoReflectionType* type);

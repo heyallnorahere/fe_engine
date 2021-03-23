@@ -16,7 +16,7 @@ namespace Scripts {
             vectors.Add(new Vec2<int>(-1, 0));
             vectors.Add(new Vec2<int>(0, -1));
         }
-        public void OnUpdate(InputMapper inputMapper)
+        public void OnUpdate()
         {
             this.Parent.Move(vectors[frame++]);
             frame %= vectors.Count;

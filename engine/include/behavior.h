@@ -8,7 +8,7 @@ namespace fe_engine {
 	public:
 		behavior(reference<cs_class> _class, reference<assembly> core_assembly);
 		void on_attach(uint64_t index);
-		void on_unit_update(reference<input_mapper> im);
+		void on_unit_update();
 		void on_render(reference<renderer> r);
 		reference<cs_object> get_object();
 		reference<assembly> get_core();

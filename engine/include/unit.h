@@ -39,7 +39,7 @@ namespace fe_engine {
 		void set_current_hp(int32_t hp);
 		unit_affiliation get_affiliation() const;
 		void update();
-		void unit_update(reference<input_mapper> im);
+		void unit_update();
 		void move(s8vec2 offset, int8_t consumption_multiplier = 1);
 		size_t get_equipped_weapon() const;
 		void set_equipped_weapon(size_t register_index);

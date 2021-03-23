@@ -145,7 +145,7 @@ namespace Scripts
 
             return candidates[0];
         }
-        public void OnUpdate(InputMapper inputMapper)
+        public void OnUpdate()
         {
             List<Unit> inRange = this.GetUnitsInRange();
             if (inRange.Count == 0)

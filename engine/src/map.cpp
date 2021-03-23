@@ -43,12 +43,12 @@ namespace fe_engine {
 			u->update();
 		}
 	}
-	void map::update_units(unit_affiliation affiliation, reference<input_mapper> im) {
+	void map::update_units(unit_affiliation affiliation) {
 		auto unit_register = object_registry::get_register<unit>();
 		for (size_t index : this->m_units) {
 			auto u = unit_register->get(index);
 			if (u->get_affiliation() == affiliation) {
-				u->unit_update(im);
+				u->unit_update();
 			}
 		}
 	}
