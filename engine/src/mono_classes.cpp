@@ -81,6 +81,10 @@ namespace fe_engine {
 	void* cs_object::unbox() {
 		return unbox_object((MonoObject*)this->raw());
 	}
+	cs_object::cs_object(void* object, void* domain) {
+		this->m_object = mono_gchandle_new((MonoObject*)object, false);
+		this->m_domain = (MonoDomain*)domain;
+	}
 	cs_object::~cs_object() {
 		if (this->m_object) mono_gchandle_free(this->m_object);
 	}

@@ -5,7 +5,9 @@
 #include "renderer.h"
 #include "weapon.h"
 #include "input_mapper.h"
+#include "script_engine.h"
 extern "C" {
+	typedef struct _MonoObject MonoObject;
 	typedef struct _MonoString MonoString;
 	typedef struct _MonoDomain MonoDomain;
 	typedef struct _MonoImage MonoImage;
@@ -13,7 +15,13 @@ extern "C" {
 }
 namespace fe_engine {
 	namespace script_wrappers {
-		void init_wrappers(MonoDomain* domain, MonoImage* image);
+		namespace cs_structs {
+			struct menu_description_struct {
+				MonoString* name;
+				MonoObject* menu;
+			};
+		}
+		void init_wrappers(MonoDomain* domain, MonoImage* image, reference<script_engine> engine);
 		// unit class
 		MonoString* FEEngine_Unit_GetName(uint64_t unit_index);
 		void FEEngine_Unit_SetName(uint64_t unit_index, MonoString* name);
@@ -62,5 +70,10 @@ namespace fe_engine {
 		// uicontroller class
 		uint64_t FEEngine_UI_UIController_GetUnitMenuTarget(uint64_t index);
 		bool FEEngine_UI_UIController_HasUnitSelected(uint64_t index);
+		uint64_t FEEngine_UI_UIController_GetUserMenuCount(uint64_t index);
+		cs_structs::menu_description_struct FEEngine_UI_UIController_GetUserMenu(uint64_t index, uint64_t menu_index);
+		void FEEngine_UI_UIController_AddUserMenu(uint64_t index, cs_structs::menu_description_struct menu);
+		// menu class
+		uint64_t FEEngine_UI_Menu_MakeNew();
 	}
 }

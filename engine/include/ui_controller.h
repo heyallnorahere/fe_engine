@@ -9,8 +9,15 @@
 #include <vector>
 #include <functional>
 namespace fe_engine {
+	namespace internal {
+		struct menu_spec;
+	}
 	class ui_controller : public ref_counted {
 	public:
+		struct user_menu {
+			size_t register_index;
+			std::string menu_item_name;
+		};
 		ui_controller(reference<renderer> r, reference<map> m, reference<input_mapper> im);
 		void set_info_panel_target(reference<unit> u);
 		void set_unit_menu_target(reference<unit> u, s8vec2 original_position);
@@ -18,6 +25,8 @@ namespace fe_engine {
 		void render();
 		reference<unit> get_unit_menu_target() const;
 		void set_can_close(bool c);
+		void add_user_menu(const user_menu& menu);
+		const std::vector<user_menu>& get_user_menus() const;
 	private:
 		struct unit_menu_item {
 			std::string text;
@@ -40,6 +49,7 @@ namespace fe_engine {
 		reference<unit> m_info_panel_target, m_unit_menu_target;
 		std::vector<unit_menu_item> m_menu_items;
 		menu_state m_unit_menu_state;
+		std::vector<user_menu> m_user_menus;
 		bool m_can_close;
 		size_t m_unit_menu_index;
 		void close_unit_menu();

@@ -219,6 +219,10 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.Util.ObjectRegister`1::GetCount_Native", (void*)script_wrappers::FEEngine_Util_ObjectRegister_GetCount);
 		mono_add_internal_call("FEEngine.UI.UIController::GetUnitMenuTarget_Native", (void*)script_wrappers::FEEngine_UI_UIController_GetUnitMenuTarget);
 		mono_add_internal_call("FEEngine.UI.UIController::HasUnitSelected_Native", (void*)script_wrappers::FEEngine_UI_UIController_HasUnitSelected);
+		mono_add_internal_call("FEEngine.UI.UIController::GetUserMenuCount_Native", (void*)script_wrappers::FEEngine_UI_UIController_GetUserMenuCount);
+		mono_add_internal_call("FEEngine.UI.UIController::GetUserMenu_Native", (void*)script_wrappers::FEEngine_UI_UIController_GetUserMenu);
+		mono_add_internal_call("FEEngine.UI.UIController::AddUserMenu_Native", (void*)script_wrappers::FEEngine_UI_UIController_AddUserMenu);
+		mono_add_internal_call("FEEngine.UI.Menu::MakeNew_Native", (void*)script_wrappers::FEEngine_UI_Menu_MakeNew);
 	}
 	void script_engine::init_engine(const std::string& core_assembly_path) {
 		this->init_mono();
@@ -230,7 +234,7 @@ namespace fe_engine {
 			cleanup = true;
 		}
 		this->m_core = load_assembly_from_file(core_assembly_path.c_str());
-		script_wrappers::init_wrappers(cleanup ? domain : this->m_domain, mono_assembly_get_image(this->m_core));
+		script_wrappers::init_wrappers(cleanup ? domain : this->m_domain, mono_assembly_get_image(this->m_core), this);
 		register_wrappers();
 		if (cleanup) {
 #ifndef FEENGINE_LINUX

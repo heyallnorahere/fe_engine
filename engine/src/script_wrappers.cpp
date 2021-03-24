@@ -9,8 +9,10 @@
 #include "logger.h"
 #include "object_register.h"
 #include "ui_controller.h"
+#include "menu.h"
 static MonoDomain* domain;
 static MonoImage* image;
+static fe_engine::reference<fe_engine::script_engine> engine;
 namespace fe_engine {
 	static renderer::color parse_cs_color_enum(int color) {
 		switch (color) {
@@ -74,6 +76,7 @@ namespace fe_engine {
 		static reference<object_register<map>> map_register;
 		static reference<object_register<input_mapper>> im_register;
 		static reference<object_register<ui_controller>> uc_register;
+		static reference<object_register<internal::menu>> menu_register;
 		static std::unordered_map<MonoType*, std::function<bool()>> registerexists_map;
 		static std::unordered_map<MonoType*, std::function<uint64_t()>> size_map;
 		template<typename T> static uint64_t get_register_size() {
@@ -85,26 +88,29 @@ namespace fe_engine {
 			registerexists_map[type] = object_registry::register_exists<T>;
 			size_map[type] = get_register_size<T>;
 		}
-		void init_registeredobject_types() {
-			register_registeredobject_type<unit>("FEEngine.Unit");
-			register_registeredobject_type<item>("FEEngine.Item");
-			register_registeredobject_type<map>("FEEngine.Map");
-			register_registeredobject_type<input_mapper>("FEEngine.InputMapper");
-			register_registeredobject_type<ui_controller>("FEEngine.UI.UIController");
-		}
 		template<typename T> void get_register(reference<object_register<T>>& ref) {
 			assert(object_registry::register_exists<T>());
 			ref = object_registry::get_register<T>();
 		}
-		void init_wrappers(MonoDomain* domain, MonoImage* image) {
+		template<typename T> void init_register(reference<object_register<T>>& ref, const std::string& class_name) {
+			get_register(ref);
+			register_registeredobject_type<T>(class_name);
+		}
+		void init_registers() {
+			init_register(unit_register, "FEEngine.Unit");
+			init_register(item_register, "FEEngine.Item");
+			init_register(map_register, "FEEngine.Map");
+			init_register(im_register, "FEEngine.InputMapper");
+			if (object_registry::register_exists<ui_controller>()) {
+				init_register(uc_register, "FEEngine.UI.UIController");
+				init_register(menu_register, "FEEngine.UI.Menu");
+			}
+		}
+		void init_wrappers(MonoDomain* domain, MonoImage* image, reference<script_engine> engine) {
 			::domain = domain;
 			::image = image;
-			init_registeredobject_types();
-			get_register(unit_register);
-			get_register(item_register);
-			get_register(map_register);
-			get_register(im_register);
-			get_register(uc_register);
+			::engine = engine;
+			init_registers();
 		}
 		MonoString* FEEngine_Unit_GetName(uint64_t unit_index) {
 			return to_mono(unit_register->get(unit_index)->get_name());
@@ -270,6 +276,35 @@ namespace fe_engine {
 		}
 		bool FEEngine_UI_UIController_HasUnitSelected(uint64_t index) {
 			return uc_register->get(index)->get_unit_menu_target();
+		}
+		uint64_t FEEngine_UI_UIController_GetUserMenuCount(uint64_t index) {
+			return uc_register->get(index)->get_user_menus().size();
+		}
+		cs_structs::menu_description_struct FEEngine_UI_UIController_GetUserMenu(uint64_t index, uint64_t menu_index) {
+			reference<ui_controller> uc = uc_register->get(index);
+			ui_controller::user_menu user_menu = uc->get_user_menus()[menu_index];
+			reference<cs_class> menu_class = engine->get_core()->get_class("FEEngine.UI", "Menu");
+			reference<cs_method> construction_method = menu_class->get_method("FEEngine.UI.Menu:MakeFromRegisterIndex(ulong)");
+			std::vector<void*> args;
+			args.push_back(&menu_index);
+			reference<cs_object> menu_object = cs_method::call_function(construction_method, args.data());
+			MonoString* menu_name = to_mono(user_menu.menu_item_name);
+			return { menu_name, (MonoObject*)menu_object->raw() };
+		}
+		void FEEngine_UI_UIController_AddUserMenu(uint64_t index, cs_structs::menu_description_struct menu) {
+			reference<ui_controller> uc = uc_register->get(index);
+			reference<cs_object> menu_object = reference<cs_object>::create(menu.menu, domain);
+			reference<cs_class> menu_class = engine->get_core()->get_class("FEEngine.UI", "Menu");
+			reference<cs_property> index_property = menu_class->get_property("Index");
+			reference<cs_object> property_value = menu_object->get_property(index_property);
+			uint64_t menu_index = *(uint64_t*)property_value->unbox();
+			std::string menu_name = from_mono(menu.name);
+			uc->add_user_menu({ menu_index, menu_name });
+		}
+		uint64_t FEEngine_UI_Menu_MakeNew() {
+			uint64_t index = menu_register->size();
+			menu_register->add(reference<internal::menu>::create());
+			return index;
 		}
 	}
 }

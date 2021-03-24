@@ -42,6 +42,7 @@ namespace fe_engine {
 		void set_field(reference<cs_field> field, void* value);
 		void* raw();
 		void* unbox();
+		cs_object(void* object, void* domain);
 		~cs_object();
 	private:
 		cs_object(uint32_t object, MonoDomain* domain);

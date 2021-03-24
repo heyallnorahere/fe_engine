@@ -3,6 +3,7 @@
 #include <cassert>
 #include "logger.h"
 #include "object_register.h"
+#include "menu.h"
 namespace fe_engine {
 	template<typename T> static size_t get_register_index(reference<T> element) {
 		auto obj_register = object_registry::get_register<T>();
@@ -17,6 +18,9 @@ namespace fe_engine {
 		this->m_renderer = r;
 		this->m_map = m;
 		this->m_imapper = im;
+		if (!object_registry::register_exists<internal::menu>()) {
+			object_registry::add_register<internal::menu>();
+		}
 	}
 	void ui_controller::set_info_panel_target(reference<unit> u) {
 		this->m_info_panel_target = u;
@@ -125,6 +129,12 @@ namespace fe_engine {
 	}
 	void ui_controller::close_unit_menu() {
 		this->m_unit_menu_target.reset();
+	}
+	void ui_controller::add_user_menu(const user_menu& menu) {
+		this->m_user_menus.push_back(menu);
+	}
+	const std::vector<ui_controller::user_menu>& ui_controller::get_user_menus() const {
+		return this->m_user_menus;
 	}
 	void ui_controller::render_frame(size_t info_panel_width, size_t unit_menu_width, size_t map_width, size_t map_height, size_t log_height) {
 		size_t viewport_width, viewport_height;
