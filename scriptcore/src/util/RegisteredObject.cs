@@ -7,6 +7,6 @@ namespace FEEngine.Util
 {
     public interface RegisteredObject<T> where T : new()
     {
-        public void SetRegisterIndex(ulong index);
+        void SetRegisterIndex(ulong index);
     }
 }
