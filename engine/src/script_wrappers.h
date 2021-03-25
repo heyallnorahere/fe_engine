@@ -20,6 +20,12 @@ namespace fe_engine {
 				MonoString* name;
 				MonoObject* menu;
 			};
+			struct menu_item {
+				MonoString* name;
+				int type;
+				MonoObject* action;
+				uint64_t submenu_index;
+			};
 		}
 		void init_wrappers(MonoDomain* domain, MonoImage* image, reference<script_engine> engine);
 		// unit class
@@ -75,5 +81,8 @@ namespace fe_engine {
 		void FEEngine_UI_UIController_AddUserMenu(uint64_t index, cs_structs::menu_description_struct menu);
 		// menu class
 		uint64_t FEEngine_UI_Menu_MakeNew();
+		uint64_t FEEngine_UI_Menu_GetMenuItemCount(uint64_t index);
+		cs_structs::menu_item FEEngine_UI_Menu_GetMenuItem(uint64_t index, uint64_t item_index);
+		void FEEngine_UI_Menu_AddMenuItem(uint64_t index, cs_structs::menu_item item);
 	}
 }

@@ -46,6 +46,7 @@ static void add_registers() {
 	object_registry::add_register<controller>();
 	object_registry::add_register<input_mapper>();
 	object_registry::add_register<ui_controller>();
+	object_registry::add_register<assembly>(); // yes.
 }
 // entrypoint
 int main() {
@@ -104,7 +105,9 @@ int main() {
 	std::string directory = "script-assemblies/";
 	std::vector<std::string> script_assembly_names = get_file_entries(directory, directory + "scriptcore.dll", "dll");
 	for (auto filename : script_assembly_names) {
-		script_assemblies.push_back(script_engine->load_assembly(filename));
+		fe_engine::reference<fe_engine::assembly> assembly = script_engine->load_assembly(filename);
+		script_assemblies.push_back(assembly);
+		fe_engine::object_registry::get_register<fe_engine::assembly>()->add(assembly);
 	}
 	// load json map file
 	fe_engine::reference<json_parser> parser = fe_engine::reference<json_parser>::create("data/map.json", script_assemblies, core, map.get());

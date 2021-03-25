@@ -111,11 +111,9 @@ namespace fe_engine {
 			MonoClass* exception_class = mono_get_exception_class();
 			MonoDomain* domain = mono_object_get_domain(exception);
 			std::string message = from_mono((MonoString*)get_property(exception, exception_class, "Message"));
-			std::string src = from_mono((MonoString*)get_property(exception, exception_class, "Source"));
 			std::string stacktrace_str = from_mono((MonoString*)get_property(exception, exception_class, "StackTrace"));
 			logger::print("Exception occurred!", renderer::color::red);
 			logger::print("Message: " + message);
-			logger::print("Source assembly: " + src);
 			std::vector<std::string> stacktrace = parse_newlines(stacktrace_str);
 			for (size_t i = 0; i < stacktrace.size(); i++) {
 				std::stringstream ss;
@@ -223,6 +221,9 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.UI.UIController::GetUserMenu_Native", (void*)script_wrappers::FEEngine_UI_UIController_GetUserMenu);
 		mono_add_internal_call("FEEngine.UI.UIController::AddUserMenu_Native", (void*)script_wrappers::FEEngine_UI_UIController_AddUserMenu);
 		mono_add_internal_call("FEEngine.UI.Menu::MakeNew_Native", (void*)script_wrappers::FEEngine_UI_Menu_MakeNew);
+		mono_add_internal_call("FEEngine.UI.Menu::GetMenuItemCount_Native", (void*)script_wrappers::FEEngine_UI_Menu_GetMenuItemCount);
+		mono_add_internal_call("FEEngine.UI.Menu::GetMenuItem_Native", (void*)script_wrappers::FEEngine_UI_Menu_GetMenuItem);
+		mono_add_internal_call("FEEngine.UI.Menu::AddMenuItem_Native", (void*)script_wrappers::FEEngine_UI_Menu_AddMenuItem);
 	}
 	void script_engine::init_engine(const std::string& core_assembly_path) {
 		this->init_mono();

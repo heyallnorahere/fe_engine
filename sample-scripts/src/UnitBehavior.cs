@@ -5,11 +5,29 @@ using System.Threading.Tasks;
 using FEEngine;
 using FEEngine.Math;
 using FEEngine.Util;
+using FEEngine.UI;
 
 namespace Scripts
 {
     public class UnitBehavior : Behavior
     {
+        private static void MenuTest(UIController uiController)
+        {
+            Logger.Print("Hello");
+        }
+        public void OnAttach()
+        {
+            Menu menu = Menu.MakeNew();
+            MenuItem item = new MenuItem();
+            item.type = MenuItem.MenuItemType.ACTION;
+            item.name = "Test";
+            item.action = MenuTest;
+            item.submenuIndex = 0;
+            menu.AddMenuItem(item);
+            List<MenuItem> items = menu.GetMenuItems();
+            item = items[items.Count - 1];
+            item.action(ObjectRegistry.GetRegister<UIController>().Get(0));
+        }
         private bool IsAllied(Unit unit)
         {
             bool allied = unit.Affiliation == this.Parent.Affiliation;

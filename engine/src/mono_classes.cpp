@@ -15,13 +15,22 @@ namespace fe_engine {
 	extern void* unbox_object(MonoObject* object);
 	extern void check_exception(MonoObject* exception);
 	reference<cs_class> assembly::get_class(const std::string& namespace_name, const std::string& class_name) {
-		MonoImage* image = mono_assembly_get_image(this->m_assembly);
+		MonoImage* image = (MonoImage*)this->m_image;
 		MonoClass* _class = ::fe_engine::get_class(image, namespace_name, class_name);
 		return reference<cs_class>(new cs_class(_class, this->m_domain, image, namespace_name, class_name));
+	}
+	void* assembly::get_image() {
+		return this->m_image;
+	}
+	reference<assembly> assembly::get_corlib(MonoDomain* domain) {
+		auto a = new assembly(NULL, domain);
+		a->m_image = mono_get_corlib();
+		return reference<assembly>(a);
 	}
 	assembly::assembly(MonoAssembly* a, MonoDomain* domain) {
 		this->m_assembly = a;
 		this->m_domain = domain;
+		if (this->m_assembly) this->m_image = mono_assembly_get_image(this->m_assembly);
 	}
 	reference<cs_object> cs_class::instantiate() {
 		return reference<cs_object>(new cs_object(::fe_engine::instantiate(this->m_domain, (MonoClass*)this->m_class), this->m_domain));

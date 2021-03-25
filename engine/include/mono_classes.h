@@ -84,9 +84,12 @@ namespace fe_engine {
 	class assembly : public ref_counted {
 	public:
 		reference<cs_class> get_class(const std::string& namespace_name, const std::string& class_name);
+		void* get_image();
+		static reference<assembly> get_corlib(MonoDomain* domain);
 	private:
 		assembly(MonoAssembly* a, MonoDomain* domain);
 		MonoAssembly* m_assembly;
+		void* m_image;
 		MonoDomain* m_domain;
 		friend class script_engine;
 	};

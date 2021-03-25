@@ -112,6 +112,38 @@ namespace fe_engine {
 			::engine = engine;
 			init_registers();
 		}
+		static MonoType* find_type(const std::string& name) {
+			reference<object_register<assembly>> assembly_register = object_registry::get_register<assembly>();
+			for (size_t i = 0; i < assembly_register->size(); i++) {
+				auto _assembly = assembly_register->get(i);
+				MonoImage* image = (MonoImage*)_assembly->get_image();
+				MonoType* type = mono_reflection_type_from_name((char*)name.c_str(), image);
+				if (type) {
+					return type;
+				}
+			}
+			return NULL;
+		}
+		static reference<cs_class> find_class(const std::string& name) {
+			size_t pos = name.find_last_of('.');
+			std::string ns_name, class_name;
+			if (pos == std::string::npos) {
+				class_name = name;
+			}
+			else {
+				ns_name = name.substr(0, pos);
+				class_name = name.substr(pos + 1);
+			}
+			reference<object_register<assembly>> assembly_register = object_registry::get_register<assembly>();
+			for (size_t i = 0; i < assembly_register->size(); i++) {
+				auto _assembly = assembly_register->get(i);
+				auto _class = _assembly->get_class(ns_name, class_name);
+				if (_class->raw()) {
+					return _class;
+				}
+			}
+			return reference<cs_class>();
+		}
 		MonoString* FEEngine_Unit_GetName(uint64_t unit_index) {
 			return to_mono(unit_register->get(unit_index)->get_name());
 		}
@@ -305,6 +337,45 @@ namespace fe_engine {
 			uint64_t index = menu_register->size();
 			menu_register->add(reference<internal::menu>::create());
 			return index;
+		}
+		uint64_t FEEngine_UI_Menu_GetMenuItemCount(uint64_t index) {
+			return menu_register->get(index)->get_items().size();
+		}
+		cs_structs::menu_item FEEngine_UI_Menu_GetMenuItem(uint64_t index, uint64_t item_index) {
+			internal::menu_item item = menu_register->get(index)->get_items()[item_index];
+			cs_structs::menu_item menu_item;
+			if (!item.action.empty()) {
+				size_t pos = item.action.find_last_of('.');
+				std::string action_name = item.action.substr(pos + 1);
+				std::string class_name = item.action.substr(0, pos);
+				auto type = find_type(class_name);
+				std::vector<void*> args;
+				args.push_back(mono_type_get_object(domain, type));
+				args.push_back(to_mono(action_name));
+				reference<cs_class> menu_item_struct = engine->get_core()->get_class("FEEngine.UI", "MenuItem");
+				reference<cs_method> makeaction_method = menu_item_struct->get_method("FEEngine.UI.MenuItem:MakeAction(Type,string)");
+				reference<cs_object> delegate = cs_method::call_function(makeaction_method, args.data());
+				menu_item.action = (MonoObject*)delegate->raw();
+			}
+			menu_item.submenu_index = item.submenu;
+			menu_item.name = to_mono(item.name);
+			menu_item.type = (int)item.type;
+			return menu_item;
+		}
+		void FEEngine_UI_Menu_AddMenuItem(uint64_t index, cs_structs::menu_item item) {
+			internal::menu_item menu_item;
+			menu_item.name = from_mono(item.name);
+			if (item.action) {
+				reference<cs_class> menu_item_struct = engine->get_core()->get_class("FEEngine.UI", "MenuItem");
+				reference<cs_method> get_name_method = menu_item_struct->get_method("FEEngine.UI.MenuItem:GetActionName(MenuItemAction)");
+				void* action = item.action;
+				reference<cs_object> name = cs_method::call_function(get_name_method, &action);
+				menu_item.action = from_mono((MonoString*)name->raw());
+			}
+			menu_item.type = (internal::menu_item_type)item.type;
+			menu_item.submenu = item.submenu_index;
+			reference<internal::menu> menu = menu_register->get(index);
+			menu->add_item(menu_item);
 		}
 	}
 }
