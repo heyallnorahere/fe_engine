@@ -1,9 +1,12 @@
 #include "util.h"
 #include <chrono>
 #include "object_register.h"
+#include "map.h"
+#include "ui_controller.h"
+#include "gameloop.h"
 namespace fe_engine {
 	std::unordered_map<size_t, reference<ref_counted>> object_registry::m;
-	namespace util {
+	namespace internal {
 		double start_time = 0;
 		bool time_initialized = false;
 		float get_current_time() {
@@ -13,6 +16,27 @@ namespace fe_engine {
 				time_initialized = true;
 			}
 			return static_cast<float>(current_time - start_time);
+		}
+	}
+	void gameloop(reference<player> p, reference<renderer> r) {
+		auto imapper = object_registry::get_register<input_mapper>()->get(0);
+		auto m = object_registry::get_register<map>()->get(0);
+		auto uc = object_registry::get_register<ui_controller>()->get(0);
+		while (true) {
+			// update the engine state
+			imapper->update();
+			m->update();
+			m->update_units();
+			p->update();
+			uc->update();
+			if (imapper->get_state().exit) break;
+			// render the map and ui
+			r->clear();
+			m->render(r);
+			p->render_cursor(r);
+			uc->render();
+			// print the characters to the console
+			r->present();
 		}
 	}
 }

@@ -12,7 +12,6 @@
 #include <deque>
 namespace fe_engine {
 	namespace internal {
-		struct menu_spec;
 		class close_ui_controller_unit_menu;
 	}
 	class ui_controller : public ref_counted {

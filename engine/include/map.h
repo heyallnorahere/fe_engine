@@ -9,12 +9,17 @@
 #include "map.h"
 #include "input_mapper.h"
 namespace fe_engine {
+	namespace internal {
+		struct pm_struct;
+	}
+	class phase_manager;
 	class map : public ref_counted {
 	public:
-		map(size_t width, size_t height);
+		map(size_t width, size_t height, phase_manager* pm);
+		~map();
 		void add_unit(const reference<unit>& unit);
 		void update();
-		void update_units(unit_affiliation affiliation);
+		void update_units();
 		void render(reference<renderer> r);
 		size_t get_unit_count() const;
 		reference<unit> get_unit(size_t index) const;
@@ -29,5 +34,6 @@ namespace fe_engine {
 		std::list<size_t> m_units;
 		std::unordered_map<s8vec2, reference<tile>, hash_vec2t<int8_t>> m_tiles;
 		size_t m_width, m_height;
+		internal::pm_struct* m_phase_manager;
 	};
 }

@@ -98,7 +98,7 @@ namespace fe_engine {
 				renderer::color color = renderer::color::white;
 				if (this->m_selected) {
 					constexpr float interval = 0.5f;
-					float modded = fmod(util::get_current_time(), interval * 2.f);
+					float modded = fmod(internal::get_current_time(), interval * 2.f);
 					if (modded < interval) {
 						color = renderer::color::red;
 					}

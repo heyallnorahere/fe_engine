@@ -58,8 +58,10 @@ int main() {
 	// width and height of the map
 	constexpr size_t width = 20;
 	constexpr size_t height = 10;
+	// make a phase manager
+	fe_engine::reference<fe_engine::phase_manager> phase_manager = fe_engine::reference<fe_engine::phase_manager>::create();
 	// create a map object
-	fe_engine::reference<fe_engine::map> map = fe_engine::reference<fe_engine::map>::create(width, height);
+	fe_engine::reference<fe_engine::map> map = fe_engine::reference<fe_engine::map>::create(width, height, phase_manager.get());
 	fe_engine::object_registry::get_register<fe_engine::map>()->add(map);
 	// create a renderer
 	fe_engine::reference<fe_engine::renderer> renderer = fe_engine::reference<fe_engine::renderer>::create();
@@ -80,8 +82,6 @@ int main() {
 	// make a ui controller
 	fe_engine::reference<fe_engine::ui_controller> ui_controller = fe_engine::reference<fe_engine::ui_controller>::create(renderer, map, imapper);
 	fe_engine::object_registry::get_register<fe_engine::ui_controller>()->add(ui_controller);
-	// make a phase manager
-	fe_engine::reference<fe_engine::phase_manager> phase_manager = fe_engine::reference<fe_engine::phase_manager>::create();
 	// make the player (cursor, etc.)
 	fe_engine::reference<fe_engine::player> player = fe_engine::reference<fe_engine::player>::create(imapper, map, ui_controller, phase_manager);
 	// instantiate the script engine and load the core assembly
@@ -119,22 +119,7 @@ int main() {
 	fe_engine::logger::print("Initialized! Starting main loop...", fe_engine::renderer::color::green);
 	phase_manager->log_phase();
 	// start the loop
-	while (true) {
-		// update the engine state
-		imapper->update();
-		map->update();
-		map->update_units(phase_manager->get_current_phase());
-		player->update();
-		ui_controller->update();
-		if (imapper->get_state().exit) break;
-		// render the map and ui
-		renderer->clear();
-		map->render(renderer);
-		player->render_cursor(renderer);
-		ui_controller->render();
-		// print the characters to the console
-		renderer->present();
-	}
+	fe_engine::gameloop(player, renderer);
 	fe_engine::logger::print("Shutting down. Goodbye!", fe_engine::renderer::color::green);
 	// free all of the allocated memory (via fe_engine::reference) and terminate the program
 	return 0;

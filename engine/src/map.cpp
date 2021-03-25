@@ -7,10 +7,15 @@
 #include <limits>
 #include <cassert>
 #include "object_register.h"
+#include "util.h"
 namespace fe_engine {
-	map::map(size_t width, size_t height) {
+	map::map(size_t width, size_t height, phase_manager* pm) {
 		this->m_width = width;
 		this->m_height = height;
+		this->m_phase_manager = new internal::pm_struct{ pm };
+	}
+	map::~map() {
+		delete this->m_phase_manager;
 	}
 	void map::add_unit(const reference<unit>& unit) {
 		auto unit_register = object_registry::get_register<::fe_engine::unit>();
@@ -43,7 +48,8 @@ namespace fe_engine {
 			u->update();
 		}
 	}
-	void map::update_units(unit_affiliation affiliation) {
+	void map::update_units() {
+		unit_affiliation affiliation = this->m_phase_manager->m->get_current_phase();
 		auto unit_register = object_registry::get_register<unit>();
 		for (size_t index : this->m_units) {
 			auto u = unit_register->get(index);
