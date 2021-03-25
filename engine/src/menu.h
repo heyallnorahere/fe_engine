@@ -10,6 +10,8 @@ namespace fe_engine {
 		enum class menu_item_type {
 			submenu,
 			action,
+			back,
+			no_action,
 		};
 		struct menu_item {
 			std::string name;

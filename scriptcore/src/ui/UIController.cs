@@ -15,6 +15,12 @@ namespace FEEngine.UI
             public Menu menu;
         }
         public ulong Index { get; private set; }
+        public static UIController MakeFromRegisterIndex(ulong index)
+        {
+            UIController uiController = new UIController();
+            uiController.Index = index;
+            return uiController;
+        }
         public UIController()
         {
             this.Index = 0;
@@ -35,7 +41,7 @@ namespace FEEngine.UI
         {
             return HasUnitSelected_Native(this.Index);
         }
-        public List<MenuDescriptionStruct> GeUserMenus()
+        public List<MenuDescriptionStruct> GetUserMenus()
         {
             List<MenuDescriptionStruct> menus = new List<MenuDescriptionStruct>();
             ulong count = GetUserMenuCount_Native(this.Index);
@@ -44,6 +50,10 @@ namespace FEEngine.UI
                 menus.Add(GetUserMenu_Native(this.Index, i));
             }
             return menus;
+        }
+        public void ExitUnitMenu()
+        {
+            ExitUnitMenu_Native(this.Index);
         }
         public void AddUserMenu(MenuDescriptionStruct menu)
         {
@@ -59,5 +69,8 @@ namespace FEEngine.UI
         private static extern MenuDescriptionStruct GetUserMenu_Native(ulong index, ulong menuIndex);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void AddUserMenu_Native(ulong index, MenuDescriptionStruct menu);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+
+        private static extern void ExitUnitMenu_Native(ulong index);
     }
 }

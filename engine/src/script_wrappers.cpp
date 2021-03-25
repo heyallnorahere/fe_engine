@@ -70,6 +70,14 @@ namespace fe_engine {
 	static MonoString* to_mono(const std::string& str) {
 		return mono_string_new(domain, str.c_str());
 	}
+	namespace internal {
+		class close_ui_controller_unit_menu {
+		public:
+			void operator()(reference<ui_controller> uc) {
+				uc->close_unit_menu();
+			}
+		};
+	}
 	namespace script_wrappers {
 		static reference<object_register<unit>> unit_register;
 		static reference<object_register<item>> item_register;
@@ -332,6 +340,10 @@ namespace fe_engine {
 			uint64_t menu_index = *(uint64_t*)property_value->unbox();
 			std::string menu_name = from_mono(menu.name);
 			uc->add_user_menu({ menu_index, menu_name });
+		}
+		void FEEngine_UI_UIController_ExitUnitMenu(uint64_t index) {
+			internal::close_ui_controller_unit_menu close;
+			close(uc_register->get(index));
 		}
 		uint64_t FEEngine_UI_Menu_MakeNew() {
 			uint64_t index = menu_register->size();

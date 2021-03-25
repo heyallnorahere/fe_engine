@@ -79,6 +79,7 @@ namespace fe_engine {
 		uint64_t FEEngine_UI_UIController_GetUserMenuCount(uint64_t index);
 		cs_structs::menu_description_struct FEEngine_UI_UIController_GetUserMenu(uint64_t index, uint64_t menu_index);
 		void FEEngine_UI_UIController_AddUserMenu(uint64_t index, cs_structs::menu_description_struct menu);
+		void FEEngine_UI_UIController_ExitUnitMenu(uint64_t index);
 		// menu class
 		uint64_t FEEngine_UI_Menu_MakeNew();
 		uint64_t FEEngine_UI_Menu_GetMenuItemCount(uint64_t index);

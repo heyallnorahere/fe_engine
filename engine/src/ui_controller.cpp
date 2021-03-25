@@ -33,6 +33,14 @@ namespace fe_engine {
 		this->m_unit_menu_state.selected_item.reset();
 		this->m_unit_menu_state.original_position = original_position;
 	}
+	void ui_controller::set_core_assembly(reference<assembly> core) {
+		this->m_core = core;
+	}
+	static std::vector<internal::menu_item> get_menu_items(size_t index) {
+		auto menu_register = object_registry::get_register<internal::menu>();
+		reference<internal::menu> menu = menu_register->get(index);
+		return menu->get_items();
+	}
 	void ui_controller::update() {
 		auto item_register = object_registry::get_register<item>();
 		if (this->m_unit_menu_target) {
@@ -102,6 +110,55 @@ namespace fe_engine {
 				if (input.back && this->m_can_close) {
 					this->m_unit_menu_state.page = menu_page::base;
 					this->m_unit_menu_index = 0;
+				}
+			}
+				break;
+			case menu_page::user_menu:
+			{
+				auto go_back = [&]() {
+					this->m_user_menu_queue.pop_front();
+					if (this->m_user_menu_queue.size() == 0) {
+						this->m_unit_menu_state.page = menu_page::base;
+					}
+					this->m_unit_menu_index = 0;
+				};
+				std::vector<internal::menu_item> items = get_menu_items(this->m_user_menu_queue[0]);
+				if (input.down && this->m_unit_menu_index < items.size() - 1) {
+					this->m_unit_menu_index++;
+				}
+				if (input.ok && this->m_can_close) {
+					internal::menu_item _item = items[this->m_unit_menu_index];
+					switch (_item.type) {
+					case internal::menu_item_type::action:
+					{
+						reference<cs_class> ui_controller_class = this->m_core->get_class("FEEngine.UI", "UIController");
+						reference<cs_method> creation_method = ui_controller_class->get_method("FEEngine.UI.UIController:MakeFromRegisterIndex(ulong)");
+						uint64_t index = (size_t)-1;
+						reference<object_register<ui_controller>> uc_register = object_registry::get_register<ui_controller>();
+						for (size_t i = 0; i < uc_register->size(); i++) {
+							if (uc_register->get(i).get() == this) {
+								index = i;
+								break;
+							}
+						}
+						assert(index != (size_t)-1);
+						void* addr = &index;
+						reference<cs_object> ui_controller_object = cs_method::call_function(creation_method, &addr);
+						addr = ui_controller_object->raw();
+						_item.action->invoke(&addr);
+					}
+						break;
+					case internal::menu_item_type::submenu:
+						this->m_user_menu_queue.push_front(_item.submenu);
+						this->m_unit_menu_index = 0;
+						break;
+					case internal::menu_item_type::back:
+						go_back();
+						break;
+					}
+				}
+				if (input.back && this->m_can_close) {
+					go_back();
 				}
 			}
 				break;
@@ -233,6 +290,19 @@ namespace fe_engine {
 				}
 			}
 				break;
+			case menu_page::user_menu:
+			{
+				std::vector<internal::menu_item> items = get_menu_items(this->m_user_menu_queue[0]);
+				for (size_t i = 0; i < items.size(); i++) {
+					bool selected = (this->m_unit_menu_index == i);
+					size_t y = origin_y + height - (1 + (i * 2));
+					if (selected) {
+						this->m_renderer->render_char_at(origin_x, y, '>', renderer::color::red);
+					}
+					this->m_renderer->render_string_at(origin_x + 2, y, items[i].name, selected ? renderer::color::red : renderer::color::white);
+				}
+			}
+				break;
 			}
 		}
 	}
@@ -302,6 +372,14 @@ namespace fe_engine {
 			}
 		}
 		this->m_menu_items.push_back({ "Item", [](reference<ui_controller> controller) { controller->m_unit_menu_state.page = menu_page::item; controller->m_unit_menu_index = 0; } });
+		for (auto menu : this->m_user_menus) {
+			size_t index = menu.register_index;
+			this->m_menu_items.push_back({ menu.menu_item_name, [index](reference<ui_controller> controller) {
+				controller->m_unit_menu_state.page = menu_page::user_menu;
+				controller->m_user_menu_queue.push_front(index);
+				controller->m_unit_menu_index = 0;
+			} });
+		}
 		this->m_menu_items.push_back({ "Wait", [](reference<ui_controller> controller) { controller->close_unit_menu(); } });
 	}
 }

@@ -220,6 +220,7 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.UI.UIController::GetUserMenuCount_Native", (void*)script_wrappers::FEEngine_UI_UIController_GetUserMenuCount);
 		mono_add_internal_call("FEEngine.UI.UIController::GetUserMenu_Native", (void*)script_wrappers::FEEngine_UI_UIController_GetUserMenu);
 		mono_add_internal_call("FEEngine.UI.UIController::AddUserMenu_Native", (void*)script_wrappers::FEEngine_UI_UIController_AddUserMenu);
+		mono_add_internal_call("FEEngine.UI.UIController::ExitUnitMenu_Native", (void*)script_wrappers::FEEngine_UI_UIController_ExitUnitMenu);
 		mono_add_internal_call("FEEngine.UI.Menu::MakeNew_Native", (void*)script_wrappers::FEEngine_UI_Menu_MakeNew);
 		mono_add_internal_call("FEEngine.UI.Menu::GetMenuItemCount_Native", (void*)script_wrappers::FEEngine_UI_Menu_GetMenuItemCount);
 		mono_add_internal_call("FEEngine.UI.Menu::GetMenuItem_Native", (void*)script_wrappers::FEEngine_UI_Menu_GetMenuItem);

@@ -14,10 +14,16 @@ namespace FEEngine.UI
         {
             SUBMENU,
             ACTION,
+            BACK,
+            NOACTION,
         }
-        public String name;
+        public string name;
         public MenuItemType type;
         public MenuItemAction action;
         public ulong submenuIndex;
+        public void SetSubmenu(Menu menu)
+        {
+            this.submenuIndex = menu.Index;
+        }
     }
 }

@@ -87,6 +87,7 @@ int main() {
 	// instantiate the script engine and load the core assembly
 	fe_engine::reference<fe_engine::script_engine> script_engine = fe_engine::reference<fe_engine::script_engine>::create("script-assemblies/scriptcore.dll");
 	fe_engine::reference<fe_engine::assembly> core = script_engine->get_core();
+	ui_controller->set_core_assembly(core);
 	fe_engine::reference<fe_engine::cs_class> test_class = core->get_class("FEEngine", "Test");
 	// a test; might remove later
 	{
