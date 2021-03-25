@@ -4,6 +4,7 @@
 #include <string>
 #include <functional>
 #include "ui_controller.h"
+#include "mono_classes.h"
 namespace fe_engine {
 	namespace internal {
 		enum class menu_item_type {
@@ -13,7 +14,7 @@ namespace fe_engine {
 		struct menu_item {
 			std::string name;
 			menu_item_type type;
-			std::string action;
+			reference<cs_delegate> action;
 			size_t submenu;
 		};
 		class menu : public ref_counted {

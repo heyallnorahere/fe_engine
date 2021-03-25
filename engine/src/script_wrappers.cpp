@@ -344,18 +344,8 @@ namespace fe_engine {
 		cs_structs::menu_item FEEngine_UI_Menu_GetMenuItem(uint64_t index, uint64_t item_index) {
 			internal::menu_item item = menu_register->get(index)->get_items()[item_index];
 			cs_structs::menu_item menu_item;
-			if (!item.action.empty()) {
-				size_t pos = item.action.find_last_of('.');
-				std::string action_name = item.action.substr(pos + 1);
-				std::string class_name = item.action.substr(0, pos);
-				auto type = find_type(class_name);
-				std::vector<void*> args;
-				args.push_back(mono_type_get_object(domain, type));
-				args.push_back(to_mono(action_name));
-				reference<cs_class> menu_item_struct = engine->get_core()->get_class("FEEngine.UI", "MenuItem");
-				reference<cs_method> makeaction_method = menu_item_struct->get_method("FEEngine.UI.MenuItem:MakeAction(Type,string)");
-				reference<cs_object> delegate = cs_method::call_function(makeaction_method, args.data());
-				menu_item.action = (MonoObject*)delegate->raw();
+			if (item.action) {
+				menu_item.action = (MonoObject*)item.action->raw();
 			}
 			menu_item.submenu_index = item.submenu;
 			menu_item.name = to_mono(item.name);
@@ -366,11 +356,7 @@ namespace fe_engine {
 			internal::menu_item menu_item;
 			menu_item.name = from_mono(item.name);
 			if (item.action) {
-				reference<cs_class> menu_item_struct = engine->get_core()->get_class("FEEngine.UI", "MenuItem");
-				reference<cs_method> get_name_method = menu_item_struct->get_method("FEEngine.UI.MenuItem:GetActionName(MenuItemAction)");
-				void* action = item.action;
-				reference<cs_object> name = cs_method::call_function(get_name_method, &action);
-				menu_item.action = from_mono((MonoString*)name->raw());
+				menu_item.action = reference<cs_delegate>::create(item.action, domain);
 			}
 			menu_item.type = (internal::menu_item_type)item.type;
 			menu_item.submenu = item.submenu_index;
