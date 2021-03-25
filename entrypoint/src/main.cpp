@@ -116,6 +116,9 @@ int main() {
 		auto unit = parser->make_unit_from_index(i);
 		map->add_unit(unit);
 	}
+	// load ui data file
+	json_parser::ui_data data = parser->parse_ui_data("data/ui_data.json");
+	ui_controller->set_ui_script(data.ui_script);
 	fe_engine::logger::print("Initialized! Starting main loop...", fe_engine::renderer::color::green);
 	phase_manager->log_phase();
 	// start the loop

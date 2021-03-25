@@ -7,8 +7,13 @@
 // json parser class; pass in a path, load a file, and parse items/units
 class json_parser : fe_engine::ref_counted {
 public:
+	struct ui_data {
+		fe_engine::reference<fe_engine::cs_class> ui_script;
+		// nothing else, FOR NOW
+	};
 	size_t get_unit_count();
 	fe_engine::reference<fe_engine::unit> make_unit_from_index(size_t index);
+	ui_data parse_ui_data(const std::string& filepath);
 private:
 	json_parser(const std::string& json_path, std::vector<fe_engine::reference<fe_engine::assembly>> script_assemblies, fe_engine::reference<fe_engine::assembly> core_assembly, fe_engine::reference<fe_engine::map> map);
 	void load_items();

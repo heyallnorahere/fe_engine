@@ -30,6 +30,7 @@ namespace fe_engine {
 		void set_can_close(bool c);
 		void add_user_menu(const user_menu& menu);
 		const std::vector<user_menu>& get_user_menus() const;
+		void set_ui_script(reference<cs_class> _class);
 	private:
 		struct unit_menu_item {
 			std::string text;
@@ -56,6 +57,15 @@ namespace fe_engine {
 		menu_state m_unit_menu_state;
 		std::vector<user_menu> m_user_menus;
 		std::deque<size_t> m_user_menu_queue;
+		struct {
+			reference<cs_class> _class;
+			reference<cs_object> instance;
+			reference<cs_method> init_method;
+			bool initialized;
+			bool can_init() {
+				return (!this->initialized) && this->_class && this->instance && this->init_method;
+			}
+		} m_script_data;
 		bool m_can_close;
 		size_t m_unit_menu_index;
 		void close_unit_menu();

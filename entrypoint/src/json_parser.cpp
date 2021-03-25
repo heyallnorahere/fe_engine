@@ -137,6 +137,22 @@ reference<unit> json_parser::make_unit_from_index(size_t index) {
 	}
 	return unit_object;
 }
+json_parser::ui_data json_parser::parse_ui_data(const std::string& filepath) {
+	nlohmann::json j;
+	{
+		std::ifstream file(filepath);
+		file >> j;
+		file.close();
+	}
+	ui_data data;
+	if (j.find("script") != j.end()) {
+		std::string ns, cls, full;
+		j["script"].get_to(full);
+		parse_cs_classname(full, ns, cls);
+		data.ui_script = this->find_class(ns, cls);
+	}
+	return data;
+}
 json_parser::json_parser(const std::string& json_path, std::vector<fe_engine::reference<fe_engine::assembly>> script_assemblies, fe_engine::reference<fe_engine::assembly> core_assembly, fe_engine::reference<fe_engine::map> map) {
 	std::ifstream file(json_path);
 	file >> this->m_file;

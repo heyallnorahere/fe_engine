@@ -42,6 +42,24 @@ namespace fe_engine {
 		return menu->get_items();
 	}
 	void ui_controller::update() {
+		if (this->m_script_data.can_init()) {
+			reference<cs_class> uc_class = this->m_core->get_class("FEEngine.UI", "UIController");
+			reference<cs_method> creation_method = uc_class->get_method("FEEngine.UI.UIController:MakeFromRegisterIndex(ulong)");
+			uint64_t index = (size_t)-1;
+			reference<object_register<ui_controller>> uc_register = object_registry::get_register<ui_controller>();
+			for (size_t i = 0; i < uc_register->size(); i++) {
+				if (uc_register->get(i).get() == this) {
+					index = i;
+					break;
+				}
+			}
+			assert(index != (size_t)-1);
+			void* addr = &index;
+			reference<cs_object> uc_instance = cs_method::call_function(creation_method, &addr);
+			addr = uc_instance->raw();
+			this->m_script_data.instance->call_method(this->m_script_data.init_method, &addr);
+			this->m_script_data.initialized = true;
+		}
 		auto item_register = object_registry::get_register<item>();
 		if (this->m_unit_menu_target) {
 			auto input = this->m_imapper->get_state();
@@ -192,6 +210,18 @@ namespace fe_engine {
 	}
 	const std::vector<ui_controller::user_menu>& ui_controller::get_user_menus() const {
 		return this->m_user_menus;
+	}
+	void ui_controller::set_ui_script(reference<cs_class> _class) {
+		this->m_script_data.initialized = false;
+		this->m_script_data._class = _class;
+		if (_class) {
+			this->m_script_data.instance = _class->instantiate();
+			this->m_script_data.init_method = _class->get_method(_class->get_full_name() + ":Initialize(UIController)");
+		}
+		else {
+			this->m_script_data.instance.reset();
+			this->m_script_data.init_method.reset();
+		}
 	}
 	void ui_controller::render_frame(size_t info_panel_width, size_t unit_menu_width, size_t map_width, size_t map_height, size_t log_height) {
 		size_t viewport_width, viewport_height;
