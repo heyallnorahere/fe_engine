@@ -43,9 +43,6 @@ project "engine"
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp",
         "%{prj.name}/include/**.h",
-        "vendor/other/discord-game-sdk/src/**.cpp",
-        "vendor/other/discord-game-sdk/src/**.h",
-        "vendor/other/discord-game-sdk/include/**.h",
     }
     includedirs {
         "%{prj.name}/include"
@@ -56,6 +53,11 @@ project "engine"
         "vendor/other/discord-game-sdk/include"
     }
     filter "system:windows"
+        files {
+            "vendor/other/discord-game-sdk/src/**.cpp",
+            "vendor/other/discord-game-sdk/src/**.h",
+            "vendor/other/discord-game-sdk/include/**.h",    
+        }
         links {
             "vendor/binaries/windows/%{cfg.buildcfg}/lib/*.lib",
             "vendor/binaries/%{cfg.system}/other/lib/*.lib"
@@ -132,14 +134,14 @@ project "entrypoint"
         links {
             "monosgen-2.0"
         }
-        syslibdirs {
-            "/usr/local/lib"
+        libdirs {
+            "/usr/local/lib",
         }
     filter "system:macosx"
         links {
             "z"
         }
-        syslibdirs {
+        libdirs {
             "/usr/local/opt/zlib/lib"
         }
     filter "system:linux"

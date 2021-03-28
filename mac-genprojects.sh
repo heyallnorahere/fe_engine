@@ -1,1 +1,2 @@
-vendor/binaries/macos/premake5 gmake --dotnet=mono
+#!/bin/sh
+vendor/binaries/macosx/premake5 gmake --dotnet=mono
