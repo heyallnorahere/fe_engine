@@ -30,34 +30,6 @@ workspace "fe_engine"
             "FEENGINE_RELEASE"
         }
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
-group "dependencies"
-project "discord-game-sdk"
-    kind "StaticLib"
-    language "C++"
-    cppdialect "C++17"
-    staticruntime "on"
-    targetdir ("bin/" .. outputdir .. "/%{prj.name")
-    objdir ("bin-int/" .. outputdir .. "/%{prj.name")
-    files {
-        "vendor/other/%{prj.name}/src/**.cpp",
-        "vendor/other/%{prj.name}/src/**.h",
-        "vendor/other/%{prj.name}/include/**.h",
-    }
-    includedirs {
-        "vendor/other/%{prj.name}/include"
-    }
-    filter "system:windows"
-        libdirs {
-            "binaries/%{cfg.system}/other/lib"
-        }
-        links {
-            "discord_game_sdk.dll.lib"
-        }
-    filter "configurations:Debug"
-        symbols "On"
-    filter "configurations:Release"
-        optimize "On"
-group ""
 group "engine"
 project "engine"
     location "engine"
@@ -70,7 +42,10 @@ project "engine"
     files {
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp",
-        "%{prj.name}/include/**.h"
+        "%{prj.name}/include/**.h",
+        "vendor/other/discord-game-sdk/src/**.cpp",
+        "vendor/other/discord-game-sdk/src/**.h",
+        "vendor/other/discord-game-sdk/include/**.h",
     }
     includedirs {
         "%{prj.name}/include"
@@ -80,12 +55,10 @@ project "engine"
         "vendor/submodules/json/include",
         "vendor/other/discord-game-sdk/include"
     }
-    links {
-        "discord-game-sdk"
-    }
     filter "system:windows"
         links {
-            "vendor/binaries/windows/%{cfg.buildcfg}/lib/*.lib"
+            "vendor/binaries/windows/%{cfg.buildcfg}/lib/*.lib",
+            "vendor/binaries/%{cfg.system}/other/lib/*.lib"
         }
     filter "configurations:Debug"
         symbols "On"
