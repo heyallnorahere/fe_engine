@@ -18,3 +18,4 @@
 #include "logger.h"
 #include "object_register.h"
 #include "gameloop.h"
+#include "discord_app.h"

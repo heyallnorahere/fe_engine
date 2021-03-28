@@ -18,11 +18,15 @@ namespace fe_engine {
 			return static_cast<float>(current_time - start_time);
 		}
 	}
-	void gameloop(reference<player> p, reference<renderer> r) {
+	void gameloop(reference<player> p, reference<renderer> r, reference<discord_app> da) {
 		auto imapper = object_registry::get_register<input_mapper>()->get(0);
 		auto m = object_registry::get_register<map>()->get(0);
 		auto uc = object_registry::get_register<ui_controller>()->get(0);
 		while (true) {
+			// if a discord_app object was passed, update it
+			if (da) {
+				da->update();
+			}
 			// update the engine state
 			imapper->update();
 			m->update();

@@ -119,11 +119,16 @@ int main() {
 	// load ui data file
 	json_parser::ui_data data = parser->parse_ui_data("data/ui_data.json");
 	ui_controller->set_ui_script(data.ui_script);
+	// test discord app; this points to one of my (ys1219) discord apps
+	auto discord_app = fe_engine::reference<fe_engine::discord_app>::create(825530445415317536);
+	fe_engine::discord_activity activity;
+	activity.state = "This is an FEEngine test application.";
+	discord_app->update_activity(activity);
+	// start the loop
 	fe_engine::logger::print("Initialized! Starting main loop...", fe_engine::renderer::color::green);
 	phase_manager->log_phase();
-	// start the loop
-	fe_engine::gameloop(player, renderer);
-	fe_engine::logger::print("Shutting down. Goodbye!", fe_engine::renderer::color::green);
+	fe_engine::gameloop(player, renderer, discord_app);
 	// free all of the allocated memory (via fe_engine::reference) and terminate the program
+	fe_engine::logger::print("Shutting down. Goodbye!", fe_engine::renderer::color::green);
 	return 0;
 }
