@@ -30,6 +30,10 @@ workspace "fe_engine"
             "FEENGINE_RELEASE"
         }
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+group "dependencies"
+include "vendor"
+group ""
+group "engine"
 project "engine"
     location "engine"
     kind "StaticLib"
@@ -48,7 +52,11 @@ project "engine"
     }
     sysincludedirs {
         "vendor/include",
-        "vendor/submodules/json/include"
+        "vendor/submodules/json/include",
+        "vendor/other/discord-game-sdk/include"
+    }
+    links {
+        "discord-game-sdk"
     }
     filter "system:windows"
         links {
@@ -67,6 +75,8 @@ project "scriptcore"
     files {
         "%{prj.name}/src/**.cs"
     }
+group ""
+group "examples"
 project "sample-scripts"
     location "sample-scripts"
     kind "SharedLib"
@@ -111,6 +121,7 @@ project "entrypoint"
         }
         postbuildcommands {
             '{COPY} "../vendor/binaries/windows/%{cfg.buildcfg}/bin/*.dll" "%{cfg.targetdir}\\"',
+            '{COPY} "../vendor/binaries/windows/other/bin/*.dll" "%{cfg.targetdir}\\"',
             '{COPY} "%{cfg.targetdir}/../scriptcore/scriptcore.dll" "script-assemblies\\"',
             '{COPY} "%{cfg.targetdir}/../sample-scripts/sample-scripts.dll" "script-assemblies\\"'
         }
@@ -140,3 +151,4 @@ project "entrypoint"
         links {
             "stdc++fs"
         }
+group ""
