@@ -31,7 +31,33 @@ workspace "fe_engine"
         }
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 group "dependencies"
-include "vendor"
+project "discord-game-sdk"
+    location "vendor/other/%{prj.name}"
+    kind "StaticLib"
+    language "C++"
+    cppdialect "C++17"
+    staticruntime "on"
+    targetdir ("bin/" .. outputdir .. "/%{prj.name")
+    objdir ("bin-int/" .. outputdir .. "/%{prj.name")
+    files {
+        "vendor/other/%{prj.name}/src/**.cpp",
+        "vendor/other/%{prj.name}/src/**.h",
+        "vendor/other/%{prj.name}/include/**.h",
+    }
+    includedirs {
+        "vendor/other/%{prj.name}/include"
+    }
+    filter "system:windows"
+        libdirs {
+            "binaries/%{cfg.system}/other/lib"
+        }
+        links {
+            "discord_game_sdk.dll.lib"
+        }
+    filter "configurations:Debug"
+        symbols "On"
+    filter "configurations:Release"
+        optimize "On"
 group ""
 group "engine"
 project "engine"
