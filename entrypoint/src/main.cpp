@@ -116,6 +116,15 @@ int main() {
 		auto unit = parser->make_unit_from_index(i);
 		map->add_unit(unit);
 	}
+	// check map tiles and init pathfinding
+	map->check_tiles();	
+	fe_engine::pathfinding::graph::init_graph(map);
+	// pathfinding test
+	{
+		auto graph = fe_engine::pathfinding::graph::get_graph();
+		auto algorithm = fe_engine::pathfinding::algorithm::create_algorithm(graph);
+		algorithm({ 0, 0 }, { width - 1, height - 1 });
+	}
 	// load ui data file
 	json_parser::ui_data data = parser->parse_ui_data("data/ui_data.json");
 	ui_controller->set_ui_script(data.ui_script);

@@ -31,6 +31,15 @@ namespace fe_engine {
             s8vec2 m_position;
             tile::passing_properties m_properties;
         };
+        class node : public ref_counted {
+        public:
+            node(reference<cell> c, reference<node> parent = reference<node>());
+            reference<cell> get();
+            reference<node> get_parent();
+        private:
+            reference<cell> m;
+            reference<node> m_parent;
+        };
         class graph : public ref_counted {
         public:
             static void init_graph(reference<map> m);

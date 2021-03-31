@@ -8,6 +8,7 @@
 #include <cassert>
 #include "object_register.h"
 #include "util.h"
+#include "pathfinding/graph.h"
 namespace fe_engine {
 	map::map(size_t width, size_t height, phase_manager* pm) {
 		this->m_width = width;
@@ -22,15 +23,6 @@ namespace fe_engine {
 		this->m_units.push_back(unit_register->add(unit));
 	}
 	void map::update() {
-		if (this->m_tiles.size() != this->m_width * this->m_height) {
-			for (int8_t x = 0; (int8_t)x < this->m_width; x++) {
-				for (int8_t y = 0; (int8_t)y < this->m_height; y++) {
-					if (this->m_tiles.find({ x, y }) == this->m_tiles.end()) {
-						this->m_tiles[{ x, y }] = reference<tile>::create(tile::passing_properties{ true });
-					}
-				}
-			}
-		}
 		auto unit_register = object_registry::get_register<unit>();
 		this->m_units.remove_if([&](size_t index) {
 			auto u = unit_register->get(index);
@@ -141,5 +133,16 @@ namespace fe_engine {
 	}
 	size_t map::get_height() const {
 		return this->m_height;
+	}
+	void map::check_tiles() {
+		if (this->m_tiles.size() != this->m_width * this->m_height) {
+			for (int8_t x = 0; (int8_t)x < this->m_width; x++) {
+				for (int8_t y = 0; (int8_t)y < this->m_height; y++) {
+					if (this->m_tiles.find({ x, y }) == this->m_tiles.end()) {
+						this->m_tiles[{ x, y }] = reference<tile>::create(tile::passing_properties{ true });
+					}
+				}
+			}
+		}
 	}
 }

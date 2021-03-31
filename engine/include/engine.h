@@ -19,3 +19,5 @@
 #include "object_register.h"
 #include "gameloop.h"
 #include "discord_app.h"
+#include "pathfinding/graph.h"
+#include "pathfinding/algorithm.h"

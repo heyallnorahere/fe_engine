@@ -5,6 +5,7 @@ namespace fe_engine {
     namespace pathfinding {
         static std::map<direction, s8vec2> direction_map;
         static reference<graph> g_graph;
+        bool graph_initialized = false;
         static bool is_border(s8vec2 pos, reference<map> m) {
             bool west = pos.x < 0;
             bool east = pos.x > m->get_width() - 1;
@@ -41,6 +42,16 @@ namespace fe_engine {
         tile::passing_properties cell::get_passing_properties() {
             return this->m_properties;
         }
+        node::node(reference<cell> c, reference<node> parent) {
+            this->m = c;
+            this->m_parent = parent;
+        }
+        reference<cell> node::get() {
+            return this->m;
+        }
+        reference<node> node::get_parent() {
+            return this->m_parent;
+        }
         void graph::init_graph(reference<map> m) {
             if (!object_registry::register_exists<cell>()) {
                 object_registry::add_register<cell>();
@@ -51,12 +62,14 @@ namespace fe_engine {
                 { direction::south, { 0, -1 } },
                 { direction::west, { -1, 0 } },
             };
+            graph_initialized = true;
             g_graph = reference<graph>::create(m);
         }
         reference<graph> graph::get_graph() {
             return g_graph;
         }
         graph::graph(reference<map> m) {
+            assert(graph_initialized);
             for (int8_t x = 0; x < m->get_width(); x++) {
                 for (int8_t y = 0; y < m->get_height(); y++) {
                     s8vec2 pos = { x, y };

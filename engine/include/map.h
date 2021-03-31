@@ -30,6 +30,7 @@ namespace fe_engine {
 		std::vector<reference<unit>> get_all_units_of_affiliation(unit_affiliation affiliation);
 		size_t get_width() const;
 		size_t get_height() const;
+		void check_tiles();
 	private:
 		std::list<size_t> m_units;
 		std::unordered_map<s8vec2, reference<tile>, hash_vec2t<int8_t>> m_tiles;
