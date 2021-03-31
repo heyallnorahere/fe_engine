@@ -1,3 +1,14 @@
+newoption {
+    trigger = "pathfinder",
+    value = "algorithm",
+    description = "Choose an algorithm for pathfinding",
+    allowed = {
+        { "astar", "AStar" }
+    }
+}
+if not _OPTIONS["pathfinder"] then
+    _OPTIONS["pathfinder"] = "astar"
+end
 workspace "fe_engine"
     architecture "x64"
     targetdir "build"
@@ -61,6 +72,10 @@ project "engine"
         links {
             "vendor/binaries/windows/%{cfg.buildcfg}/lib/*.lib",
             "vendor/binaries/%{cfg.system}/other/lib/*.lib"
+        }
+    filter "options:pathfinder=astar"
+        defines {
+            "FEENGINE_PATHFINDING_ALGORITHM_ASTAR"
         }
     filter "configurations:Debug"
         symbols "On"

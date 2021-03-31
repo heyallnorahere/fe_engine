@@ -1,2 +1,2 @@
 #!/bin/sh
-vendor/binaries/macosx/premake5 gmake --dotnet=mono
+vendor/binaries/macosx/premake5 gmake --dotnet=mono --pathfinder=astar
