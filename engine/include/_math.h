@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstdint>
 #include <typeinfo>
+#include <functional>
 namespace fe_engine {
 	// basic vec2 struct, good enough for our purposes
 	template<typename T> struct vec2t {
