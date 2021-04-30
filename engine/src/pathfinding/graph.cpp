@@ -3,7 +3,7 @@
 #include <cassert>
 namespace fe_engine {
     namespace pathfinding {
-        static std::map<direction, s8vec2> direction_map;
+        std::map<direction, s8vec2> direction_map;
         static reference<graph> g_graph;
         bool graph_initialized = false;
         static bool is_border(s8vec2 pos, reference<map> m) {
@@ -42,6 +42,9 @@ namespace fe_engine {
         tile::passing_properties cell::get_passing_properties() {
             return this->m_properties;
         }
+        s8vec2 cell::get_position() {
+            return this->m_position;
+        }
         node::node(reference<cell> c, reference<node> parent) {
             this->m = c;
             this->m_parent = parent;
@@ -51,6 +54,12 @@ namespace fe_engine {
         }
         reference<node> node::get_parent() {
             return this->m_parent;
+        }
+        std::vector<node::child_struct> node::get_children() {
+            return this->m_children;
+        }
+        void node::add_child(direction d, reference<node> n) {
+            this->m_children.push_back({ d, n });
         }
         void graph::init_graph(reference<map> m) {
             if (!object_registry::register_exists<cell>()) {
@@ -68,8 +77,15 @@ namespace fe_engine {
         reference<graph> graph::get_graph() {
             return g_graph;
         }
+        std::unordered_map<s8vec2, size_t, hash_vec2t<int8_t>> graph::get_cells() {
+            return this->m_cells;
+        }
+        reference<map> graph::get_map() {
+            return this->m_map;
+        }
         graph::graph(reference<map> m) {
             assert(graph_initialized);
+            this->m_map = m;
             for (int8_t x = 0; x < m->get_width(); x++) {
                 for (int8_t y = 0; y < m->get_height(); y++) {
                     s8vec2 pos = { x, y };
