@@ -4,6 +4,7 @@
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/attrdefs.h>
 #include <mono/metadata/environment.h>
+#include <nlohmann/json.hpp>
 #include <fstream>
 #include <vector>
 #include <string>
@@ -18,6 +19,20 @@
 #include <Windows.h>
 #endif
 namespace fe_engine {
+	template<typename T> bool config_has_property(const std::string& name, T& value) {
+		std::ifstream file("scriptconfig.json");
+		if (!file.is_open()) {
+			return false;
+		}
+		nlohmann::json json_data;
+		file >> json_data;
+		file.close();
+		if (json_data.find(name) != json_data.end()) {
+			json_data[name].get_to(value);
+			return true;
+		}
+		return false;
+	}
 	util::buffer* read_file(const char* filepath) {
 #ifdef FEENGINE_WINDOWS
 		HANDLE file = CreateFileA(filepath, FILE_READ_ACCESS, NULL, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -168,7 +183,9 @@ namespace fe_engine {
 		return reference<assembly>(new assembly(this->m_core, this->m_domain));
 	}
 	void script_engine::init_mono() {
-		mono_set_assemblies_path("mono/lib");
+		std::string path;
+		bool has_path = config_has_property("cslibrarypath", path);
+		mono_set_assemblies_path(has_path ? path.c_str() : "mono/lib");
 		MonoDomain* domain = mono_jit_init("FEEngine");
 		char* name = (char*)"FEEngineRuntime";
 		this->m_domain = mono_domain_create_appdomain(name, NULL);
