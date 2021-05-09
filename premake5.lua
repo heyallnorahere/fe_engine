@@ -2,15 +2,19 @@ newoption {
     trigger = "pathfinder",
     value = "algorithm",
     description = "Choose an algorithm for pathfinding",
+    default = "astar",
     allowed = {
         { "astar", "AStar" }
     }
 }
-if not _OPTIONS["pathfinder"] then
-    _OPTIONS["pathfinder"] = "astar"
-end
+newoption {
+    trigger = "architecture",
+    value = "ARCH",
+    description = "Architecture to target",
+    default = "x64"
+}
 workspace "fe_engine"
-    architecture "x64"
+    architecture (_OPTIONS["architecture"])
     targetdir "build"
     configurations {
         "Debug",
