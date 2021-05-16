@@ -31,6 +31,10 @@ namespace FEEngine
             }
             return Unit.MakeFromIndex(GetUnitAt_Native(this.Index, position));
         }
+        public Tile GetTileAt(Vec2<int> position)
+        {
+            return Tile.MakeFromPosition(position, this);
+        }
         public Vec2<int> GetSize()
         {
             return GetSize_Native(this.Index);

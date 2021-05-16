@@ -14,7 +14,7 @@ static MonoDomain* domain;
 static MonoImage* image;
 static fe_engine::reference<fe_engine::script_engine> engine;
 namespace fe_engine {
-	static renderer::color parse_cs_color_enum(int color) {
+	static renderer::color parse_cs_color_enum(int32_t color) {
 		switch (color) {
 		case 0: // red
 			return renderer::color::red;
@@ -39,7 +39,7 @@ namespace fe_engine {
 			break;
 		}
 	}
-	static renderer::background_color parse_cs_bg_color_enum(int color) {
+	static renderer::background_color parse_cs_bg_color_enum(int32_t color) {
 		switch (color) {
 		case 0: // red
 			return renderer::background_color::red;
@@ -61,6 +61,31 @@ namespace fe_engine {
 			break;
 		default:
 			return renderer::background_color::none;
+			break;
+		}
+	}
+	static int32_t get_cs_bg_color_enum(renderer::background_color color) {
+		switch (color) {
+		case renderer::background_color::red:
+			return 0;
+			break;
+		case renderer::background_color::green:
+			return 1;
+			break;
+		case renderer::background_color::blue:
+			return 2;
+			break;
+		case renderer::background_color::yellow:
+			return 3;
+			break;
+		case renderer::background_color::white:
+			return 4;
+			break;
+		case renderer::background_color::black:
+			return 5;
+			break;
+		case renderer::background_color::none:
+			return 6;
 			break;
 		}
 	}
@@ -289,12 +314,22 @@ namespace fe_engine {
 			reference<weapon> w = item_register->get(index);
 			return w->get_type();
 		}
-		void FEEngine_Logger_Print(MonoString* message, int color) {
+		void FEEngine_Logger_Print(MonoString* message, int32_t color) {
 			logger::print(from_mono(message), parse_cs_color_enum(color));
 		}
 		input_mapper::commands FEEngine_InputMapper_GetState(uint64_t index) {
 			reference<input_mapper> im = im_register->get(index);
 			return im->get_state();
+		}
+		tile::passing_properties FEEngine_Tile_GetPassingProperties(uint64_t map_index, s32vec2 tile_position) {
+			auto map_register = object_registry::get_register<map>();
+			reference<map> m = map_register->get(map_index);
+			return m->get_tile(tile_position)->get_properties();
+		}
+		int32_t FEEngine_Tile_GetColor(uint64_t map_index, s32vec2 tile_position) {
+			auto map_register = object_registry::get_register<map>();
+			reference<map> m = map_register->get(map_index);
+			return get_cs_bg_color_enum(m->get_tile(tile_position)->get_color());
 		}
 		bool FEEngine_Util_ObjectRegistry_RegisterExists(MonoReflectionType* type) {
 			MonoType* _type = mono_reflection_type_get_type(type);

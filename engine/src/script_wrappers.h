@@ -67,9 +67,12 @@ namespace fe_engine {
 		void FEEngine_Weapon_SetStats(uint64_t unit, uint64_t index, weapon::weapon_stats stats);
 		weapon::type FEEngine_Weapon_GetType(uint64_t unit, uint64_t index);
 		// logger class
-		void FEEngine_Logger_Print(MonoString* message, int color);
+		void FEEngine_Logger_Print(MonoString* message, int32_t color);
 		// inputmapper class
 		input_mapper::commands FEEngine_InputMapper_GetState(uint64_t index);
+		// tile class
+		tile::passing_properties FEEngine_Tile_GetPassingProperties(uint64_t map_index, s32vec2 tile_position);
+		int32_t FEEngine_Tile_GetColor(uint64_t map_index, s32vec2 tile_position);
 		// objectregistry/objectregister class
 		bool FEEngine_Util_ObjectRegistry_RegisterExists(MonoReflectionType* type);
 		uint64_t FEEngine_Util_ObjectRegister_GetCount(MonoReflectionType* type);

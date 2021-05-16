@@ -126,21 +126,10 @@ namespace fe_engine {
 			MonoClass* exception_class = mono_get_exception_class();
 			MonoDomain* domain = mono_object_get_domain(exception);
 			std::string message = from_mono((MonoString*)get_property(exception, exception_class, "Message"));
-			std::string stacktrace_str = from_mono((MonoString*)get_property(exception, exception_class, "StackTrace"));
+			std::string stacktrace = from_mono((MonoString*)get_property(exception, exception_class, "StackTrace"));
 			logger::print("Exception occurred!", renderer::color::red);
 			logger::print("Message: " + message);
-			std::vector<std::string> stacktrace = parse_newlines(stacktrace_str);
-			for (size_t i = 0; i < stacktrace.size(); i++) {
-				std::stringstream ss;
-				if (i == 0) {
-					ss << "Stack Trace: ";
-				}
-				else {
-					ss << "	";
-				}
-				ss << stacktrace[i];
-				logger::print(ss.str());
-			}
+			logger::print("Stacktrace: " + stacktrace);
 		}
 	}
 	MonoObject* call_method(MonoObject* object, MonoMethod* method, void** params = NULL) {
@@ -230,6 +219,8 @@ namespace fe_engine {
 		mono_add_internal_call("FEEngine.Weapon::GetType_Native", (void*)script_wrappers::FEEngine_Weapon_GetType);
 		mono_add_internal_call("FEEngine.Logger::Print_Native", (void*)script_wrappers::FEEngine_Logger_Print);
 		mono_add_internal_call("FEEngine.InputMapper::GetState_Native", (void*)script_wrappers::FEEngine_InputMapper_GetState);
+		mono_add_internal_call("FEEngine.Tile::GetPassingProperties_Native", (void*)script_wrappers::FEEngine_Tile_GetPassingProperties);
+		mono_add_internal_call("FEEngine.Tile::GetColor_Native", (void*)script_wrappers::FEEngine_Tile_GetColor);
 		mono_add_internal_call("FEEngine.Util.ObjectRegistry::RegisterExists_Native", (void*)script_wrappers::FEEngine_Util_ObjectRegistry_RegisterExists);
 		mono_add_internal_call("FEEngine.Util.ObjectRegister`1::GetCount_Native", (void*)script_wrappers::FEEngine_Util_ObjectRegister_GetCount);
 		mono_add_internal_call("FEEngine.UI.UIController::GetUnitMenuTarget_Native", (void*)script_wrappers::FEEngine_UI_UIController_GetUnitMenuTarget);
