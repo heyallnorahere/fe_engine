@@ -89,17 +89,6 @@ int main() {
 	fe_engine::reference<fe_engine::assembly> core = script_engine->get_core();
 	ui_controller->set_core_assembly(core);
 	fe_engine::reference<fe_engine::cs_class> test_class = core->get_class("FEEngine", "Test");
-	// a test; might remove later
-	{
-		fe_engine::reference<fe_engine::cs_method> get_callback = test_class->get_method("FEEngine.Test:GetCallback");
-		fe_engine::reference<fe_engine::cs_object> object = fe_engine::cs_method::call_function(get_callback);
-		auto delegate = fe_engine::reference<fe_engine::cs_delegate>::create(object);
-		int32_t a = 4;
-		int32_t b = 2;
-		std::vector<void*> params = { &a, &b };
-		auto result = delegate->invoke(params.data());
-		fe_engine::logger::print(std::to_string(*(int32_t*)result->unbox()));
-	}
 	// load a test item script
 	fe_engine::reference<fe_engine::cs_class> test_item = core->get_class("FEEngine", "TestItem");
 	// load all assemblies in the "script-assemblies" directory, excluding the core assembly

@@ -102,25 +102,6 @@ namespace fe_engine {
 		MonoProperty* id = get_property_id(_class, name);
 		return get_property(id, object);
 	}
-	static std::vector<std::string> parse_newlines(const std::string& string) {
-		std::vector<std::string> strings;
-		std::string find;
-#ifdef FEENGINE_WINDOWS
-		find = "\r\n";
-#else
-		find = "\n";
-#endif
-		size_t pos = string.find(find);
-		size_t begin = 0;
-		auto replace = [&]() {
-			begin = pos + find.length();
-			return pos = string.find(find, begin);
-		};
-		do {
-			strings.push_back(string.substr(begin, pos - begin));
-		} while (replace() != std::string::npos);
-		return strings;
-	}
 	void check_exception(MonoObject* exception) {
 		if (exception) {
 			MonoClass* exception_class = mono_get_exception_class();
