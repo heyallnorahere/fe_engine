@@ -12,7 +12,7 @@ jobs:
       - name: install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y mono-devel zip
+          sudo apt-get install -y mono-devel
       - name: generate makefiles
         run: |
           ./linux-genprojects.sh
@@ -45,7 +45,7 @@ jobs:
       - name: build
         shell: cmd
         run: |
-          "%MSBUILD_PATH%\MSBuild.exe" fe_engine.sln -p:Configuration=Release
+          "%MSBUILD_PATH%\MSBuild.exe" fe_engine.sln -p:Configuration=Release -m
       - name: package binaries
         shell: bash
         run: |
@@ -55,4 +55,28 @@ jobs:
         with:
           name: release-windows
           path: fe_engine.tar.gz
-
+  macosx-build:
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: sync submodules
+        run: |
+          git submodule init
+          git submodule update
+      - name: install dependencies
+        run: |
+          brew install mono
+      - name: generate makefiles
+        run: |
+          ./mac-genprojects.sh
+      - name: build
+        run: |
+          make -j 8 config=release
+      - name: package binaries
+        run: |
+          ./package-unix.sh build-nightly Release macosx x86_64 fe_engine.tar.gz
+      - name: upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: release-macosx
+          path: fe_engine.tar.gz
