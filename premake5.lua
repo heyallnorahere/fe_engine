@@ -114,6 +114,7 @@ project "entrypoint"
     language "C++"
     cppdialect "C++17"
     staticruntime "on"
+    targetname "demo"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
     files {

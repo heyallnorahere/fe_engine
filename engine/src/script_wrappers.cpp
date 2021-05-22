@@ -110,16 +110,22 @@ namespace fe_engine {
 		static reference<object_register<input_mapper>> im_register;
 		static reference<object_register<ui_controller>> uc_register;
 		static reference<object_register<internal::menu>> menu_register;
-		static std::unordered_map<MonoType*, std::function<bool()>> registerexists_map;
-		static std::unordered_map<MonoType*, std::function<uint64_t()>> size_map;
+		static reference<object_register<assembly>> assembly_register;
+		struct register_function_struct {
+			std::function<bool()> register_exists;
+			std::function<uint64_t()> size;
+		};
+		static std::unordered_map<MonoType*, register_function_struct> register_function_map;
 		template<typename T> static uint64_t get_register_size() {
 			return object_registry::get_register<T>()->size();
 		}
 		template<typename T> void register_registeredobject_type(const std::string& class_name) {
 			MonoType* type = mono_reflection_type_from_name((char*)class_name.c_str(), image);
 			assert(type);
-			registerexists_map[type] = object_registry::register_exists<T>;
-			size_map[type] = get_register_size<T>;
+			register_function_struct rfs;
+			rfs.register_exists = object_registry::register_exists<T>;
+			rfs.size = get_register_size<T>;
+			register_function_map[type] = rfs;
 		}
 		template<typename T> void get_register(reference<object_register<T>>& ref) {
 			assert(object_registry::register_exists<T>());
@@ -138,6 +144,10 @@ namespace fe_engine {
 				init_register(uc_register, "FEEngine.UI.UIController");
 				init_register(menu_register, "FEEngine.UI.Menu");
 			}
+			// for FEEngine.Item.NewItem<>()
+			if (object_registry::register_exists<assembly>()) {
+				get_register(assembly_register);
+			}
 		}
 		void init_wrappers(MonoDomain* domain, MonoImage* image, reference<script_engine> engine) {
 			::domain = domain;
@@ -146,7 +156,6 @@ namespace fe_engine {
 			init_registers();
 		}
 		static MonoType* find_type(const std::string& name) {
-			reference<object_register<assembly>> assembly_register = object_registry::get_register<assembly>();
 			for (size_t i = 0; i < assembly_register->size(); i++) {
 				auto _assembly = assembly_register->get(i);
 				MonoImage* image = (MonoImage*)_assembly->get_image();
@@ -157,7 +166,7 @@ namespace fe_engine {
 			}
 			return NULL;
 		}
-		static reference<cs_class> find_class(const std::string& name) {
+		static reference<cs_class> find_class(const std::string& name, reference<assembly>* assembly_out = NULL) {
 			size_t pos = name.find_last_of('.');
 			std::string ns_name, class_name;
 			if (pos == std::string::npos) {
@@ -172,6 +181,9 @@ namespace fe_engine {
 				auto _assembly = assembly_register->get(i);
 				auto _class = _assembly->get_class(ns_name, class_name);
 				if (_class->raw()) {
+					if (assembly_out) {
+						*assembly_out = _assembly;
+					}
 					return _class;
 				}
 			}
@@ -205,6 +217,16 @@ namespace fe_engine {
 		}
 		uint64_t FEEngine_Unit_GetInventorySize(uint64_t unit_index) {
 			return unit_register->get(unit_index)->get_inventory().size();
+		}
+		uint64_t FEEngine_Unit_GetItemIndex(uint64_t unit_index, uint64_t item_index) {
+			auto& inventory = unit_register->get(unit_index)->get_inventory();
+			auto it = inventory.begin();
+			std::advance(it, item_index);
+			return *it;
+		}
+		void FEEngine_Unit_AddItem(uint64_t unit_index, uint64_t item_registry_index) {
+			auto& inventory = unit_register->get(unit_index)->get_inventory();
+			inventory.push_back(item_registry_index);
 		}
 		unit_affiliation FEEngine_Unit_GetAffiliation(uint64_t unit_index) {
 			return unit_register->get(unit_index)->get_affiliation();
@@ -299,6 +321,15 @@ namespace fe_engine {
 			reference<item> i = item_register->get(item_index);
 			return i->get_item_flags() & item::weapon;
 		}
+		uint64_t FEEngine_Item_NewItem(MonoString* managed_name, MonoReflectionType* behavior_type) {
+			std::string name = from_mono(managed_name);
+			MonoType* type = mono_reflection_type_get_type(behavior_type);
+			std::string type_name = mono_type_get_name(type);
+			reference<cs_class> cls = find_class(type_name);
+			reference<item_behavior> behavior = reference<item_behavior>::create(cls, engine->get_core());
+			reference<item> i = reference<item>::create(name, item::usable, behavior);
+			return item_register->add(i);
+		}
 		weapon::weapon_stats FEEngine_Weapon_GetStats(uint64_t unit, uint64_t index) {
 			auto item_register = object_registry::get_register<item>();
 			reference<weapon> w = item_register->get(index);
@@ -331,13 +362,19 @@ namespace fe_engine {
 			reference<map> m = map_register->get(map_index);
 			return get_cs_bg_color_enum(m->get_tile(tile_position)->get_color());
 		}
+		void FEEngine_Tile_SetColor(uint64_t map_index, s32vec2 tile_position, int32_t color) {
+			auto map_register = object_registry::get_register<map>();
+			reference<map> m = map_register->get(map_index);
+			reference<tile> t = m->get_tile(tile_position);
+			t->set_color(parse_cs_bg_color_enum(color));
+		}
 		bool FEEngine_Util_ObjectRegistry_RegisterExists(MonoReflectionType* type) {
 			MonoType* _type = mono_reflection_type_get_type(type);
-			return registerexists_map[_type]();
+			return register_function_map[_type].register_exists();
 		}
 		uint64_t FEEngine_Util_ObjectRegister_GetCount(MonoReflectionType* type) {
 			MonoType* _type = mono_reflection_type_get_type(type);
-			return size_map[_type]();
+			return register_function_map[_type].size();
 		}
 		uint64_t FEEngine_UI_UIController_GetUnitMenuTarget(uint64_t index) {
 			reference<ui_controller> uc = uc_register->get(index);

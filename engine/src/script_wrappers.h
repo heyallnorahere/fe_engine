@@ -40,6 +40,8 @@ namespace fe_engine {
 		uint32_t FEEngine_Unit_GetCurrentMovement(uint64_t unit_index);
 		void FEEngine_Unit_SetCurrentMovement(uint64_t unit_index, uint32_t mv);
 		uint64_t FEEngine_Unit_GetInventorySize(uint64_t unit_index);
+		uint64_t FEEngine_Unit_GetItemIndex(uint64_t unit_index, uint64_t item_index);
+		void FEEngine_Unit_AddItem(uint64_t unit_index, uint64_t item_registry_index);
 		unit_affiliation FEEngine_Unit_GetAffiliation(uint64_t unit_index);
 		void FEEngine_Unit_Move(uint64_t unit_index, s32vec2 offset);
 		void FEEngine_Unit_Attack(uint64_t unit_index, uint64_t other_index);
@@ -62,6 +64,7 @@ namespace fe_engine {
 		void FEEngine_Item_SetName(uint64_t item_index, MonoString* name);
 		void FEEngine_Item_Use(uint64_t unit_index, uint64_t item_index);
 		bool FEEngine_Item_IsWeapon(uint64_t item_index);
+		uint64_t FEEngine_Item_NewItem(MonoString* name, MonoReflectionType* behavior_type);
 		// weapon class
 		weapon::weapon_stats FEEngine_Weapon_GetStats(uint64_t unit, uint64_t index);
 		void FEEngine_Weapon_SetStats(uint64_t unit, uint64_t index, weapon::weapon_stats stats);
@@ -73,6 +76,7 @@ namespace fe_engine {
 		// tile class
 		tile::passing_properties FEEngine_Tile_GetPassingProperties(uint64_t map_index, s32vec2 tile_position);
 		int32_t FEEngine_Tile_GetColor(uint64_t map_index, s32vec2 tile_position);
+		void FEEngine_Tile_SetColor(uint64_t map_index, s32vec2 tile_position, int32_t color);
 		// objectregistry/objectregister class
 		bool FEEngine_Util_ObjectRegistry_RegisterExists(MonoReflectionType* type);
 		uint64_t FEEngine_Util_ObjectRegister_GetCount(MonoReflectionType* type);

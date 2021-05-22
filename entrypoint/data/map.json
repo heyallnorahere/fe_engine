@@ -136,5 +136,18 @@
       "name": "Soldier C",
       "behavior": "Scripts.UnitBehavior"
     }
+  ],
+  "tiles": [
+    {
+      "pos": {
+        "x": 18,
+        "y": 8
+      },
+      "color": 3,
+      "passing_properties": {
+        "foot": true
+      },
+      "interact_behavior": null
+    }
   ]
 }

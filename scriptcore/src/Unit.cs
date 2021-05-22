@@ -117,11 +117,17 @@ namespace FEEngine {
         }
         public Item GetInventoryItem(ulong index)
         {
-            return Item.MakeFromRegistryIndex(index, this.Index);
+            return Item.MakeFromRegistryIndex(GetItemIndex_Native(this.Index, index), this.Index);
         }
         public Weapon GetInventoryWeapon(ulong index)
         {
-            return Weapon.MakeFromRegistryIndex(index, this.Index);
+            return Weapon.MakeFromRegistryIndex(GetItemIndex_Native(this.Index, index), this.Index);
+        }
+        public ulong AddItem(Item item)
+        {
+            ulong index = this.GetInventorySize();
+            AddItem_Native(this.Index, item.Index);
+            return index;
         }
         public Weapon GetEquippedWeapon()
         {
@@ -179,9 +185,12 @@ namespace FEEngine {
         private static extern UnitStats GetStats_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void SetStats_Native(ulong index, UnitStats stats);
-
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern ulong GetInventorySize_Native(ulong index);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern ulong GetItemIndex_Native(ulong index, ulong itemIndex);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void AddItem_Native(ulong index, ulong itemRegistryIndex);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern UnitAffiliation GetAffiliation_Native(ulong index);
         [MethodImpl(MethodImplOptions.InternalCall)]

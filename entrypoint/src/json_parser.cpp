@@ -25,6 +25,9 @@ namespace fe_engine {
 		j["x"].get_to(v.x);
 		j["y"].get_to(v.y);
 	}
+	void from_json(const nlohmann::json& j, tile::passing_properties& pp) {
+		j["foot"].get_to(pp.foot);
+	}
 }
 namespace json_types {
 	struct unit_data {
@@ -56,6 +59,12 @@ namespace json_types {
 		std::string name;
 		bool is_weapon;
 		reference<item_subdata> data;
+	};
+	struct tile_data {
+		s8vec2 pos;
+		renderer::background_color color;
+		tile::passing_properties properties;
+		std::string interact_behavior_name;
 	};
 	void from_json(const nlohmann::json& j, unit_data& ud) {
 		ud.has_weapon = j.find("equipped") != j.end();
@@ -98,8 +107,39 @@ namespace json_types {
 			if (cd->has_behavior) j["behavior"].get_to(cd->behavior_name);
 		}
 	}
+	void from_json(const nlohmann::json& j, tile_data& td) {
+		j["pos"].get_to(td.pos);
+		int bg_color_id = j["color"].get<int>();
+		switch (bg_color_id) {
+		case 0:
+			td.color = renderer::background_color::red;
+			break;
+		case 1:
+			td.color = renderer::background_color::green;
+			break;
+		case 2:
+			td.color = renderer::background_color::blue;
+			break;
+		case 3:
+			td.color = renderer::background_color::yellow;
+			break;
+		case 4:
+			td.color = renderer::background_color::white;
+			break;
+		case 5:
+			td.color = renderer::background_color::black;
+			break;
+		default:
+			td.color = renderer::background_color::none;
+			break;
+		}
+		j["passing_properties"].get_to(td.properties);
+		if (!j["interact_behavior"].is_null()) {
+			j["interact_behavior"].get_to(td.interact_behavior_name);
+		}
+	}
 }
-static void parse_cs_classname(const std::string& full_name, std::string& namespace_name, std::string& class_name) {
+void parse_cs_classname(const std::string& full_name, std::string& namespace_name, std::string& class_name) {
 	size_t period = full_name.find_last_of('.');
 	if (period != std::string::npos) {
 		namespace_name = full_name.substr(0, period);
@@ -136,6 +176,30 @@ reference<unit> json_parser::make_unit_from_index(size_t index) {
 		unit_object->get_inventory().push_back(index);
 	}
 	return unit_object;
+}
+void json_parser::update_tiles() {
+	if (this->m_file.find("tiles") == this->m_file.end()) {
+		return;
+	}
+	if (this->m_file["tiles"].is_null()) {
+		return;
+	}
+	std::vector<json_types::tile_data> data;
+	this->m_file["tiles"].get_to(data);
+	for (const auto& entry : data) {
+		reference<tile> t = reference<tile>::create(entry.properties, entry.color);
+		if (!entry.interact_behavior_name.empty()) {
+			std::string ns, cls;
+			parse_cs_classname(entry.interact_behavior_name, ns, cls);
+			auto _class = this->find_class(ns, cls);
+			if (_class) {
+				auto get_delegate = _class->get_method(entry.interact_behavior_name + ":GetBehavior()");
+				reference<cs_object> return_value = cs_method::call_function(get_delegate);
+				t->set_interact_behavior(reference<cs_delegate>::create(return_value));
+			}
+		}
+		this->m_map->set_tile(entry.pos, t);
+	}
 }
 json_parser::ui_data json_parser::parse_ui_data(const std::string& filepath) {
 	nlohmann::json j;

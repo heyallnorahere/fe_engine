@@ -9,6 +9,7 @@ namespace FEEngine
 {
     public class Tile
     {
+        public delegate void InteractBehavior(Unit trigger, Tile tile, Vec2<int> position);
         public struct PassingPropertiesStruct
         {
             public bool Foot;
@@ -35,6 +36,10 @@ namespace FEEngine
             {
                 return GetColor_Native(this.parentIndex, this.Position);
             }
+            set
+            {
+                SetColor_Native(this.parentIndex, this.Position, value);
+            }
         }
         private Tile()
         {
@@ -52,5 +57,7 @@ namespace FEEngine
         private static extern PassingPropertiesStruct GetPassingProperties_Native(ulong mapIndex, Vec2<int> tilePosition);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern Renderer.Color GetColor_Native(ulong mapIndex, Vec2<int> tilePosition);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void SetColor_Native(ulong mapIndex, Vec2<int> tilePosition, Renderer.Color color);
     }
 }

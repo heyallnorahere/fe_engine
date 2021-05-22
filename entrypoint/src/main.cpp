@@ -103,6 +103,7 @@ int main() {
 		auto unit = parser->make_unit_from_index(i);
 		map->add_unit(unit);
 	}
+	parser->update_tiles();
 	// check map tiles and init pathfinding
 	map->check_tiles();	
 	fe_engine::pathfinding::graph::init_graph(map);
