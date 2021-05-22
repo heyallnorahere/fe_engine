@@ -27,3 +27,32 @@ jobs:
         with:
           name: release-ubuntu
           path: fe_engine.tar.gz
+  windows-build:
+    runs-on: windows-latest
+    env:
+      MSBUILD_PATH: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\
+    steps:
+      - uses: actions/checkout@v2
+      - name: sync submodules
+        shell: cmd
+        run: |
+          git submodule init
+          git submodule update
+      - name: generate build files
+        shell: cmd
+        run: |
+          windows-genprojects.bat
+      - name: build
+        shell: cmd
+        run: |
+          "%MSBUILD_PATH%\MSBuild.exe" fe_engine.sln
+      - name: package binaries
+        shell: bash
+        run: |
+          ./package-unix.sh pkg Release linux x86_64 fe_engine.tar.gz
+      - name: upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: release-windows
+          path: fe_engine.tar.gz
+
