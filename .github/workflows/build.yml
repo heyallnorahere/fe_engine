@@ -65,7 +65,7 @@ jobs:
           git submodule update
       - name: install dependencies
         run: |
-          brew cleanup
+          brew uninstall xsd
           brew install mono
       - name: generate makefiles
         run: |
