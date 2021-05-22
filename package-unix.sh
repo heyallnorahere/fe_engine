@@ -23,6 +23,7 @@ echo "Copying external data..."
 $COPY_COMMAND entrypoint/data $PACKAGE_DIR
 $COPY_COMMAND entrypoint/mono $PACKAGE_DIR
 $COPY_COMMAND entrypoint/script-assemblies $PACKAGE_DIR
+rm $PACKAGE_DIR/script-assemblies/placeholder
 
 # copy binaries to package directory
 echo "Copying binaries..."
