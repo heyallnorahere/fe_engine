@@ -12,7 +12,7 @@ jobs:
       - name: install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install mono-devel
+          sudo apt-get install -y mono-devel zip
       - name: generate makefiles
         run: |
           chmod +x linux-genprojects.sh
@@ -20,3 +20,13 @@ jobs:
       - name: build
         run: |
           make -j 8 config=release
+      - name: package binaries
+        run: |
+          chmod +x package-unix.sh
+          mkdir pkg
+          ./package-unix.sh pkg Release linux x86_64 fe_engine.tar.gz
+      - name: upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: release-ubuntu
+          path: fe_engine.tar.gz

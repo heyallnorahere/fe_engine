@@ -21,3 +21,4 @@ Makefile
 !scriptcore/scriptcore.net.csproj
 !sample-scripts/sample-scripts.net.csproj
 .vs/
+pkg/
