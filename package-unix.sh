@@ -37,6 +37,10 @@ mv $INCLUDE_DIR/include $INCLUDE_DIR/fe_engine
 
 # package it into a tarball
 echo "Compressing..."
-tar -cf "$OUTPUT_FILE" "$PACKAGE_DIR"
+tar -cf $OUTPUT_FILE $PACKAGE_DIR
+
+# delete intermediate directory
+echo "Deleting intermediate directory..."
+rm -rf $PACKAGE_DIR
 
 echo "Done! Output written to $OUTPUT_FILE"
