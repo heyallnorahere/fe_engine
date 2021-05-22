@@ -4,7 +4,7 @@ newoption {
     description = "Choose an algorithm for pathfinding",
     default = "astar",
     allowed = {
-        { "astar", "AStar" }
+        { "astar", "A*" }
     }
 }
 newoption {
@@ -120,7 +120,8 @@ project "entrypoint"
     files {
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp",
-        "%{prj.name}/data/**.json"
+        "%{prj.name}/data/**.json",
+        _SCRIPT
     }
     sysincludedirs {
         "engine/include",

@@ -390,8 +390,68 @@ namespace fe_engine {
 		}
 		return units;
 	}
+	static reference<cs_object> make_cs_object(reference<unit> u, reference<assembly> core) {
+		auto unit_class = core->get_class("FEEngine", "Unit");
+		auto instance = unit_class->instantiate();
+		auto index_property = unit_class->get_property("Index");
+		// using uint64_t for 32-bit systems
+		uint64_t index = (uint64_t)-1;
+		auto unit_register = object_registry::get_register<unit>();
+		for (size_t i = 0; i < unit_register->size(); i++) {
+			if (unit_register->get(i).get() == u.get()) {
+				index = (uint64_t)i;
+				break;
+			}
+		}
+		assert(index != (uint64_t)-1);
+		instance->set_property(index_property, &index);
+		return instance;
+	}
+	static reference<cs_object> make_cs_object(s8vec2 pos, reference<assembly> core) {
+		auto tile_class = core->get_class("FEEngine", "Tile");
+		auto instance = tile_class->instantiate();
+		auto position_property = tile_class->get_property("Position");
+		instance->set_property(position_property, &pos);
+		return instance;
+	}
+	void ui_controller::add_tile_menu_items() {
+		for (int8_t x = 0; x < (int8_t)this->m_map->get_width(); x++) {
+			for (int8_t y = 0; y < (int8_t)this->m_map->get_height(); y++) {
+				s8vec2 pos = { x, y };
+				s8vec2 unit_pos = this->m_unit_menu_target->get_pos();
+				if ((pos - unit_pos).taxicab() != 1) {
+					continue;
+				}
+				reference<tile> t = this->m_map->get_tile(pos);
+				auto id = t->get_interaction_data();
+				if (!id.callback) {
+					continue;
+				}
+				bool found_identical_item = false;
+				for (const auto& item : this->m_menu_items) {
+					if (item.text == id.menu_text) {
+						found_identical_item = true;
+						break;
+					}
+				}
+				if (found_identical_item) continue; // todo: implement other menu
+				this->m_menu_items.push_back({ id.menu_text, [id, pos](reference<ui_controller> controller) {
+					auto cs_tile = make_cs_object(pos, controller->m_core);
+					auto cs_unit = make_cs_object(controller->m_unit_menu_target, controller->m_core);
+					s32vec2 temp_pos = (s32vec2)pos;
+					std::vector<void*> args;
+					args.push_back(cs_unit->raw());
+					args.push_back(cs_tile->raw());
+					args.push_back(&temp_pos);
+					id.callback->invoke(args.data());
+					controller->close_unit_menu();
+				} });
+			}
+		}
+	}
 	void ui_controller::refresh_base_menu_items() {
 		this->m_menu_items.clear();
+		// if there is an enemy unit nearby, add the option to attack it
 		{
 			std::vector<reference<unit>> units = this->get_attackable_units(this->m_unit_menu_target);
 			if (units.size() > 0) {
@@ -401,7 +461,11 @@ namespace fe_engine {
 				} });
 			}
 		}
+		// add item menu
 		this->m_menu_items.push_back({ "Item", [](reference<ui_controller> controller) { controller->m_unit_menu_state.page = menu_page::item; controller->m_unit_menu_index = 0; } });
+		// add menu items for nearby, interactable tiles
+		this->add_tile_menu_items();
+		// add user menus
 		for (auto menu : this->m_user_menus) {
 			size_t index = menu.register_index;
 			this->m_menu_items.push_back({ menu.menu_item_name, [index](reference<ui_controller> controller) {
@@ -410,6 +474,7 @@ namespace fe_engine {
 				controller->m_unit_menu_index = 0;
 			} });
 		}
+		// add wait option
 		this->m_menu_items.push_back({ "Wait", [](reference<ui_controller> controller) { controller->close_unit_menu(); } });
 	}
 }

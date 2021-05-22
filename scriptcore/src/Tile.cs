@@ -9,7 +9,7 @@ namespace FEEngine
 {
     public class Tile
     {
-        public delegate void InteractBehavior(Unit trigger, Tile tile, Vec2<int> position);
+        public delegate void InteractionBehavior(Unit trigger, Tile tile, Vec2<int> position);
         public struct PassingPropertiesStruct
         {
             public bool Foot;

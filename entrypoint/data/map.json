@@ -46,14 +46,14 @@
       }
     },
     {
-      "name": "Test Item",
+      "name": "Vulnerary",
       "is weapon": false,
       "data": {
         "behavior": "Scripts.Vulnerary"
       }
     },
     {
-      "name": "Test Item",
+      "name": "Vulnerary",
       "is weapon": false,
       "data": {
         "behavior": "Scripts.Vulnerary"
@@ -64,8 +64,8 @@
   "units": [
     {
       "pos": {
-        "x": 1,
-        "y": 1
+        "x": 17,
+        "y": 8
       },
       "stats": {
         "lvl": 10,
@@ -145,9 +145,12 @@
       },
       "color": 3,
       "passing_properties": {
-        "foot": true
+        "foot": false
       },
-      "interact_behavior": null
+      "interaction_data": {
+        "callback": "Scripts.Chest",
+        "menu_text": "Open chest"
+      }
     }
   ]
 }

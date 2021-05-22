@@ -133,10 +133,10 @@ namespace fe_engine {
 	cs_delegate::~cs_delegate() {
 		mono_gchandle_free(this->m_object);
 	}
-	void* cs_delegate::raw() {
+	void* cs_delegate::raw() const {
 		return mono_gchandle_get_target(this->m_object);
 	}
-	reference<cs_object> cs_delegate::invoke(void** params) {
+	reference<cs_object> cs_delegate::invoke(void** params) const {
 		MonoObject* exception = NULL;
 		MonoObject* object = mono_runtime_delegate_invoke((MonoObject*)this->raw(), params, &exception);
 		check_exception(exception);

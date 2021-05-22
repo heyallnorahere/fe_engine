@@ -47,7 +47,7 @@ namespace fe_engine {
 			*this = *this / other;
 			return *this;
 		}
-		template<typename U> operator vec2t<U>() {
+		template<typename U> operator vec2t<U>() const {
 			return { (U)this->x, (U)this->y };
 		}
 		double length() {

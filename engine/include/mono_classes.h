@@ -57,8 +57,8 @@ namespace fe_engine {
 		cs_delegate(reference<cs_object> object);
 		cs_delegate(void* object, void* domain);
 		~cs_delegate();
-		void* raw();
-		reference<cs_object> invoke(void** params = NULL);
+		void* raw() const;
+		reference<cs_object> invoke(void** params = NULL) const;
 	private:
 		uint32_t m_object;
 		MonoDomain* m_domain;

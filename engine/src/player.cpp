@@ -34,7 +34,9 @@ namespace fe_engine {
 			if (this->m_selected) {
 				s8vec2 delta = (this->m_cursor_pos + to_move) - this->m_selected->get_pos();
 				uint8_t delta_length = static_cast<uint8_t>(abs(delta.x) + abs(delta.y));
-				if (delta_length > this->m_selected->get_available_movement()) {
+				reference<tile> t = this->m_map->get_tile(this->m_cursor_pos + to_move);
+				auto properties = t->get_properties();
+				if (delta_length > this->m_selected->get_available_movement() || /* once classes are implemented, change this to fit the units class */ !properties.foot) {
 					update_tile_selection = false;
 				}
 				else {

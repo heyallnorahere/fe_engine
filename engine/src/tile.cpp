@@ -13,10 +13,10 @@ namespace fe_engine {
 	tile::passing_properties tile::get_properties() {
 		return this->m_properties;
 	}
-	void tile::set_interact_behavior(reference<cs_delegate> behavior) {
-		this->m_interact_behavior = behavior;
+	void tile::set_interaction_data(const interaction_data& data) {
+		this->m_interaction_data = data;
 	}
-	reference<cs_delegate> tile::get_interact_behavior() {
-		return this->m_interact_behavior;
+	tile::interaction_data tile::get_interaction_data() {
+		return this->m_interaction_data;
 	}
 }
