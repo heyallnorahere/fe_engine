@@ -21,7 +21,7 @@ jobs:
           make -j 8 config=release
       - name: package binaries
         run: |
-          ./package-unix.sh pkg Release linux x86_64 fe_engine.tar.gz
+          ./package-unix.sh build-nightly Release linux x86_64 fe_engine.tar.gz
       - name: upload artifact
         uses: actions/upload-artifact@v2
         with:
@@ -49,7 +49,7 @@ jobs:
       - name: package binaries
         shell: bash
         run: |
-          ./package-unix.sh pkg Release windows x86_64 fe_engine.tar.gz
+          ./package-unix.sh build-nightly Release windows x86_64 fe_engine.tar.gz
       - name: upload artifact
         uses: actions/upload-artifact@v2
         with:
