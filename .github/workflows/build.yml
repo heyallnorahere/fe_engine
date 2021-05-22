@@ -65,7 +65,8 @@ jobs:
           git submodule update
       - name: install dependencies
         run: |
-          brew install --force mono
+          brew cleanup
+          brew install mono
       - name: generate makefiles
         run: |
           ./mac-genprojects.sh
