@@ -1,7 +1,7 @@
 #pragma once
 #include <cmath>
 #include <cstdint>
-#include <typeinfo>
+#include <type_traits>
 #include <functional>
 namespace fe_engine {
 	// basic vec2 struct, good enough for our purposes
@@ -61,7 +61,7 @@ namespace fe_engine {
 		}
 		T taxicab() {
 			auto _abs = [](T x) -> T {
-				if (typeid(T).hash_code() == typeid(float).hash_code() || typeid(T).hash_code() == typeid(double).hash_code()) {
+				if (std::is_floating_point_v<T>) {
 					return fabs(x);
 				} else {
 					return abs(x);

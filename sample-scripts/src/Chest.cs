@@ -13,9 +13,6 @@ namespace Scripts
         {
             Item item = Item.NewItem<Vulnerary>("Vulnerary");
             trigger.AddItem(item);
-#if FEENGINE_DEBUG
-            Logger.Print($"Got vector: ({position.X}, {position.Y})");
-#endif
             // todo: add popup on UIController or something
         }
         public static Tile.InteractionBehavior GetBehavior()
