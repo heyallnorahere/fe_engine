@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <cassert>
 // recently added header (c++17 i think?)
 #ifdef FEENGINE_LINUX
 #include <experimental/filesystem>
@@ -88,7 +89,6 @@ int main() {
 	fe_engine::reference<fe_engine::script_engine> script_engine = fe_engine::reference<fe_engine::script_engine>::create("script-assemblies/scriptcore.dll");
 	fe_engine::reference<fe_engine::assembly> core = script_engine->get_core();
 	ui_controller->set_core_assembly(core);
-	fe_engine::reference<fe_engine::cs_class> test_class = core->get_class("FEEngine", "Test");
 	// load a test item script
 	fe_engine::reference<fe_engine::cs_class> test_item = core->get_class("FEEngine", "TestItem");
 	// load all assemblies in the "script-assemblies" directory, excluding the core assembly
@@ -116,6 +116,16 @@ int main() {
 	fe_engine::discord_activity activity;
 	activity.state = "This is an FEEngine test application.";
 	discord_app->update_activity(activity);
+	// run c# tests
+	fe_engine::reference<fe_engine::cs_class> test_class = core->get_class("FEEngine", "Tests");
+	{
+		auto run_function = test_class->get_method("FEEngine.Tests:Run()");
+		fe_engine::reference<fe_engine::cs_object> return_value = fe_engine::cs_method::call_function(run_function);
+		bool succeeded = *(bool*)return_value->unbox();
+		if (!succeeded) {
+			fe_engine::logger::print("One or more tests have failed; the scripting API may not work correctly", fe_engine::renderer::color::red);
+		}
+	}
 	// start the loop
 	fe_engine::logger::print("Initialized! Starting main loop...", fe_engine::renderer::color::green);
 	phase_manager->log_phase();

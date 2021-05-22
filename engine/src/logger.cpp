@@ -1,6 +1,5 @@
 #include "logger.h"
 namespace fe_engine {
-	std::vector<logger::message> log;
 	void logger::print(const std::string& msg, renderer::color color) {
 		size_t pos = msg.find("\n");
 		std::string to_print, to_print_next;
@@ -18,4 +17,5 @@ namespace fe_engine {
 	std::vector<logger::message> logger::get_log() {
 		return log;
 	}
+	std::vector<logger::message> logger::log;
 }

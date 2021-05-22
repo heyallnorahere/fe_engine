@@ -49,14 +49,14 @@
       "name": "Test Item",
       "is weapon": false,
       "data": {
-        "behavior": "FEEngine.TestItem"
+        "behavior": "Scripts.Vulnerary"
       }
     },
     {
       "name": "Test Item",
       "is weapon": false,
       "data": {
-        "behavior": "FEEngine.TestItem"
+        "behavior": "Scripts.Vulnerary"
       }
     }
 

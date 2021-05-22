@@ -10,5 +10,7 @@ namespace fe_engine {
 		};
 		static void print(const std::string& msg, renderer::color color = renderer::color::white);
 		static std::vector<message> get_log();
+	private:
+		static std::vector<logger::message> log;
 	};
 }
