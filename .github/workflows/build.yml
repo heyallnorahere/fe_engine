@@ -65,6 +65,7 @@ jobs:
           git submodule update
       - name: install dependencies
         run: |
+          rm /usr/local/share/man/man1/al.1
           brew install mono
       - name: generate makefiles
         run: |
