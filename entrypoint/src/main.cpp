@@ -89,8 +89,6 @@ int main() {
 	fe_engine::reference<fe_engine::script_engine> script_engine = fe_engine::reference<fe_engine::script_engine>::create("script-assemblies/scriptcore.dll");
 	fe_engine::reference<fe_engine::assembly> core = script_engine->get_core();
 	ui_controller->set_core_assembly(core);
-	// load a test item script
-	fe_engine::reference<fe_engine::cs_class> test_item = core->get_class("FEEngine", "TestItem");
 	// load all assemblies in the "script-assemblies" directory, excluding the core assembly
 	std::string directory = "script-assemblies/";
 	std::vector<std::string> script_assembly_names = get_file_entries(directory, directory + "scriptcore.dll", "dll");

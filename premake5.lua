@@ -126,7 +126,9 @@ project "entrypoint"
         "vendor/submodules/json/include"
     }
     links {
-        "engine",
+        "engine"
+    }
+    dependson {
         "scriptcore",
         "sample-scripts"
     }
