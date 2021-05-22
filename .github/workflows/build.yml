@@ -45,7 +45,7 @@ jobs:
       - name: build
         shell: cmd
         run: |
-          "%MSBUILD_PATH%\MSBuild.exe" fe_engine.sln -t:Configuration=Release
+          "%MSBUILD_PATH%\MSBuild.exe" fe_engine.sln -p:Configuration=Release
       - name: package binaries
         shell: bash
         run: |
