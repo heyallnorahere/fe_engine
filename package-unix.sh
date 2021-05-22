@@ -27,7 +27,7 @@ $COPY_COMMAND entrypoint/script-assemblies $PACKAGE_DIR
 # copy binaries to package directory
 echo "Copying binaries..."
 $COPY_COMMAND $BINARY_DIR/engine/*engine* $LIBRARY_DIR
-$COPY_COMMAND $BINARY_DIR/entrypoint/entrypoint* $PACKAGE_DIR
+$COPY_COMMAND $BINARY_DIR/entrypoint/* $PACKAGE_DIR
 
 # copy headers to package directory
 echo "Copying headers..."
