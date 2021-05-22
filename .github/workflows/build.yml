@@ -45,11 +45,11 @@ jobs:
       - name: build
         shell: cmd
         run: |
-          "%MSBUILD_PATH%\MSBuild.exe" fe_engine.sln
+          "%MSBUILD_PATH%\MSBuild.exe" fe_engine.sln -t:Configuration=Release
       - name: package binaries
         shell: bash
         run: |
-          ./package-unix.sh pkg Release linux x86_64 fe_engine.tar.gz
+          ./package-unix.sh pkg Release windows x86_64 fe_engine.tar.gz
       - name: upload artifact
         uses: actions/upload-artifact@v2
         with:
