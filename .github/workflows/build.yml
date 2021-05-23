@@ -55,29 +55,33 @@ jobs:
         with:
           name: release-windows
           path: fe_engine.tar.gz
-  #macosx-build:
-  #  runs-on: macOS-latest
-  #  steps:
-  #    - uses: actions/checkout@v2
-  #    - name: sync submodules
-  #      run: |
-  #        git submodule init
-  #        git submodule update
-  #    - name: install dependencies
-  #      run: |
-  #        brew uninstall xsd
-  #        brew install mono
-  #    - name: generate makefiles
-  #      run: |
-  #        ./mac-genprojects.sh
-  #    - name: build
-  #      run: |
-  #        make -j 8 config=release
-  #    - name: package binaries
-  #      run: |
-  #        ./package-unix.sh build-nightly Release macosx x86_64 fe_engine.tar.gz
-  #    - name: upload artifact
-  #      uses: actions/upload-artifact@v2
-  #      with:
-  #        name: release-macosx
-  #        path: fe_engine.tar.gz
+  macosx-build:
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: sync submodules
+        run: |
+          git submodule init
+          git submodule update
+      - name: pull, build, and install mono
+        run: |
+          git clone https://github.com/mono/mono.git --recursive
+          cd mono
+          ./autogen.sh
+          make
+          sudo make install
+          cd ..
+      - name: generate makefiles
+        run: |
+          ./mac-genprojects.sh
+      - name: build
+        run: |
+          make -j 8 config=release
+      - name: package binaries
+        run: |
+          ./package-unix.sh build-nightly Release macosx x86_64 fe_engine.tar.gz
+      - name: upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: release-macosx
+          path: fe_engine.tar.gz
