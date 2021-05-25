@@ -1,0 +1,13 @@
+#pragma once
+#include <mono/jit/jit.h>
+#include <mono/metadata/assembly.h>
+#include <mono/metadata/debug-helpers.h>
+#include <mono/metadata/attrdefs.h>
+#include <mono/metadata/environment.h>
+#include <cxxopts.hpp>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <memory>
+#include <functional>
+#include <cassert>

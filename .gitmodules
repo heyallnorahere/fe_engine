@@ -1,3 +1,6 @@
 [submodule "vendor/submodules/json"]
 	path = vendor/submodules/json
 	url = https://github.com/nlohmann/json
+[submodule "vendor/submodules/cxxopts"]
+	path = vendor/submodules/cxxopts
+	url = https://github.com/jarro2783/cxxopts.git
