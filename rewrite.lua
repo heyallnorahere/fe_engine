@@ -52,10 +52,12 @@ workspace "fe_engine-rewrite"
         defines {
             "FEENGINE_DEBUG"
         }
+        symbols "on"
     filter "configurations:Release"
         defines {
             "FEENGINE_RELEASE"
         }
+        optimize "on"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 group "engine"
 project "FEEngine"
@@ -81,8 +83,6 @@ project "host"
         "rewrite/src/%{prj.name}/**.h",
         _SCRIPT
     }
-    pchheader "pch.h"
-    pchsource "rewrite/src/%{prj.name}/pch.cpp"
     sysincludedirs {
         "%{includedirs_table.mono}",
         "%{includedirs_table.cxxopts}",
@@ -127,6 +127,9 @@ project "host"
             "pthread",
             "stdc++fs"
         }
+    filter "action:not gmake*"
+        pchheader "pch.h"
+        pchsource "rewrite/src/%{prj.name}/pch.cpp"
 group ""
 group "examples"
 project "ExampleGame"

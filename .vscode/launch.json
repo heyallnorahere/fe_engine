@@ -27,6 +27,23 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "lldb"
+        },
+        {
+            "name": "debug host (mac)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/bin/Debug-macosx-x86_64/rewrite/host/FEEngine",
+            "args": [
+                "-f",
+                "ExampleGame.dll",
+                "-e",
+                "ExampleGame.ExampleGame"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/rewrite/src/host",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
         }
     ]
 }
