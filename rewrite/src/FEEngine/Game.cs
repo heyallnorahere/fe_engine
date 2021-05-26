@@ -10,13 +10,15 @@ namespace FEEngine
     {
         public Game()
         {
-            Console.WriteLine("just testing...");
+            mRegistry = new Registry();
         }
-        public void Test()
+        public Registry Registry
         {
-            Test_Native();
+            get
+            {
+                return mRegistry;
+            }
         }
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        private extern void Test_Native();
+        private Registry mRegistry;
     }
 }

@@ -18,6 +18,9 @@ managed_field::managed_field(MonoClassField* field) {
 managed_property::managed_property(MonoProperty* property) {
     this->m = property;
 }
+static void check_exception() {
+
+}
 static MonoObject* call_method(MonoObject* object, MonoMethod* method, void** params = NULL) {
     MonoObject* exception = NULL;
     MonoObject* return_value = mono_runtime_invoke(method, object, params, &exception);

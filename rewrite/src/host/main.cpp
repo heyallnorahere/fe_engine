@@ -1,8 +1,5 @@
 #include "pch.h"
 #include "scripthost.h"
-void test() {
-    std::cout << "hello from c++" << std::endl;
-}
 int main(int argc, const char** argv) {
     cxxopts::Options options("FEEngine");
     options.add_options()("f,file", "Path of DLL to load and run", cxxopts::value<std::string>()->default_value("Game.dll"))("e,entrypoint", "The entrypoint class to call on", cxxopts::value<std::string>()->default_value("Game.Entrypoint"))("d,debug", "Debug mode")("a,arg", "Pass an argument to the game", cxxopts::value<std::vector<std::string>>());
@@ -23,7 +20,6 @@ int main(int argc, const char** argv) {
         }
     }
     auto host = std::make_shared<scripthost>();
-    host->register_function("FEEngine.Game::Test_Native", test);
     auto game_assembly = host->load_assembly(path);
     auto entrypoint_class = game_assembly->get_class(entrypoint);
     auto main_method = entrypoint_class->get_method(":Main()");

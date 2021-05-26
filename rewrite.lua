@@ -64,6 +64,7 @@ project "FEEngine"
     location "rewrite/src/FEEngine"
     kind "SharedLib"
     language "C#"
+    clr "unsafe"
     targetdir ("bin/" .. outputdir .. "/rewrite/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/rewrite/%{prj.name}")
     files {

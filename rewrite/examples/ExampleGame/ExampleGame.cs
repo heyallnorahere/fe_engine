@@ -11,7 +11,6 @@ namespace ExampleGame
         public static void Main() // todo: add args parameter
         {
             Game game = new Game();
-            game.Test();
         }
     }
 }
