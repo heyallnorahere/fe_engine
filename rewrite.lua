@@ -131,6 +131,7 @@ project "FEEngine"
     language "C#"
     csversion (cs_version)
     framework (dotnet_framework_version)
+    clr "unsafe"
     targetdir ("bin/" .. outputdir .. "/rewrite/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/rewrite/%{prj.name}")
     files {

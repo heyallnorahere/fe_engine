@@ -10,6 +10,15 @@ namespace FEEngine
         Register<T> GetRegister();
         void SetRegister(int index, Register<T> register);
     }
+    // todo: add content to these classes
+    public class RegisterDoesNotExistException : Exception
+    {
+        public RegisterDoesNotExistException() : base("The specified register does not exist") { }
+    }
+    public class RegisterAlreadyExistsException : Exception
+    {
+        public RegisterAlreadyExistsException() : base("The specified register already exists") { }
+    }
     public class Registry
     {
         public Registry()
@@ -31,7 +40,7 @@ namespace FEEngine
         {
             if (!RegisterExists<T>())
             {
-                throw new Exception("The specified register does not exist!");
+                throw new RegisterDoesNotExistException();
             }
             for (int i = 0; i < mRegisters.Count; i++)
             {
@@ -47,7 +56,7 @@ namespace FEEngine
         {
             if (RegisterExists<T>())
             {
-                throw new Exception("The specified register already exists!");
+                throw new RegisterAlreadyExistsException();
             }
             mRegisters.Add(new Register<T>(this));
         }
@@ -87,6 +96,10 @@ namespace FEEngine
         {
             get
             {
+                if (index >= Count)
+                {
+                    throw new IndexOutOfRangeException();
+                }
                 return mElements[index];
             }
             set

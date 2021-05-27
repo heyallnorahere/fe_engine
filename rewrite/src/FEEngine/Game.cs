@@ -4,6 +4,7 @@
     {
         public Game()
         {
+            InputManager.Init();
             mRegistry = new Registry();
         }
         public Registry Registry
@@ -12,6 +13,22 @@
             {
                 return mRegistry;
             }
+        }
+        public void Loop(Player player)
+        {
+            while (true)
+            {
+                Update(player);
+                if (InputManager.GetState().Quit)
+                {
+                    break;
+                }
+            }
+        }
+        private void Update(Player player)
+        {
+            InputManager.Update();
+            player.Update();
         }
         public void SetupRegisters()
         {
