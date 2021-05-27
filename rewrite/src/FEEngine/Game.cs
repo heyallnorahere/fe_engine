@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Runtime.CompilerServices;
-
-namespace FEEngine
+﻿namespace FEEngine
 {
     public class Game
     {
@@ -17,6 +12,11 @@ namespace FEEngine
             {
                 return mRegistry;
             }
+        }
+        public void SetupRegisters()
+        {
+            mRegistry.CreateRegister<Map>();
+            mRegistry.CreateRegister<Unit>();
         }
         private Registry mRegistry;
     }

@@ -44,9 +44,10 @@ public:
     void set_field(std::shared_ptr<managed_field> field, void* value);
     virtual void* raw() const override;
     void* unbox() const;
+    MonoDomain* get_domain();
     virtual ~managed_object() override;
-private:
     managed_object(uint32_t object, MonoDomain* domain);
+private:
     uint32_t m;
     MonoDomain* m_domain;
     friend class managed_class;
@@ -75,6 +76,7 @@ public:
     std::string get_namespace() const;
     std::string get_class_name() const;
     virtual void* raw() const override;
+    static std::shared_ptr<managed_class> get_exception_class(MonoDomain* domain);
 private:
     managed_class(MonoClass* _class, MonoDomain* domain, MonoImage* image, const std::string& namespace_name, const std::string& class_name);
     MonoClass* m;

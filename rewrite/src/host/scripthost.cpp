@@ -28,7 +28,8 @@ static MonoAssembly* load_assembly_from_file(const std::string& path) {
     free(buffer);
     return assembly;
 }
-scripthost::scripthost() {
+scripthost::scripthost(bool debug) {
+    this->m_debug = debug;
     this->init();
 }
 scripthost::~scripthost() {

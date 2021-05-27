@@ -39,6 +39,7 @@ includedirs_table["cxxopts"] = "vendor/submodules/cxxopts/include"
 libdirs_table["mono"] = _OPTIONS["mono-libdir"]
 cs_version = _OPTIONS["cs-version"]
 dotnet_framework_version = _OPTIONS["framework-version"]
+dotnet_assembly_path = "%{libdirs_table.mono}/mono/%{dotnet_framework_version}-api"
 workspace "fe_engine-rewrite"
     architecture (architecture_)
     targetdir "bin"
@@ -89,12 +90,9 @@ project "Newtonsoft.Json"
         "vendor/submodules/%{prj.name}/Src/%{prj.name}/obj/**.cs"
     }
     links {
-        "System.ComponentModel",
-        "System.Xml",
         "System",
-        "System.Text.RegularExpressions",
-        "System.Core",
-        "System.Data"
+        "System.Data",
+        "System.Xml"
     }
     filter "options:framework-version=2.0"
         defines {
@@ -166,13 +164,20 @@ project "host"
         'MONO_CS_LIBDIR="%{libdirs_table.mono}"'
     }
     postbuildcommands {
-        '{COPY} "%{cfg.targetdir}/../FEEngine/FEEngine.dll" "."',
-        '{COPY} "%{cfg.targetdir}/../examples/ExampleGame/ExampleGame.dll" "."'
+        '{MOVE} "%{cfg.targetdir}/FEEngine.dll" "."',
+        '{MOVE} "%{cfg.targetdir}/ExampleGame.exe" "."',
+        '{MOVE} "%{cfg.targetdir}/Newtonsoft.Json.dll" "."',
+        '{COPY} "%{dotnet_assembly_path}/System.dll" "."',
+        '{COPY} "%{dotnet_assembly_path}/System.Data.dll" "."',
+        '{COPY} "%{dotnet_assembly_path}/System.Xml.dll" "."',
     }
-    dependson {
+    links {
         "FEEngine",
-        "ExampleGame"
+        "ExampleGame",
+        "Newtonsoft.Json"
     }
+    filter "configurations:Debug"
+        targetsuffix "-d"
     filter "system:windows"
         links {
             "mono-2.0-sgen.lib"
@@ -206,7 +211,7 @@ group ""
 group "examples"
 project "ExampleGame"
     location "rewrite/examples/ExampleGame"
-    kind "SharedLib"
+    kind "ConsoleApp"
     language "C#"
     csversion (cs_version)
     framework (dotnet_framework_version)
@@ -216,6 +221,8 @@ project "ExampleGame"
         "rewrite/examples/%{prj.name}/**.cs"
     }
     links {
-        "FEEngine"
+        "FEEngine",
+        "Newtonsoft.Json",
+        "System"
     }
 group ""

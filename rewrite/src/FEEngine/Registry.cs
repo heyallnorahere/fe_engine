@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Security.Permissions;
-using System.Text;
+using Newtonsoft.Json;
 
 namespace FEEngine
 {
@@ -51,33 +49,38 @@ namespace FEEngine
             {
                 throw new Exception("The specified register already exists!");
             }
-            mRegisters.Add(new Register<T>());
+            mRegisters.Add(new Register<T>(this));
         }
         private readonly List<IRegister> mRegisters;
     }
-    interface IRegister
+    internal interface IRegister
     {
-        bool IsOfType<T2>() where T2 : class, IRegisteredObject<T2>;
+        bool IsOfType<T>() where T : class, IRegisteredObject<T>;
     }
-    /// <summary>
-    /// Essentially a glorified List<>
-    /// </summary>
-    /// <typeparam name="T">The type of data to store</typeparam>
+    [JsonArray(false)]
     public class Register<T> : IRegister where T : class, IRegisteredObject<T>
     {
-        public Register()
+        public Register(Registry registry)
         {
             mElements = new List<T>();
+            mRegistry = registry;
         }
-        public bool IsOfType<T2>() where T2 : class, IRegisteredObject<T2>
+        public bool IsOfType<U>() where U : class, IRegisteredObject<U>
         {
-            return true;
+            return typeof(T) == typeof(U);
         }
         public int Count
         {
             get
             {
                 return mElements.Count;
+            }
+        }
+        public Registry Parent
+        {
+            get
+            {
+                return mRegistry;
             }
         }
         public T this[int index]
@@ -97,5 +100,6 @@ namespace FEEngine
             mElements.Add(element);
         }
         private List<T> mElements;
+        private Registry mRegistry;
     }
 }

@@ -1,6 +1,7 @@
 out/
 *.so*
 *.dll
+*.exe
 Debug/
 Release/
 !vendor/**

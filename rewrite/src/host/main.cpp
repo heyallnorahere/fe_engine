@@ -19,7 +19,7 @@ int main(int argc, const char** argv) {
             std::cout << "\t" << args[i] << std::endl;
         }
     }
-    auto host = std::make_shared<scripthost>();
+    auto host = std::make_shared<scripthost>(debug);
     auto game_assembly = host->load_assembly(path);
     auto entrypoint_class = game_assembly->get_class(entrypoint);
     auto main_method = entrypoint_class->get_method(":Main()");

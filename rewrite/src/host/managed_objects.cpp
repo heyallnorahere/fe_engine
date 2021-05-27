@@ -18,17 +18,29 @@ managed_field::managed_field(MonoClassField* field) {
 managed_property::managed_property(MonoProperty* property) {
     this->m = property;
 }
-static void check_exception() {
-
+static std::string from_mono(MonoString* string) {
+    return mono_string_to_utf8(string);
 }
-static MonoObject* call_method(MonoObject* object, MonoMethod* method, void** params = NULL) {
+static void check_exception(std::shared_ptr<managed_object> exception) {
+    std::cerr << "Exception caught!" << std::endl;
+    auto exception_class = managed_class::get_exception_class(exception->get_domain());
+    auto message_property = exception_class->get_property("Message");
+    auto stacktrace_property = exception_class->get_property("StackTrace");
+    std::string message = from_mono((MonoString*)exception->get_property(message_property)->raw());
+    std::string stacktrace = from_mono((MonoString*)exception->get_property(stacktrace_property)->raw());
+    std::cout << "Message: " << message << std::endl;
+    std::cout << "StackTrace: " << stacktrace << std::endl;
+}
+static MonoObject* call_method(MonoObject* object, MonoMethod* method, MonoDomain* domain, void** params = NULL) {
     MonoObject* exception = NULL;
     MonoObject* return_value = mono_runtime_invoke(method, object, params, &exception);
-    // todo: check exception object
+    if (exception) {
+        check_exception(std::make_shared<managed_object>(mono_gchandle_new(exception, false), domain));
+    }
     return return_value;
 }
 managed_object* managed_method::call_function(std::shared_ptr<managed_method> method, void** params) {
-    auto return_value = call_method(NULL, method->m, params);
+    auto return_value = call_method(NULL, method->m, method->m_domain, params);
     uint32_t handle = mono_gchandle_new(return_value, false);
     return new managed_object(handle, method->m_domain);
 }
@@ -40,7 +52,7 @@ std::shared_ptr<managed_object> managed_object::make_null() {
     return std::shared_ptr<managed_object>(new managed_object(0, NULL));
 }
 std::shared_ptr<managed_object> managed_object::call_method(std::shared_ptr<managed_method> method, void** params) {
-    auto return_value = ::call_method(mono_gchandle_get_target(this->m), method->m, params);
+    auto return_value = ::call_method(mono_gchandle_get_target(this->m), method->m, this->m_domain, params);
     uint32_t handle = mono_gchandle_new(return_value, false);
     return std::shared_ptr<managed_object>(new managed_object(handle, this->m_domain));
 }
@@ -62,6 +74,9 @@ void managed_object::set_field(std::shared_ptr<managed_field> field, void* value
 }
 void* managed_object::unbox() const {
     return mono_object_unbox(mono_gchandle_get_target(this->m));
+}
+MonoDomain* managed_object::get_domain() {
+    return this->m_domain;
 }
 managed_object::~managed_object() {
     mono_gchandle_free(this->m);
@@ -115,6 +130,9 @@ std::string managed_class::get_namespace() const {
 }
 std::string managed_class::get_class_name() const {
     return this->m_class_name;
+}
+std::shared_ptr<managed_class> managed_class::get_exception_class(MonoDomain* domain) {
+    return std::shared_ptr<managed_class>(new managed_class(mono_get_exception_class(), domain, mono_get_corlib(), "", ""));
 }
 managed_class::managed_class(MonoClass* _class, MonoDomain* domain, MonoImage* image, const std::string& namespace_name, const std::string& class_name) {
     this->m = _class;

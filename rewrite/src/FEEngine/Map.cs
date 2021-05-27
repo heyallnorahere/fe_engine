@@ -1,39 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace FEEngine
 {
-    public class Map
+    [JsonObject]
+    public class Map : RegistedObjectTemplate<Map>
     {
-        public int Width
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public List<int> Units { get; private set; }
+        public void AddUnit(Unit unit)
         {
-            get
-            {
-                return mWidth;
-            }
-            set
-            {
-                mWidth = value;
-            }
+            Units.Add(unit.RegisterIndex);
         }
-        public int Height
-        {
-            get
-            {
-                return mHeight;
-            }
-            set
-            {
-                mHeight = value;
-            }
-        }
+        [JsonConstructor]
         public Map(int width, int height)
         {
-            mWidth = width;
-            mHeight = height;
+            Width = width;
+            Height = height;
+            Units = new List<int>();
         }
-        private int mWidth, mHeight;
     }
 }
