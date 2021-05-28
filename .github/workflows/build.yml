@@ -5,10 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: sync submodules
-        run: |
-          git submodule init
-          git submodule update
+        with:
+          submodules: recursive
       - name: install dependencies
         run: |
           sudo apt-get update
@@ -33,11 +31,8 @@ jobs:
       MSBUILD_PATH: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\
     steps:
       - uses: actions/checkout@v2
-      - name: sync submodules
-        shell: cmd
-        run: |
-          git submodule init
-          git submodule update
+        with:
+          submodules: recursive
       - name: generate build files
         shell: cmd
         run: |
@@ -59,10 +54,8 @@ jobs:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v2
-      - name: sync submodules
-        run: |
-          git submodule init
-          git submodule update
+        with:
+          submodules: recursive
       - name: install homebrew dependencies
         run: |
           brew install autoconf automake libtool pkg-config cmake python3

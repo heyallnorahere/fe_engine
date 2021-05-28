@@ -7,10 +7,8 @@ jobs:
       MSBUILD_PATH: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\
     steps:
       - uses: actions/checkout@v2
-      - name: sync submodules
-        shell: cmd
-        run: |
-          git submodule update --init --recursive
+        with:
+          submodules: recursive
       - name: install mono
         shell: cmd
         run: |
