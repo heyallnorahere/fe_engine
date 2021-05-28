@@ -50,7 +50,7 @@ namespace FEEngine
                 Height = value.Y;
             }
         }
-        public List<int> Units { get; private set; }
+        public List<int> Units { get; set; }
         public void AddUnit(Unit unit)
         {
             unit.Parent = this;
@@ -61,11 +61,11 @@ namespace FEEngine
             return new Enumerator(this);
         }
         [JsonConstructor]
-        public Map(int width, int height)
+        public Map(int width, int height, List<int> units = null)
         {
             Width = width;
             Height = height;
-            Units = new List<int>();
+            Units = units ?? new List<int>();
         }
     }
 }

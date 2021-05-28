@@ -223,7 +223,6 @@ project "ExampleGame"
     }
     links {
         "FEEngine",
-        "Newtonsoft.Json",
         "System"
     }
 group ""

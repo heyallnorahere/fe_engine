@@ -79,9 +79,21 @@ namespace FEEngine.Math
         {
             v1 = AddVectors(v1, v2);
         }
+        public static IVec2<T> SubVectors<T>(IVec2<T> v1, IVec2<T> v2) where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
+        {
+            return new GenericVec2<T>(Sub<T, T, T>(v1.X, v2.X), Sub<T, T, T>(v1.Y, v2.Y));
+        }
+        public static void SubVectors<T>(ref IVec2<T> v1, IVec2<T> v2) where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
+        {
+            v1 = SubVectors(v1, v2);
+        }
         public static T Add<T, P1, P2>(P1 v1, P2 v2) where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
         {
             return (T)Convert.ChangeType(Convert.ToDouble(v1) + Convert.ToDouble(v2), typeof(T));
+        }
+        public static T Sub<T, P1, P2>(P1 v1, P2 v2) where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
+        {
+            return (T)Convert.ChangeType(Convert.ToDouble(v1) - Convert.ToDouble(v2), typeof(T));
         }
         public static T Mul<T, P1, P2>(P1 v1, P2 v2) where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
         {

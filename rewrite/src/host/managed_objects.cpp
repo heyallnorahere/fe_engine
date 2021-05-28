@@ -19,17 +19,25 @@ managed_property::managed_property(MonoProperty* property) {
     this->m = property;
 }
 static std::string from_mono(MonoString* string) {
+    if (!string) {
+        return "null";
+    }
     return mono_string_to_utf8(string);
 }
 static void check_exception(std::shared_ptr<managed_object> exception) {
     std::cerr << "Exception caught!" << std::endl;
     auto exception_class = managed_class::get_exception_class(exception->get_domain());
     auto message_property = exception_class->get_property("Message");
+    auto source_property = exception_class->get_property("Source");
     auto stacktrace_property = exception_class->get_property("StackTrace");
     std::string message = from_mono((MonoString*)exception->get_property(message_property)->raw());
+    std::string source = from_mono((MonoString*)exception->get_property(source_property)->raw());
     std::string stacktrace = from_mono((MonoString*)exception->get_property(stacktrace_property)->raw());
-    std::cout << "Message: " << message << std::endl;
-    std::cout << "StackTrace: " << stacktrace << std::endl;
+    std::cerr << "Message: " << message << std::endl;
+    std::cerr << "Source: " << source << std::endl;
+    std::cerr << "StackTrace: " << stacktrace << std::endl;
+    std::cout << "Press any key to exit" << std::endl;
+    std::cin.get();
 }
 static MonoObject* call_method(MonoObject* object, MonoMethod* method, MonoDomain* domain, void** params = NULL) {
     MonoObject* exception = NULL;

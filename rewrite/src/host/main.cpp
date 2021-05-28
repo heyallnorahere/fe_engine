@@ -22,8 +22,10 @@ int main(int argc, const char** argv) {
     auto host = std::make_shared<scripthost>(debug);
     auto game_assembly = host->load_assembly(path);
     auto entrypoint_class = game_assembly->get_class(entrypoint);
-    auto main_method = entrypoint_class->get_method(":Main()");
+    auto main_method = entrypoint_class->get_method(":Main(bool)");
+    std::vector<void*> cs_args;
+    cs_args.push_back(&debug);
     // we dont need the return value
-    delete managed_method::call_function(main_method);
+    delete managed_method::call_function(main_method, cs_args.data());
     return 0;
 }

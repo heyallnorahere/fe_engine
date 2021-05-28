@@ -80,6 +80,14 @@ namespace FEEngine
         {
             return state;
         }
+        public static void ReadBindings(string path)
+        {
+            Bindings = JsonSerializer.Deserialize<KeyBindings>(path);
+        }
+        public static void WriteBindings(string path)
+        {
+            JsonSerializer.Serialize(path, Bindings);
+        }
         private InputManager() { }
         private static State state = new();
     }

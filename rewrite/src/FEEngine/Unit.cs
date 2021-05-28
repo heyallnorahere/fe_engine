@@ -62,6 +62,38 @@ namespace FEEngine
             CurrentMovement = Stats.Mv;
             CanMove = true;
         }
+        public bool Move(IVec2<int> newPos, MovementType movementType = MovementType.ConsumeMovement)
+        {
+            if (!CanMove)
+            {
+                return false;
+            }
+            IVec2<int> delta = MathUtil.SubVectors(newPos, Position);
+            if (MathUtil.ClampVector(delta, new Vec2I(0), MathUtil.SubVectors(Parent.Dimensions, new Vec2I(1))) != delta)
+            {
+                return false;
+            }
+            int deltaLength = delta.TaxicabLength();
+            if (deltaLength > CurrentMovement)
+            {
+                return false;
+            }
+            switch (movementType)
+            {
+                case MovementType.ConsumeMovement:
+                    CurrentMovement -= deltaLength;
+                    break;
+                case MovementType.RefundMovement:
+                    CurrentMovement += deltaLength;
+                    if (CurrentMovement > Stats.Mv)
+                    {
+                        CurrentMovement = Stats.Mv;
+                    }
+                    break;
+            }
+            Position = newPos;
+            return true;
+        }
         public string BehaviorName { get; set; }
         [JsonConstructor]
         public Unit(IVec2<int> position, UnitAffiliation affiliation, UnitStats stats, string behaviorName = null, string name = "Soldier")

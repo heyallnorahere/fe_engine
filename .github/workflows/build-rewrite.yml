@@ -1,0 +1,26 @@
+name: build-rewrite
+on: [ push ]
+jobs:
+  windows-build:
+    runs-on: windows-latest
+    env:
+      MSBUILD_PATH: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\
+    steps:
+      - uses: actions/checkout@v2
+      - name: sync submodules
+        shell: cmd
+        run: |
+          git submodule update --init --recursive
+      - name: install mono
+        shell: cmd
+        run: |
+          curl -L https://download.mono-project.com/archive/6.12.0/windows-installer/mono-6.12.0.107-x64-0.msi -o mono.msi
+          msiexec /a mono.msi /quiet
+      - name: generate build files
+        shell: cmd
+        run: |
+          vendor\binaries\windows\premake5 vs2019 --file=rewrite.lua
+      - name: build
+        shell: cmd
+        run: |
+          "%MSBUILD_PATH%\MSBuild.exe" fe_engine-rewrite.sln -p:Configuration=Release -m
