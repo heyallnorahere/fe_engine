@@ -1,4 +1,4 @@
-# fe_engine [![build](https://github.com/yodasoda1219/fe_engine/actions/workflows/build.yml/badge.svg)](https://github.com/yodasoda1219/fe_engine/actions/workflows/build.yml)
+# fe_engine [![build](https://github.com/yodasoda1219/fe_engine/actions/workflows/build.yml/badge.svg)](https://github.com/yodasoda1219/fe_engine/actions/workflows/build.yml) [![build-rewrite](https://github.com/yodasoda1219/fe_engine/actions/workflows/build-rewrite.yml/badge.svg)](https://github.com/yodasoda1219/fe_engine/actions/workflows/build-rewrite.yml)
 ## About
 This project aims to recreate the Fire Emblem: Three Houses game engine in a terminal. The gameplay side, I mean.
 ## What's this Fire Emblem?
