@@ -221,10 +221,9 @@ project "host"
         'MONO_CS_LIBDIR="%{libdirs_table.mono}"'
     }
     postbuildcommands {
-        '{COPY} "%{cfg.targetdir}/../FEEngine/FEEngine.dll" "."',
-        '{COPY} "%{cfg.targetdir}/../examples/ExampleGame/ExampleGame.exe" "."',
-        '{COPY} "%{cfg.targetdir}/../dependencies/Newtonsoft.Json/Newtonsoft.Json.dll" "."',
-        '{COPY} "%{cfg.targetdir}/../dependencies/Newtonsoft.Json.Schema/Newtonsoft.Json.Schema.dll" "."',
+        '{MOVE} "%{cfg.targetdir}/FEEngine.dll" "."',
+        '{MOVE} "%{cfg.targetdir}/ExampleGame.exe" "."',
+        '{MOVE} "%{cfg.targetdir}/Newtonsoft.Json.dll" "."',
         '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.dll" "."',
         '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Core.dll" "."',
         '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Data.dll" "."',
@@ -233,7 +232,7 @@ project "host"
         '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Xml.dll" "."',
         '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Xml.Linq.dll" "."',
     }
-    dependson {
+    links {
         "FEEngine",
         "ExampleGame",
         "Newtonsoft.Json"

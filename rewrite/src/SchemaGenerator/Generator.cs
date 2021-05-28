@@ -43,6 +43,7 @@ namespace SchemaGenerator
             }
             WriteSchema<Register<Map>>("Maps");
             WriteSchema<Register<Unit>>("Units");
+            WriteSchema<Register<Item>>("Items");
             WriteSchema<InputManager.KeyBindings>();
         }
         private static Settings settings;

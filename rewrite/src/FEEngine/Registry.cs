@@ -12,6 +12,7 @@ namespace FEEngine
         int RegisterIndex { get; }
         Register<T> GetRegister();
         void SetRegister(int index, Register<T> register);
+        void OnDeserialization();
     }
     // todo: add content to these classes
     public class RegisterDoesNotExistException : Exception
@@ -104,6 +105,10 @@ namespace FEEngine
                     {
                         serializer.Converters.Add(new Converter<T>(this));
                     });
+                    foreach (T element in (Register<T>)mRegisters[i])
+                    {
+                        mRegisters[i].OnDeserialization();
+                    }
                 }
             }
         }
@@ -112,6 +117,7 @@ namespace FEEngine
     internal interface IRegister
     {
         bool IsOfType<T>() where T : class, IRegisteredObject<T>;
+        void OnDeserialization();
     }
     [JsonArray]
     public class Register<T> : IRegister, IEnumerable<T>, ICollection<T> where T : class, IRegisteredObject<T>
@@ -164,7 +170,7 @@ namespace FEEngine
         }
         public bool IsOfType<U>() where U : class, IRegisteredObject<U>
         {
-            return typeof(T) == typeof(U);
+            return typeof(T).FullName == typeof(U).FullName;
         }
         public int Count
         {
@@ -200,6 +206,14 @@ namespace FEEngine
             get
             {
                 return false;
+            }
+        }
+        public void OnDeserialization()
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                T element = this[i];
+                element.OnDeserialization();
             }
         }
         public void Add(T element)

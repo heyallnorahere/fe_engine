@@ -1,15 +1,24 @@
 ﻿using System;
 using System.IO;
 using FEEngine;
+using FEEngine.Scripting;
 
 namespace ExampleGame
 {
-    public class TestBehavior : FEEngine.Scripting.IUnitBehavior
+    public class TestUnitBehavior : IUnitBehavior
     {
         public Unit Parent { get; set; }
         public void Update()
         {
-            Console.WriteLine("hello");
+            Console.WriteLine("Testing...");
+        }
+    }
+    public class TestItemBehavior : IItemBehavior
+    {
+        public Item Parent { get; set; }
+        public void OnUse()
+        {
+            Console.WriteLine("Testing again, but from IItemBehavior");
         }
     }
     public class Entrypoint
@@ -23,21 +32,40 @@ namespace ExampleGame
             Game.Debug = debug;
             Game game = new Game();
             game.SetupRegisters();
-            Map map;
-            if (File.Exists("maps.json"))
+            if (!Directory.Exists("data"))
             {
-                game.Registry.DeserializeRegister<Map>("maps.json");
-                map = game.Registry.GetRegister<Map>()[0];
+                Directory.CreateDirectory("data");
             }
-            else
+            InitRegister<Item>("data/items.json", game);
+            InitRegister<Unit>("data/units.json", game);
+            InitRegister<Map>("data/maps.json", game, () =>
             {
-                map = new Map(20, 10);
+                var map = new Map(20, 10);
                 game.Registry.GetRegister<Map>().Add(map);
-                game.Registry.SerializeRegister<Map>("maps.json");
-            }
+                return true;
+            });
             Player player = new(game);
             Console.WriteLine("Successfully initialized!");
             game.Loop(player);
+        }
+        private static void InitRegister<T>(string filename, Game game, Func<bool> beforeSerializationCallback = null, Func<bool> afterDeserializationCallback = null) where T : class, IRegisteredObject<T>
+        {
+            if (File.Exists(filename))
+            {
+                game.Registry.DeserializeRegister<T>(filename);
+                if (!(afterDeserializationCallback?.Invoke() ?? true))
+                {
+                    throw new Exception();
+                }
+            }
+            else
+            {
+                if (!(beforeSerializationCallback?.Invoke() ?? true))
+                {
+                    throw new Exception();
+                }
+                game.Registry.SerializeRegister<T>(filename);
+            }
         }
     }
 }

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections;
+using Newtonsoft.Json;
 
 namespace FEEngine.Math
 {
     public interface IVector<T> : IEnumerable where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
     {
+        [JsonIgnore]
         int Count { get; }
         T this[int index] { get; }
     }

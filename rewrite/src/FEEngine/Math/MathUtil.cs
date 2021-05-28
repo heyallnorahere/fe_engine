@@ -30,6 +30,7 @@ namespace FEEngine.Math
         {
             return new VectorEnumerator<T>(this);
         }
+        public GenericVec2() { }
         public GenericVec2(T x, T y)
         {
             X = x;

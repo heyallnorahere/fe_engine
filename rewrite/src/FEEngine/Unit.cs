@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using FEEngine.Math;
@@ -30,6 +31,7 @@ namespace FEEngine
         public string Name { get; set; }
         public UnitStats Stats { get; set; }
         public IVec2<int> Position { get; private set; }
+        public List<int> Inventory { get; private set; }
         [JsonIgnore]
         public int CurrentMovement { get; private set; }
         [JsonIgnore]
@@ -50,7 +52,7 @@ namespace FEEngine
             else
             {
                 mBehavior.Parent = this;
-                BehaviorName = typeof(B).Name;
+                BehaviorName = typeof(B).AssemblyQualifiedName;
             }
         }
         public B GetBehavior<B>() where B : IUnitBehavior, new()
@@ -61,6 +63,19 @@ namespace FEEngine
         {
             CurrentMovement = Stats.Mv;
             CanMove = true;
+        }
+        public void Add(Item item)
+        {
+            item.Parent = this;
+            Inventory.Add(item.RegisterIndex);
+        }
+        public override void OnDeserialization()
+        {
+            Register<Item> itemRegister = mRegister.Parent.GetRegister<Item>();
+            foreach (int index in Inventory)
+            {
+                itemRegister[index].Parent = this;
+            }
         }
         public bool Move(IVec2<int> newPos, MovementType movementType = MovementType.ConsumeMovement)
         {
@@ -98,6 +113,7 @@ namespace FEEngine
         [JsonConstructor]
         public Unit(IVec2<int> position, UnitAffiliation affiliation, UnitStats stats, string behaviorName = null, string name = "Soldier")
         {
+            Inventory = new List<int>();
             Name = name;
             Position = position;
             Affiliation = affiliation;
@@ -120,6 +136,7 @@ namespace FEEngine
                 }
                 var constructor = behaviorType.GetConstructor(new Type[0]);
                 mBehavior = (IUnitBehavior)constructor.Invoke(new object[0]);
+                mBehavior.Parent = this;
             }
         }
         private IUnitBehavior mBehavior;

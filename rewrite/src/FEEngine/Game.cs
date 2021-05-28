@@ -51,6 +51,7 @@
         {
             mRegistry.CreateRegister<Map>();
             mRegistry.CreateRegister<Unit>();
+            mRegistry.CreateRegister<Item>();
         }
         private Registry mRegistry;
         private string mKeyBindingsFile;

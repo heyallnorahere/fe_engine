@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using FEEngine.Math;
@@ -6,25 +7,41 @@ using FEEngine.Math;
 namespace FEEngine
 {
     [JsonObject]
-    public class Map : RegistedObjectTemplate<Map>, IEnumerable
+    public class Map : RegistedObjectTemplate<Map>, IEnumerable<Unit>
     {
-        private struct Enumerator : IEnumerator
+        private struct Enumerator : IEnumerator<Unit>
         {
             public bool MoveNext()
             {
+                if (mPosition < mParent.Units.Count - 1)
+                {
+                    mPosition++;
+                    return true;
+                }
                 return false;
             }
             public void Reset()
             {
-                //
+                mPosition = -1;
             }
-            public object Current
+            public void Dispose()
+            {
+                GC.SuppressFinalize(this);
+            }
+            public Unit Current
             {
                 get
                 {
                     Registry registry = mParent.mRegister.Parent;
                     Register<Unit> unitRegister = registry.GetRegister<Unit>();
                     return unitRegister[mParent.Units[mPosition]];
+                }
+            }
+            object IEnumerator.Current
+            {
+                get
+                {
+                    return Current;
                 }
             }
             public Enumerator(Map parent)
@@ -51,14 +68,36 @@ namespace FEEngine
             }
         }
         public List<int> Units { get; set; }
+        public Unit GetUnitAt(IVec2<int> position)
+        {
+            foreach (Unit unit in this)
+            {
+                if (unit.Position == position)
+                {
+                    return unit;
+                }
+            }
+            return null;
+        }
+        public override void OnDeserialization()
+        {
+            foreach (Unit unit in this)
+            {
+                unit.Parent = this;
+            }
+        }
         public void AddUnit(Unit unit)
         {
             unit.Parent = this;
             Units.Add(unit.RegisterIndex);
         }
-        public IEnumerator GetEnumerator()
+        public IEnumerator<Unit> GetEnumerator()
         {
             return new Enumerator(this);
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
         [JsonConstructor]
         public Map(int width, int height, List<int> units = null)
