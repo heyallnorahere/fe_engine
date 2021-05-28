@@ -155,7 +155,7 @@ namespace FEEngine
                 mParent = parent;
             }
             private int mPosition;
-            private Register<T> mParent;
+            private readonly Register<T> mParent;
         }
         public Register(Registry registry)
         {

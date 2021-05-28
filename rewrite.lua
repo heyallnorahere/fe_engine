@@ -235,6 +235,7 @@ project "host"
         '{MOVE} "%{cfg.targetdir}/FEEngine.dll" "."',
         '{MOVE} "%{cfg.targetdir}/ExampleGame.exe" "."',
         '{MOVE} "%{cfg.targetdir}/Newtonsoft.Json.dll" "."',
+        '{MOVE} "%{cfg.targetdir}/Newtonsoft.Json.Schema.dll" "."',
         '{COPY} "%{dotnet_assembly_path}/2.0-api/System.dll" "."',
         '{COPY} "%{dotnet_assembly_path}/2.0-api/System.Data.dll" "."',
         '{COPY} "%{dotnet_assembly_path}/2.0-api/System.Runtime.Serialization.dll" "."',
@@ -278,6 +279,25 @@ project "host"
     filter "action:not gmake*"
         pchheader "pch.h"
         pchsource "rewrite/src/%{prj.name}/pch.cpp"
+group ""
+group "tools"
+project "SchemaGenerator"
+    location "rewrite/src/SchemaGenerator"
+    kind "ConsoleApp"
+    language "C#"
+    csversion (cs_version)
+    framework (dotnet_framework_version)
+    targetdir ("bin/" .. outputdir .. "/rewrite/%{prj.name}")
+    objdir ("bin-int/" .. outputdir .. "/rewrite/%{prj.name}")
+    files {
+        "rewrite/src/%{prj.name}/**.cs"
+    }
+    links {
+        "FEEngine",
+        "Newtonsoft.Json",
+        "Newtonsoft.Json.Schema",
+        "System"
+    }
 group ""
 group "examples"
 project "ExampleGame"
