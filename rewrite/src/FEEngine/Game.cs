@@ -7,10 +7,22 @@
             get => debug;
             set => debug = value;
         }
-        public Game()
+        public Game(string bindingsFile = null)
         {
-            InputManager.Init();
+            mKeyBindingsFile = bindingsFile;
             mRegistry = new Registry();
+            InputManager.Init();
+            if (mKeyBindingsFile != null)
+            {
+                InputManager.ReadBindings(mKeyBindingsFile);
+            }
+        }
+        ~Game()
+        {
+            if (mKeyBindingsFile != null)
+            {
+                InputManager.WriteBindings(mKeyBindingsFile);
+            }
         }
         public Registry Registry
         {
@@ -41,6 +53,7 @@
             mRegistry.CreateRegister<Unit>();
         }
         private Registry mRegistry;
+        private string mKeyBindingsFile;
         private static bool debug = false;
     }
 }

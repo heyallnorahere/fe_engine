@@ -30,7 +30,7 @@ newoption {
     trigger = "framework-version",
     value = "VER",
     description = ".NET Framework version to use",
-    default = "3.5"
+    default = "4.5"
 }
 includedirs_table = {}
 libdirs_table = {}
@@ -40,6 +40,9 @@ libdirs_table["mono"] = _OPTIONS["mono-libdir"]
 cs_version = _OPTIONS["cs-version"]
 dotnet_framework_version = _OPTIONS["framework-version"]
 dotnet_assembly_path = "%{libdirs_table.mono}/mono"
+version_table = {}
+version_table["System"] = "2.0.0.0"
+version_table["SystemCore"] = "3.5.0.0"
 workspace "fe_engine-rewrite"
     architecture (architecture_)
     targetdir "bin"
@@ -91,11 +94,71 @@ project "Newtonsoft.Json"
     }
     links {
         "System",
+        "System.Core",
         "System.Data",
+        "System.Numerics",
         "System.Runtime.Serialization",
         "System.Xml",
         "System.Xml.Linq"
     }
+    filter "options:framework-version=4.5"
+        defines {
+            "HAVE_ADO_NET",
+            "HAVE_APP_DOMAIN",
+            "HAVE_ASYNC",
+            "HAVE_BIG_INTEGER",
+            "HAVE_BINARY_FORMATTER",
+            "HAVE_BINARY_SERIALIZATION",
+            "HAVE_BINARY_EXCEPTION_SERIALIZATION",
+            "HAVE_CAS",
+            "HAVE_CHAR_TO_LOWER_WITH_CULTURE",
+            "HAVE_CHAR_TO_STRING_WITH_CULTURE",
+            "HAVE_COM_ATTRIBUTES",
+            "HAVE_COMPONENT_MODEL",
+            "HAVE_CONCURRENT_COLLECTIONS",
+            "HAVE_COVARIANT_GENERICS",
+            "HAVE_DATA_CONTRACTS",
+            "HAVE_DATE_TIME_OFFSET",
+            "HAVE_DB_NULL_TYPE_CODE",
+            "HAVE_DYNAMIC",
+            "HAVE_EMPTY_TYPES",
+            "HAVE_ENTITY_FRAMEWORK",
+            "HAVE_EXPRESSIONS",
+            "HAVE_FAST_REVERSE",
+            "HAVE_FSHARP_TYPES",
+            "HAVE_FULL_REFLECTION",
+            "HAVE_GUID_TRY_PARSE",
+            "HAVE_HASH_SET",
+            "HAVE_ICLONEABLE",
+            "HAVE_ICONVERTIBLE",
+            "HAVE_IGNORE_DATA_MEMBER_ATTRIBUTE",
+            "HAVE_INOTIFY_COLLECTION_CHANGED",
+            "HAVE_INOTIFY_PROPERTY_CHANGING",
+            "HAVE_ISET",
+            "HAVE_LINQ",
+            "HAVE_MEMORY_BARRIER",
+            "HAVE_METHOD_IMPL_ATTRIBUTE",
+            "HAVE_NON_SERIALIZED_ATTRIBUTE",
+            "HAVE_READ_ONLY_COLLECTIONS",
+            "HAVE_REFLECTION_EMIT",
+            "HAVE_REGEX_TIMEOUTS",
+            "HAVE_SECURITY_SAFE_CRITICAL_ATTRIBUTE",
+            "HAVE_SERIALIZATION_BINDER_BIND_TO_NAME",
+            "HAVE_STREAM_READER_WRITER_CLOSE",
+            "HAVE_STRING_JOIN_WITH_ENUMERABLE",
+            "HAVE_TIME_SPAN_PARSE_WITH_CULTURE",
+            "HAVE_TIME_SPAN_TO_STRING_WITH_CULTURE",
+            "HAVE_TIME_ZONE_INFO",
+            "HAVE_TRACE_WRITER",
+            "HAVE_TYPE_DESCRIPTOR",
+            "HAVE_UNICODE_SURROGATE_DETECTION",
+            "HAVE_VARIANT_TYPE_PARAMETERS",
+            "HAVE_VERSION_TRY_PARSE",
+            "HAVE_XLINQ",
+            "HAVE_XML_DOCUMENT",
+            "HAVE_XML_DOCUMENT_TYPE",
+            "HAVE_CONCURRENT_DICTIONARY"
+        }
     filter "options:framework-version=3.5"
         defines {
             "NET35",
@@ -180,8 +243,16 @@ project "Newtonsoft.Json.Schema"
         "Newtonsoft.Json",
         "System",
         "System.Data",
+        "System.Numerics",
         "System.Runtime.Serialization"
     }
+    filter "options:framework-version=4.5"
+        defines {
+            "HAVE_ADO_NET",
+            "HAVE_BIG_INTEGER",
+            "HAVE_DATE_TIME_OFFSET",
+            "HAVE_FULL_REFLECTION"
+        }
     filter "options:framework-version=3.5"
         defines {
             "HAVE_ADO_NET",
@@ -205,8 +276,7 @@ project "FEEngine"
         _SCRIPT
     }
     links {
-        "Newtonsoft.Json",
-        "Newtonsoft.Json.Schema"
+        "Newtonsoft.Json"
     }
 project "host"
     location "rewrite/src/host"
@@ -232,21 +302,22 @@ project "host"
         'MONO_CS_LIBDIR="%{libdirs_table.mono}"'
     }
     postbuildcommands {
-        '{MOVE} "%{cfg.targetdir}/FEEngine.dll" "."',
-        '{MOVE} "%{cfg.targetdir}/ExampleGame.exe" "."',
-        '{MOVE} "%{cfg.targetdir}/Newtonsoft.Json.dll" "."',
-        '{MOVE} "%{cfg.targetdir}/Newtonsoft.Json.Schema.dll" "."',
-        '{COPY} "%{dotnet_assembly_path}/2.0-api/System.dll" "."',
-        '{COPY} "%{dotnet_assembly_path}/2.0-api/System.Data.dll" "."',
-        '{COPY} "%{dotnet_assembly_path}/2.0-api/System.Runtime.Serialization.dll" "."',
-        '{COPY} "%{dotnet_assembly_path}/2.0-api/System.Xml.dll" "."',
-        '{COPY} "%{dotnet_assembly_path}/2.0-api/System.Xml.Linq.dll" "."'
+        '{COPY} "%{cfg.targetdir}/../FEEngine/FEEngine.dll" "."',
+        '{COPY} "%{cfg.targetdir}/../examples/ExampleGame/ExampleGame.exe" "."',
+        '{COPY} "%{cfg.targetdir}/../dependencies/Newtonsoft.Json/Newtonsoft.Json.dll" "."',
+        '{COPY} "%{cfg.targetdir}/../dependencies/Newtonsoft.Json.Schema/Newtonsoft.Json.Schema.dll" "."',
+        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.dll" "."',
+        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Core.dll" "."',
+        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Data.dll" "."',
+        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Numerics.dll" "."',
+        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Runtime.Serialization.dll" "."',
+        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Xml.dll" "."',
+        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Xml.Linq.dll" "."',
     }
-    links {
+    dependson {
         "FEEngine",
         "ExampleGame",
-        "Newtonsoft.Json",
-        "Newtonsoft.Json.Schema"
+        "Newtonsoft.Json"
     }
     filter "configurations:Debug"
         targetsuffix "-d"

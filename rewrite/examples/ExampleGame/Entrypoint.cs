@@ -36,6 +36,7 @@ namespace ExampleGame
                 game.Registry.SerializeRegister<Map>("maps.json");
             }
             Player player = new(game);
+            Console.WriteLine("Successfully initialized!");
             game.Loop(player);
         }
     }

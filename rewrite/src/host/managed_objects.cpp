@@ -36,7 +36,7 @@ static void check_exception(std::shared_ptr<managed_object> exception) {
     std::cerr << "Message: " << message << std::endl;
     std::cerr << "Source: " << source << std::endl;
     std::cerr << "StackTrace: " << stacktrace << std::endl;
-    std::cout << "Press any key to exit" << std::endl;
+    std::cout << "Press Enter to exit" << std::endl;
     std::cin.get();
 }
 static MonoObject* call_method(MonoObject* object, MonoMethod* method, MonoDomain* domain, void** params = NULL) {
