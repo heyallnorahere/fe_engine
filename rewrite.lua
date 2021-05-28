@@ -154,7 +154,7 @@ project "host"
         "rewrite/src/%{prj.name}/**.h",
         _SCRIPT
     }
-    sysincludedirs {
+    includedirs {
         "%{includedirs_table.mono}",
         "%{includedirs_table.cxxopts}",
     }
