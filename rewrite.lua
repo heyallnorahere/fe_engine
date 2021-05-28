@@ -26,6 +26,16 @@ newoption {
     description = "C# version to compile code as",
     default = "9.0"
 }
+newoption {
+    trigger = "clear-mode",
+    value = "MODE",
+    description = "How to clear the screen each frame",
+    default = "cursor-position",
+    allowed = {
+        { "cursor-position", "Reset the cursor position" },
+        { "full-clear", "Clear every character on the screen (worse display)" }
+    }
+}
 includedirs_table = {}
 libdirs_table = {}
 includedirs_table["mono"] = _OPTIONS["mono-include"]
@@ -195,7 +205,8 @@ project "FEEngine"
         _SCRIPT
     }
     links {
-        "Newtonsoft.Json"
+        "Newtonsoft.Json",
+        "System"
     }
 project "host"
     location "rewrite/src/host"
@@ -268,6 +279,10 @@ project "host"
     filter "action:not gmake*"
         pchheader "pch.h"
         pchsource "rewrite/src/%{prj.name}/pch.cpp"
+    filter "options:clear-mode=full-clear"
+        defines {
+            "CLEAR_MODE_FULL_CLEAR"
+        }
 group ""
 group "tools"
 project "SchemaGenerator"

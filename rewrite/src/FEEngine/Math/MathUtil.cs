@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections;
 
+using System.Runtime.InteropServices;
+
 namespace FEEngine.Math
 {
-    internal class GenericVec2<T> : IVec2<T> where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct GenericVec2<T> : IVec2<T> where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
     {
         public T X { get; set; }
         public T Y { get; set; }
@@ -30,7 +33,6 @@ namespace FEEngine.Math
         {
             return new VectorEnumerator<T>(this);
         }
-        public GenericVec2() { }
         public GenericVec2(T x, T y)
         {
             X = x;
@@ -71,6 +73,27 @@ namespace FEEngine.Math
                 copy.Y = max.Y;
             }
             return copy;
+        }
+        public static bool IsVectorOutOfBounds<T>(IVec2<T> vector, IVec2<T> bounds) where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
+        {
+            if (vector.X.CompareTo(bounds.X) >= 0)
+            {
+                return true;
+            }
+            if (vector.Y.CompareTo(bounds.Y) >= 0)
+            {
+                return true;
+            }
+            T zero = (T)Convert.ChangeType(0, typeof(T));
+            if (vector.X.CompareTo(zero) < 0)
+            {
+                return true;
+            }
+            if (vector.Y.CompareTo(zero) < 0)
+            {
+                return true;
+            }
+            return false;
         }
         public static IVec2<T> AddVectors<T>(IVec2<T> v1, IVec2<T> v2) where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
         {

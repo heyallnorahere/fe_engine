@@ -7,7 +7,7 @@ using FEEngine.Math;
 namespace FEEngine
 {
     [JsonObject]
-    public class Map : RegistedObjectTemplate<Map>, IEnumerable<Unit>
+    public class Map : RegistedObjectTemplate<Map>, IEnumerable<Unit>, IRenderable
     {
         private struct Enumerator : IEnumerator<Unit>
         {
@@ -85,6 +85,10 @@ namespace FEEngine
             {
                 unit.Parent = this;
             }
+        }
+        public void Render(Renderer.Context context)
+        {
+            // todo: render
         }
         public void AddUnit(Unit unit)
         {

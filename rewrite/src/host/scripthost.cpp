@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "scripthost.h"
+#include "renderer.h"
 static void* read_file(const std::string& path, size_t& buffer_size) {
     FILE* f = fopen(path.c_str(), "rb");
     assert(f);
@@ -42,6 +43,12 @@ std::shared_ptr<managed_assembly> scripthost::load_assembly(const std::string& p
     MonoAssembly* assembly = load_assembly_from_file(path);
     return std::shared_ptr<managed_assembly>(new managed_assembly(assembly, this->m_domain));
 }
+static void register_functions(scripthost* host) {
+    host->register_function("FEEngine.Renderer::WriteColoredChar_Native", Renderer_WriteColoredChar);
+    host->register_function("FEEngine.Renderer::ClearNativeBuffer_Native", Renderer_ClearNativeBuffer);
+    host->register_function("FEEngine.Renderer::Present_Native", Renderer_Present);
+    host->register_function("FEEngine.Renderer::DisableCursor_Native", Renderer_DisableCursor);
+}
 void scripthost::init() {
     mono_set_assemblies_path(MONO_CS_LIBDIR);
     {
@@ -59,6 +66,7 @@ void scripthost::init() {
         cleanup = true;
     }
     this->m_core = std::shared_ptr<managed_assembly>(new managed_assembly(load_assembly_from_file("FEEngine.dll"), this->m_domain));
+    register_functions(this);
     if (cleanup) {
 #ifndef FEENGINE_LINUX
         mono_domain_unload(this->m_domain);

@@ -7,8 +7,10 @@
             get => debug;
             set => debug = value;
         }
+        public int CurrentMapIndex { get; set; }
         public Game(string bindingsFile = null)
         {
+            CurrentMapIndex = 0;
             mKeyBindingsFile = bindingsFile;
             mRegistry = new Registry();
             InputManager.Init();
@@ -40,12 +42,26 @@
                 {
                     break;
                 }
+                Render(player);
             }
         }
         private void Update(Player player)
         {
             InputManager.Update();
             player.Update();
+        }
+        private void Render(Player player)
+        {
+            RenderQueue renderQueue = new();
+            // render order
+            // 1. map
+            Map map = mRegistry.GetRegister<Map>()[CurrentMapIndex];
+            renderQueue.Submit(map);
+            // 2. player (cursor)
+            renderQueue.Submit(player);
+
+            renderQueue.Close();
+            Renderer.Render(renderQueue);
         }
         public void SetupRegisters()
         {

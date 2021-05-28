@@ -84,7 +84,7 @@ namespace FEEngine
                 return false;
             }
             IVec2<int> delta = MathUtil.SubVectors(newPos, Position);
-            if (MathUtil.ClampVector(delta, new Vec2I(0), MathUtil.SubVectors(Parent.Dimensions, new Vec2I(1))) != delta)
+            if (MathUtil.IsVectorOutOfBounds(newPos, Parent.Dimensions))
             {
                 return false;
             }

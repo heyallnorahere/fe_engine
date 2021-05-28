@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections;
 
+using System.Runtime.InteropServices;
+
 namespace FEEngine.Math
 {
+    [StructLayout(LayoutKind.Sequential)]
     public struct Vec2I : IVec2<int>
     {
         public int X { get; set; }
