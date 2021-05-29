@@ -81,7 +81,7 @@ namespace FEEngine
                 }
             }
         }
-        public void Render(Renderer.Context context)
+        public void Render()
         {
             if (CursorPosition.Y < Map.Height - 1)
             {
@@ -97,7 +97,7 @@ namespace FEEngine
                     }
                     cursorColor = mRed ? Color.Red : Color.Black;
                 }
-                int yOffset = context.BufferSize.Y - Map.Height;
+                int yOffset = Renderer.BufferSize.Y - Map.Height;
                 Renderer.RenderChar(MathUtil.AddVectors(CursorPosition, new Vec2I(0, yOffset + 1)), 'v', cursorColor);
             }
         }

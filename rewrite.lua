@@ -70,6 +70,10 @@ workspace "fe_engine-rewrite"
         defines {
             "FEENGINE_LINUX"
         }
+    filter "options:clear-mode=full-clear"
+        defines {
+            "CLEAR_MODE_FULL_CLEAR"
+        }
     filter "configurations:Debug"
         defines {
             "FEENGINE_DEBUG"
@@ -171,10 +175,6 @@ project "host"
     filter "action:not gmake*"
         pchheader "pch.h"
         pchsource "rewrite/src/%{prj.name}/pch.cpp"
-    filter "options:clear-mode=full-clear"
-        defines {
-            "CLEAR_MODE_FULL_CLEAR"
-        }
 group ""
 group "tools"
 project "SchemaGenerator"

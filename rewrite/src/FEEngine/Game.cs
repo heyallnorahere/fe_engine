@@ -94,12 +94,14 @@ namespace FEEngine
         {
             Renderer.ClearBuffer();
             RenderQueue renderQueue = new();
-            // render order
+            // render order:
             // 1. map
             Map map = mRegistry.GetRegister<Map>()[CurrentMapIndex];
             renderQueue.Submit(map);
             // 2. player (cursor)
             renderQueue.Submit(player);
+            // 3. uicontroller
+            renderQueue.Submit(new UIController.RenderAgent());
             renderQueue.Close();
             Renderer.Render(renderQueue);
         }

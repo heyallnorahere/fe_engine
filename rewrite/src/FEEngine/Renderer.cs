@@ -7,7 +7,7 @@ namespace FEEngine
 {
     public interface IRenderable
     {
-        void Render(Renderer.Context context);
+        void Render();
     }
     public class RenderQueue
     {
@@ -59,10 +59,6 @@ namespace FEEngine
     }
     public class Renderer
     {
-        public struct Context
-        {
-            public IVec2<int> BufferSize { get; set; }
-        }
         public static void Render(RenderQueue renderQueue)
         {
             if (renderQueue.Open)
@@ -96,6 +92,28 @@ namespace FEEngine
                 }
                 Present_Native();
             }
+            else
+            {
+#if CLEAR_MODE_FULL_CLEAR
+                Console.Clear();
+#endif
+                Console.SetCursorPosition(0, 0);
+                string text = "";
+                for (int y = bufferSize.Y - 1; y >= 0; y--)
+                {
+                    for (int x = 0; x < bufferSize.X; x++)
+                    {
+                        int bufferIndex = GetBufferIndex(new Vec2I(x, y));
+                        char character = characterBuffer[bufferIndex];
+                        text += character;
+                    }
+                    text += '\n';
+                }
+                foreach (char character in text)
+                {
+                    Console.Write(character);
+                }
+            }
         }
         public static bool RenderChar(IVec2<int> position, char character, Color color = Color.White)
         {
@@ -108,21 +126,25 @@ namespace FEEngine
             colorBuffer[bufferIndex] = color;
             return true;
         }
-        public static void ResizeBuffer(int width, int height)
+        public static IVec2<int> BufferSize
         {
-            int length = width * height;
-            int currentLength = bufferSize.X * bufferSize.Y;
-            bufferSize = new Vec2I(width, height);
-            int difference = length - currentLength;
-            if (difference > 0)
+            get => bufferSize;
+            set
             {
-                for (int i = currentLength; i < length; i++)
+                int length = value.X * value.Y;
+                int currentLength = bufferSize.X * bufferSize.Y;
+                bufferSize = value;
+                int difference = length - currentLength;
+                if (difference > 0)
                 {
-                    characterBuffer.Add((char)0);
-                    colorBuffer.Add(Color.Black);
+                    for (int i = currentLength; i < length; i++)
+                    {
+                        characterBuffer.Add((char)0);
+                        colorBuffer.Add(Color.Black);
+                    }
                 }
+                ClearBuffer();
             }
-            ClearBuffer();
         }
         public static void ClearBuffer()
         {
@@ -147,7 +169,7 @@ namespace FEEngine
             {
                 DisableCursor_Native();
             }
-            ResizeBuffer(60, 30);
+            BufferSize = new Vec2I(60, 30);
         }
         private static readonly List<char> characterBuffer = new();
         private static readonly List<Color> colorBuffer = new();

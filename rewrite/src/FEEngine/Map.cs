@@ -109,9 +109,9 @@ namespace FEEngine
             }
             return units;
         }
-        public void Render(Renderer.Context context)
+        public void Render()
         {
-            int yOffset = context.BufferSize.Y - Height;
+            int yOffset = Renderer.BufferSize.Y - Height;
             foreach (Unit unit in this)
             {
                 // todo: replace 'U' with character corresponding to the units weapon type
