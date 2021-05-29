@@ -69,6 +69,10 @@ namespace FEEngine
                 selectedUnitIndex = value.RegisterIndex;
             }
         }
+        public static void OpenUnitMenu()
+        {
+            // todo: search for unit menu, and send the open signal
+        }
         public static void ResetSelectedUnit()
         {
             selectedUnitIndex = -1;

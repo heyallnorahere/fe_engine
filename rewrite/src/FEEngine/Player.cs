@@ -75,8 +75,8 @@ namespace FEEngine
                         Unit unit = unitRegister[mSelectedIndex];
                         unit.Move(CursorPosition);
                         mSelectedIndex = -1;
-                        // todo: hand unit over to UIController, but until thats implemented, wait
-                        unit.Wait();
+                        UIController.SelectedUnit = unit;
+                        UIController.OpenUnitMenu();
                     }
                 }
             }
