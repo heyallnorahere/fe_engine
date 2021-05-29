@@ -27,6 +27,7 @@ namespace FEEngine
         public int CurrentMapIndex { get; set; }
         public Game(string bindingsFile = null)
         {
+            UIController.Init(this);
             PhaseManager = new();
             CurrentMapIndex = 0;
             mKeyBindingsFile = bindingsFile;
