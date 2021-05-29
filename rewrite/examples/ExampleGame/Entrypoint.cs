@@ -8,9 +8,10 @@ namespace ExampleGame
     public class TestUnitBehavior : IUnitBehavior
     {
         public Unit Parent { get; set; }
-        public void Update()
+        public bool Update()
         {
             Console.WriteLine("Testing...");
+            return true;
         }
     }
     public class TestItemBehavior : IItemBehavior

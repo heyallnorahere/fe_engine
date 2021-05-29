@@ -74,6 +74,10 @@ namespace FEEngine.Math
             }
             return copy;
         }
+        public static bool AreVectorsEqual<T>(IVec2<T> v1, IVec2<T> v2) where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
+        {
+            return v1.X.Equals(v2.X) && v1.Y.Equals(v2.Y);
+        }
         public static bool IsVectorOutOfBounds<T>(IVec2<T> vector, IVec2<T> bounds) where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
         {
             if (vector.X.CompareTo(bounds.X) >= 0)

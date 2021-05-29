@@ -17,5 +17,7 @@
             }
         }
         private readonly T* m;
+        public static implicit operator T(Ref<T> @ref) => @ref.Value;
+        public static implicit operator Ref<T>(T* pointer) => new(ref *pointer);
     }
 }

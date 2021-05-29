@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Runtime.CompilerServices;
 
 namespace FEEngine
@@ -22,9 +23,11 @@ namespace FEEngine
                 BreakDebugger_Native();
             }
         }
+        public PhaseManager PhaseManager { get; set; }
         public int CurrentMapIndex { get; set; }
         public Game(string bindingsFile = null)
         {
+            PhaseManager = new();
             CurrentMapIndex = 0;
             mKeyBindingsFile = bindingsFile;
             mRegistry = new Registry();
@@ -66,6 +69,26 @@ namespace FEEngine
         {
             InputManager.Update();
             player.Update();
+            Map map = mRegistry.GetRegister<Map>()[CurrentMapIndex];
+            map.Update(PhaseManager.CurrentPhase);
+            if (ShouldCyclePhase(map))
+            {
+                PhaseManager.CyclePhase(map);
+            }
+        }
+        private bool ShouldCyclePhase(Map map)
+        {
+            bool shouldCycle = true;
+            List<Unit> units = map.GetAllUnitsOfAffiliation(PhaseManager.CurrentPhase);
+            foreach (Unit unit in units)
+            {
+                if (unit.CanMove)
+                {
+                    shouldCycle = false;
+                    break;
+                }
+            }
+            return shouldCycle;
         }
         private void Render(Player player)
         {

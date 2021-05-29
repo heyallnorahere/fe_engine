@@ -6,28 +6,20 @@ namespace FEEngine
     public class Player : IRenderable
     {
         public IVec2<int> CursorPosition { get; private set; }
-        public PhaseManager PhaseManager { get; private set; }
-        public Player(Game game, int mapRegisterIndex = 0)
+        public Player(Game game)
         {
-            PhaseManager = new PhaseManager();
+            mLastColorFlip = 0.0;
+            mRed = false;
+            mSelectedIndex = -1;
             CursorPosition = new Vec2I(0);
             mGame = game;
-            try
-            {
-                Register<Map> mapRegister = mGame.Registry.GetRegister<Map>();
-                mMap = mapRegister[mapRegisterIndex];
-            }
-            catch (RegisterDoesNotExistException)
-            {
-                throw new Exception("The Game instance was not properly initialized");
-            }
         }
         public void Update()
         {
             InputManager.State state = InputManager.GetState();
-            IVec2<int> dimensions = mMap.Dimensions;
+            IVec2<int> dimensions = Map.Dimensions;
             CursorPosition = MathUtil.ClampVector(CursorPosition, new Vec2I(0), MathUtil.SubVectors(dimensions, new Vec2I(1)));
-            if (PhaseManager.CurrentPhase == Unit.UnitAffiliation.Player)
+            if (mGame.PhaseManager.CurrentPhase == Unit.UnitAffiliation.Player)
             {
                 IVec2<int> delta = new Vec2I(0);
                 if (state.Up)
@@ -46,21 +38,77 @@ namespace FEEngine
                 {
                     MathUtil.AddVectors(ref delta, new Vec2I(1, 0));
                 }
-                delta = MathUtil.SubVectors(MathUtil.ClampVector(MathUtil.AddVectors(delta, CursorPosition), new Vec2I(0), MathUtil.SubVectors(dimensions, new Vec2I(0))), CursorPosition);
-                IVec2<int> temp = CursorPosition;
-                MathUtil.AddVectors(ref temp, delta);
-                CursorPosition = temp;
+                bool canMoveCursor = true;
+                if (mSelectedIndex != -1)
+                {
+                    Register<Unit> unitRegister = mGame.Registry.GetRegister<Unit>();
+                    Unit unit = unitRegister[mSelectedIndex];
+                    int futureLength = MathUtil.AddVectors(delta, CursorPosition).TaxicabLength();
+                    canMoveCursor = futureLength <= unit.CurrentMovement;
+                }
+                if (canMoveCursor)
+                {
+                    delta = MathUtil.SubVectors(MathUtil.ClampVector(MathUtil.AddVectors(delta, CursorPosition), new Vec2I(0), MathUtil.SubVectors(dimensions, new Vec2I(0))), CursorPosition);
+                    IVec2<int> temp = CursorPosition;
+                    MathUtil.AddVectors(ref temp, delta);
+                    CursorPosition = temp;
+                }
+                if (state.OK)
+                {
+                    if (mSelectedIndex == -1)
+                    {
+                        Unit unit = Map.GetUnitAt(CursorPosition);
+                        if (unit != null)
+                        {
+                            if (unit.CanMove)
+                            {
+                                mSelectedIndex = unit.RegisterIndex;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Register<Unit> unitRegister = mGame.Registry.GetRegister<Unit>();
+                        Unit unit = unitRegister[mSelectedIndex];
+                        unit.Move(CursorPosition);
+                        mSelectedIndex = -1;
+                        // todo: hand unit over to UIController, but until thats implemented, wait
+                        unit.Wait();
+                    }
+                }
             }
         }
         public void Render(Renderer.Context context)
         {
-            if (CursorPosition.Y < mMap.Height - 1)
+            if (CursorPosition.Y < Map.Height - 1)
             {
-                int yOffset = context.BufferSize.Y - mMap.Height;
-                Renderer.RenderChar(MathUtil.AddVectors(CursorPosition, new Vec2I(0, yOffset + 1)), 'v');
+                Color cursorColor = Color.White;
+                if (mSelectedIndex != -1)
+                {
+                    double now = DateTime.Now.TimeOfDay.TotalSeconds;
+                    const double interval = 0.5;
+                    if (now - mLastColorFlip > interval)
+                    {
+                        mLastColorFlip = now;
+                        mRed = !mRed;
+                    }
+                    cursorColor = mRed ? Color.Red : Color.Black;
+                }
+                int yOffset = context.BufferSize.Y - Map.Height;
+                Renderer.RenderChar(MathUtil.AddVectors(CursorPosition, new Vec2I(0, yOffset + 1)), 'v', cursorColor);
             }
         }
-        private Map mMap;
-        private Game mGame;
+        private Map Map
+        {
+            get
+            {
+                Register<Map> mapRegister = mGame.Registry.GetRegister<Map>();
+                return mapRegister[mGame.CurrentMapIndex];
+            }
+        }
+        private double mLastColorFlip;
+        private bool mRed;
+        private int mSelectedIndex;
+        private readonly Game mGame;
     }
 }

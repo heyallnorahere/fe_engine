@@ -72,7 +72,7 @@ namespace FEEngine
         {
             foreach (Unit unit in this)
             {
-                if (unit.Position == position)
+                if (MathUtil.AreVectorsEqual(unit.Position, position))
                 {
                     return unit;
                 }
@@ -85,6 +85,29 @@ namespace FEEngine
             {
                 unit.Parent = this;
             }
+        }
+        public void Update(Unit.UnitAffiliation currentPhase)
+        {
+            List<Unit> units = GetAllUnitsOfAffiliation(currentPhase);
+            foreach (Unit unit in units)
+            {
+                if (unit.CanMove)
+                {
+                    unit.Update();
+                }
+            }
+        }
+        public List<Unit> GetAllUnitsOfAffiliation(Unit.UnitAffiliation affiliation)
+        {
+            List<Unit> units = new();
+            foreach (Unit unit in this)
+            {
+                if (unit.Affiliation == affiliation)
+                {
+                    units.Add(unit);
+                }
+            }
+            return units;
         }
         public void Render(Renderer.Context context)
         {

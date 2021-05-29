@@ -2,7 +2,7 @@
 {
     public interface IUnitBehavior
     {
-        void Update();
+        bool Update();
         Unit Parent { get; set; }
     }
 }

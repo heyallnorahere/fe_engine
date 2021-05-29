@@ -125,6 +125,17 @@ namespace FEEngine
             Position = newPos;
             return true;
         }
+        public void Wait()
+        {
+            CanMove = false;
+        }
+        public void Update()
+        {
+            if (mBehavior?.Update() ?? false)
+            {
+                CanMove = false;
+            }
+        }
         public string BehaviorName { get; set; }
         [JsonConstructor]
         public Unit(IVec2<int> position, UnitAffiliation affiliation, UnitStats stats, string behaviorName = null, string name = "Soldier")

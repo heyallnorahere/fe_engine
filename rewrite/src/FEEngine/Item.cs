@@ -38,7 +38,7 @@ namespace FEEngine
             {
                 return false;
             }
-            mBehavior.OnUse();
+            mBehavior?.OnUse();
             return true;
         }
         public Item(bool usable, string behaviorName = null, string name = "RESERVE")
