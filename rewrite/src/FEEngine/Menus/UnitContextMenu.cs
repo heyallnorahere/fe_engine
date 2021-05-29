@@ -89,20 +89,29 @@ namespace FEEngine.Menus
         }
         private class BasePage : Page
         {
-            public BasePage()
+            public BasePage(UnitContextMenu parent)
             {
                 CanGoBack = false;
+                mParent = parent;
             }
             protected override void UpdatePage()
             {
                 // todo: refresh menu items
+                InputManager.State state = InputManager.GetState();
+                if (state.Back)
+                {
+                    UIController.SelectedUnit.Move(mParent.OriginalUnitPosition, Unit.MovementType.RefundMovement);
+                    UIController.IsUnitContextMenuOpen = false;
+                }
             }
+            private readonly UnitContextMenu mParent;
             protected override string GetTitle() { return null; } // noone's gonna call this anyway
         }
         public IVec2<int> Size { get { return new Vec2I(10, 20); } }
         public UnitContextMenu()
         {
-            mBasePage = new BasePage();
+            OriginalUnitPosition = null;
+            mBasePage = new BasePage(this);
         }
         public void Update()
         {
@@ -116,6 +125,7 @@ namespace FEEngine.Menus
         {
             return mBasePage.AddChild(page);
         }
+        public IVec2<int> OriginalUnitPosition { private get; set; }
         private readonly Page mBasePage;
     }
 }
