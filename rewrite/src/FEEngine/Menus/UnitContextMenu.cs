@@ -101,6 +101,7 @@ namespace FEEngine.Menus
                 if (state.Back)
                 {
                     UIController.SelectedUnit.Move(mParent.OriginalUnitPosition, Unit.MovementType.RefundMovement);
+                    mParent.OriginalUnitPosition = null;
                     UIController.IsUnitContextMenuOpen = false;
                 }
             }

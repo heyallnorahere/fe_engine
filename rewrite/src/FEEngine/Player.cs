@@ -1,5 +1,6 @@
 ﻿using System;
 using FEEngine.Math;
+using FEEngine.Menus;
 
 namespace FEEngine
 {
@@ -73,6 +74,7 @@ namespace FEEngine
                     {
                         Register<Unit> unitRegister = mGame.Registry.GetRegister<Unit>();
                         Unit unit = unitRegister[mSelectedIndex];
+                        UIController.FindMenu<UnitContextMenu>().OriginalUnitPosition = unit.Position;
                         unit.Move(CursorPosition);
                         mSelectedIndex = -1;
                         UIController.SelectedUnit = unit;
