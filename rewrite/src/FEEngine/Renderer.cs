@@ -65,12 +65,10 @@ namespace FEEngine
             {
                 renderQueue.Close();
             }
-            Context context = new();
-            context.BufferSize = bufferSize;
             IRenderable currentObject;
             while ((currentObject = renderQueue.Pop()) != null)
             {
-                currentObject.Render(context);
+                currentObject.Render();
             }
             Present();
         }
