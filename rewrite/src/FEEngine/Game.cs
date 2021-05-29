@@ -1,4 +1,6 @@
-﻿namespace FEEngine
+﻿using System.Runtime.CompilerServices;
+
+namespace FEEngine
 {
     public class Game
     {
@@ -6,6 +8,18 @@
         {
             get => debug;
             set => debug = value;
+        }
+        public static bool HasNativeImplementation
+        {
+            get => hasNativeImplementation;
+            set => hasNativeImplementation = value;
+        }
+        public static void BreakDebugger()
+        {
+            if (Debug && HasNativeImplementation)
+            {
+                BreakDebugger_Native();
+            }
         }
         public int CurrentMapIndex { get; set; }
         public Game(string bindingsFile = null)
@@ -52,6 +66,7 @@
         }
         private void Render(Player player)
         {
+            Renderer.ClearBuffer();
             RenderQueue renderQueue = new();
             // render order
             // 1. map
@@ -72,5 +87,9 @@
         private Registry mRegistry;
         private string mKeyBindingsFile;
         private static bool debug = false;
+        private static bool hasNativeImplementation = true;
+        // native methods
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void BreakDebugger_Native();
     }
 }

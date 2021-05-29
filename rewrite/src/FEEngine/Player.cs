@@ -46,7 +46,7 @@ namespace FEEngine
                 {
                     MathUtil.AddVectors(ref delta, new Vec2I(1, 0));
                 }
-                delta = MathUtil.ClampVector(MathUtil.AddVectors(delta, CursorPosition), new Vec2I(0), MathUtil.SubVectors(dimensions, new Vec2I(0)));
+                delta = MathUtil.SubVectors(MathUtil.ClampVector(MathUtil.AddVectors(delta, CursorPosition), new Vec2I(0), MathUtil.SubVectors(dimensions, new Vec2I(0))), CursorPosition);
                 IVec2<int> temp = CursorPosition;
                 MathUtil.AddVectors(ref temp, delta);
                 CursorPosition = temp;
@@ -54,7 +54,11 @@ namespace FEEngine
         }
         public void Render(Renderer.Context context)
         {
-            // todo: render
+            if (CursorPosition.Y < mMap.Height - 1)
+            {
+                int yOffset = context.BufferSize.Y - mMap.Height;
+                Renderer.RenderChar(MathUtil.AddVectors(CursorPosition, new Vec2I(0, yOffset + 1)), 'v');
+            }
         }
         private Map mMap;
         private Game mGame;

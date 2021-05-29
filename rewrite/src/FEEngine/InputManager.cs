@@ -7,21 +7,139 @@ namespace FEEngine
 {
     public class InputManager
     {
-        public struct State
+        public class State
         {
-            public bool Up;
-            public bool Down;
-            public bool Left;
-            public bool Right;
-            public bool Quit;
+            /// <summary>
+            /// The minimum time between accepted button presses, in seconds
+            /// </summary>
+            public static double MinimumButtonInterval { get; private set; }
+            private static bool ShouldSetValue(ButtonState state, ref double t1)
+            {
+                double t0 = state.LastPressed;
+                t1 = DateTime.Now.TimeOfDay.TotalSeconds;
+                return t1 - t0 > MinimumButtonInterval;
+            }
+            public bool Up
+            {
+                get => mUp.Pressed;
+                set
+                {
+                    if (!value)
+                    {
+                        mUp.Pressed = false;
+                    }
+                    double currentTime = 0;
+                    if (ShouldSetValue(mUp, ref currentTime))
+                    {
+                        mUp.LastPressed = currentTime;
+                        mUp.Pressed = value;
+                    }
+                }
+            }
+            public bool Down
+            {
+                get => mDown.Pressed;
+                set
+                {
+                    if (!value)
+                    {
+                        mDown.Pressed = false;
+                    }
+                    double currentTime = 0;
+                    if (ShouldSetValue(mDown, ref currentTime))
+                    {
+                        mDown.LastPressed = currentTime;
+                        mDown.Pressed = value;
+                    }
+                }
+            }
+            public bool Left
+            {
+                get => mLeft.Pressed;
+                set
+                {
+                    if (!value)
+                    {
+                        mLeft.Pressed = false;
+                    }
+                    double currentTime = 0;
+                    if (ShouldSetValue(mLeft, ref currentTime))
+                    {
+                        mLeft.LastPressed = currentTime;
+                        mLeft.Pressed = value;
+                    }
+                }
+            }
+            public bool Right
+            {
+                get => mRight.Pressed;
+                set
+                {
+                    if (!value)
+                    {
+                        mRight.Pressed = false;
+                    }
+                    double currentTime = 0;
+                    if (ShouldSetValue(mRight, ref currentTime))
+                    {
+                        mRight.LastPressed = currentTime;
+                        mRight.Pressed = value;
+                    }
+                }
+            }
+            public bool Quit
+            {
+                get => mQuit.Pressed;
+                set
+                {
+                    if (!value)
+                    {
+                        mQuit.Pressed = false;
+                    }
+                    double currentTime = 0;
+                    if (ShouldSetValue(mQuit, ref currentTime))
+                    {
+                        mQuit.LastPressed = currentTime;
+                        mQuit.Pressed = value;
+                    }
+                }
+            }
             public void Reset()
             {
-                Up = false;
-                Down = false;
-                Left = false;
-                Right = false;
-                Quit = false;
+                mUp.Reset();
+                mDown.Reset();
+                mLeft.Reset();
+                mRight.Reset();
+                mQuit.Reset();
             }
+            public State()
+            {
+                mUp = new();
+                mDown = new();
+                mLeft = new();
+                mRight = new();
+                mQuit = new();
+            }
+            static State()
+            {
+                // default interval is 0.05 seconds
+                MinimumButtonInterval = 0.05;
+            }
+            private class ButtonState
+            {
+                public bool Pressed { get; set; }
+                public double LastPressed { get; set; }
+                public void Reset()
+                {
+                    Pressed = false;
+                }
+                public ButtonState()
+                {
+                    Pressed = false;
+                    LastPressed = 0;
+                }
+            }
+            private readonly ButtonState mUp, mDown, mLeft, mRight, mQuit;
         }
         [JsonObject]
         public struct KeyBindings
@@ -38,22 +156,23 @@ namespace FEEngine
             public ConsoleKey Quit { get; set; }
         }
         public static KeyBindings Bindings { get; set; }
+        private delegate void SetStateCallback();
         private static void ParseKey(ConsoleKey key)
         {
             // why am i allowed to do this
-            var keys = new Dictionary<ConsoleKey, Ref<bool>>
+            var keys = new Dictionary<ConsoleKey, SetStateCallback>
             {
-                [Bindings.Up] = new Ref<bool>(ref state.Up),
-                [Bindings.Down] = new Ref<bool>(ref state.Down),
-                [Bindings.Left] = new Ref<bool>(ref state.Left),
-                [Bindings.Right] = new Ref<bool>(ref state.Right),
-                [Bindings.Quit] = new Ref<bool>(ref state.Quit)
+                [Bindings.Up] = () => { state.Up = true; },
+                [Bindings.Down] = () => { state.Down = true; },
+                [Bindings.Left] = () => { state.Left = true; },
+                [Bindings.Right] = () => { state.Right = true; },
+                [Bindings.Quit] = () => { state.Quit = true; }
             };
             foreach (var pair in keys)
             {
                 if (key == pair.Key)
                 {
-                    pair.Value.Get() = true;
+                    pair.Value();
                 }
             }
         }

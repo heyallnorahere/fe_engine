@@ -80,18 +80,22 @@ namespace FEEngine
         }
         private static void Present()
         {
-            ClearNativeBuffer_Native();
-            for (int y = bufferSize.Y - 1; y >= 0; y--)
+            if (Game.HasNativeImplementation)
             {
-                for (int x = 0; x < bufferSize.X; x++)
+                ClearNativeBuffer_Native();
+                for (int y = bufferSize.Y - 1; y >= 0; y--)
                 {
-                    int bufferIndex = GetBufferIndex(new Vec2I(x, y));
-                    char character = characterBuffer[bufferIndex];
-                    Color color = colorBuffer[bufferIndex];
-                    WriteColoredChar_Native(character, color);
+                    for (int x = 0; x < bufferSize.X; x++)
+                    {
+                        int bufferIndex = GetBufferIndex(new Vec2I(x, y));
+                        char character = characterBuffer[bufferIndex];
+                        Color color = colorBuffer[bufferIndex];
+                        WriteColoredChar_Native(character, color);
+                    }
+                    WriteColoredChar_Native('\n', Color.White);
                 }
+                Present_Native();
             }
-            Present_Native();
         }
         public static bool RenderChar(IVec2<int> position, char character, Color color = Color.White)
         {
@@ -139,13 +143,16 @@ namespace FEEngine
         private Renderer() { }
         static Renderer()
         {
-            DisableCursor_Native();
-            ResizeBuffer(30, 10);
+            if (Game.HasNativeImplementation)
+            {
+                DisableCursor_Native();
+            }
+            ResizeBuffer(60, 30);
         }
         private static readonly List<char> characterBuffer = new();
         private static readonly List<Color> colorBuffer = new();
         private static IVec2<int> bufferSize = new Vec2I(0);
-        // native functions
+        // native methods
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void WriteColoredChar_Native(char character, Color color);
         [MethodImpl(MethodImplOptions.InternalCall)]

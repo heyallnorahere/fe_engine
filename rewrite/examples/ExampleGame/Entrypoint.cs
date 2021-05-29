@@ -25,6 +25,7 @@ namespace ExampleGame
     {
         public static void Main()
         {
+            Game.HasNativeImplementation = false;
             Main(true);
         }
         public static void Main(bool debug) // todo: add args parameter

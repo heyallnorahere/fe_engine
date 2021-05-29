@@ -43,11 +43,17 @@ std::shared_ptr<managed_assembly> scripthost::load_assembly(const std::string& p
     MonoAssembly* assembly = load_assembly_from_file(path);
     return std::shared_ptr<managed_assembly>(new managed_assembly(assembly, this->m_domain));
 }
+static void break_debugger() {
+#ifdef FEENGINE_WINDOWS
+    __debugbreak();
+#endif
+}
 static void register_functions(scripthost* host) {
     host->register_function("FEEngine.Renderer::WriteColoredChar_Native", Renderer_WriteColoredChar);
     host->register_function("FEEngine.Renderer::ClearNativeBuffer_Native", Renderer_ClearNativeBuffer);
     host->register_function("FEEngine.Renderer::Present_Native", Renderer_Present);
     host->register_function("FEEngine.Renderer::DisableCursor_Native", Renderer_DisableCursor);
+    host->register_function("FEEngine.Game::BreakDebugger_Native", break_debugger);
 }
 void scripthost::init() {
     mono_set_assemblies_path(MONO_CS_LIBDIR);
