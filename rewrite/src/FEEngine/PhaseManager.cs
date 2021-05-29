@@ -1,4 +1,6 @@
-﻿namespace FEEngine
+﻿using System.Collections.Generic;
+
+namespace FEEngine
 {
     public class PhaseManager
     {
@@ -25,12 +27,10 @@
                     CurrentPhase = Unit.UnitAffiliation.Player;
                     break;
             }
-            foreach (Unit unit in map)
+            List<Unit> units = map.GetAllUnitsOfAffiliation(CurrentPhase);
+            foreach (Unit unit in units)
             {
-                if (unit.Affiliation == CurrentPhase)
-                {
-                    unit.RefreshMovement();
-                }
+                unit.RefreshMovement();
             }
         }
     }

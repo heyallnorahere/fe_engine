@@ -38,20 +38,23 @@ namespace FEEngine
                 {
                     MathUtil.AddVectors(ref delta, new Vec2I(1, 0));
                 }
-                bool canMoveCursor = true;
-                if (mSelectedIndex != -1)
+                if (delta.TaxicabLength() > 0)
                 {
-                    Register<Unit> unitRegister = mGame.Registry.GetRegister<Unit>();
-                    Unit unit = unitRegister[mSelectedIndex];
-                    int futureLength = MathUtil.AddVectors(delta, CursorPosition).TaxicabLength();
-                    canMoveCursor = futureLength <= unit.CurrentMovement;
-                }
-                if (canMoveCursor)
-                {
-                    delta = MathUtil.SubVectors(MathUtil.ClampVector(MathUtil.AddVectors(delta, CursorPosition), new Vec2I(0), MathUtil.SubVectors(dimensions, new Vec2I(0))), CursorPosition);
-                    IVec2<int> temp = CursorPosition;
-                    MathUtil.AddVectors(ref temp, delta);
-                    CursorPosition = temp;
+                    bool canMoveCursor = true;
+                    if (mSelectedIndex != -1)
+                    {
+                        Register<Unit> unitRegister = mGame.Registry.GetRegister<Unit>();
+                        Unit unit = unitRegister[mSelectedIndex];
+                        int futureLength = MathUtil.SubVectors(MathUtil.AddVectors(delta, CursorPosition), unit.Position).TaxicabLength();
+                        canMoveCursor = futureLength <= unit.CurrentMovement;
+                    }
+                    if (canMoveCursor)
+                    {
+                        delta = MathUtil.SubVectors(MathUtil.ClampVector(MathUtil.AddVectors(delta, CursorPosition), new Vec2I(0), MathUtil.SubVectors(dimensions, new Vec2I(0))), CursorPosition);
+                        IVec2<int> temp = CursorPosition;
+                        MathUtil.AddVectors(ref temp, delta);
+                        CursorPosition = temp;
+                    }
                 }
                 if (state.OK)
                 {
