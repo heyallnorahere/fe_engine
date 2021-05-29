@@ -56,18 +56,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - name: install homebrew dependencies
+      - name: install mono
         run: |
-          brew install autoconf automake libtool pkg-config cmake python3
-      - name: pull, build, and install mono
-        run: |
-          curl -L https://download.mono-project.com/sources/mono/mono-6.12.0.122.tar.xz -o mono.tar.xz
-          tar -xvf mono.tar.xz
-          cd mono-6.12.0.122
-          ./autogen.sh
-          make -j 8
-          sudo make install
-          cd ..
+          curl -L https://download.mono-project.com/archive/6.12.0/macos-10-universal/MonoFramework-MDK-6.12.0.122.macos10.xamarin.universal.pkg -o mono.pkg
+          sudo installer -pkg mono.pkg -target /
       - name: generate makefiles
         run: |
           ./mac-genprojects.sh
