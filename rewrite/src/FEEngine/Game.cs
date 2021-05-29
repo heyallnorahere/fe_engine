@@ -27,7 +27,6 @@ namespace FEEngine
             CurrentMapIndex = 0;
             mKeyBindingsFile = bindingsFile;
             mRegistry = new Registry();
-            InputManager.Init();
             if (mKeyBindingsFile != null)
             {
                 InputManager.ReadBindings(mKeyBindingsFile);

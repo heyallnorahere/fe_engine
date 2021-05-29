@@ -159,7 +159,7 @@ namespace FEEngine
         private delegate void SetStateCallback();
         private static void ParseKey(ConsoleKey key)
         {
-            // why am i allowed to do this
+            // why am i allowed to do this (edit: im no longer using Ref<>... whoops)
             var keys = new Dictionary<ConsoleKey, SetStateCallback>
             {
                 [Bindings.Up] = () => { state.Up = true; },
@@ -176,7 +176,7 @@ namespace FEEngine
                 }
             }
         }
-        public static void Init()
+        static InputManager()
         {
             KeyBindings bindings = new();
             bindings.Up = ConsoleKey.W;

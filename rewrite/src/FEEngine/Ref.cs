@@ -9,9 +9,12 @@
                 m = pointer;
             }
         }
-        public ref T Get()
+        public ref T Value
         {
-            return ref *m;
+            get
+            {
+                return ref *m;
+            }
         }
         private readonly T* m;
     }
