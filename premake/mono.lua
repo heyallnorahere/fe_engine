@@ -5,24 +5,22 @@ local function get_windows_path_stub(architecture)
     end
     return path
 end
-local function get_unix_path_stub()
-    local path = "/usr"
-    if os.istarget("macosx") then
-        path = path .. "/local"
-    end
-    return path;
-end
+local mono_framework_path = "/Library/Frameworks/Mono.Framework"
 function determine_mono_include(architecture)
     if os.istarget("windows") then
         return get_windows_path_stub(architecture) .. "/Mono/include/mono-2.0"
+    elseif os.istarget("macosx") then
+        return mono_framework_path .. "/Headers/mono-2.0"
     else
-        return get_unix_path_stub() .. "/include/mono-2.0"
+        return "/usr/include/mono-2.0"
     end
 end
 function determine_mono_libdir(architecture)
     if os.istarget("windows") then
         return get_windows_path_stub(architecture) .. "/Mono/lib"
+    elseif os.istarget("macosx") then
+        return mono_framework_path .. "/Libraries"
     else
-        return get_unix_path_stub() .. "/lib"
+        return "/usr/lib"
     end
 end

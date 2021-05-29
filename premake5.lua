@@ -165,7 +165,8 @@ project "entrypoint"
             "z"
         }
         libdirs {
-            "/usr/local/opt/zlib/lib"
+            "/usr/local/opt/zlib/lib",
+            "/Library/Frameworks/Mono.framework/Libraries"
         }
     filter "system:linux"
         linkoptions {
