@@ -88,7 +88,12 @@ namespace FEEngine
         }
         public void Render(Renderer.Context context)
         {
-            // todo: render
+            int yOffset = context.BufferSize.Y - Height;
+            foreach (Unit unit in this)
+            {
+                // todo: replace 'U' with character corresponding to the units weapon type
+                Renderer.RenderChar(MathUtil.AddVectors(unit.Position, new Vec2I(0, yOffset)), 'U', Unit.GetColorForAffiliation(unit.Affiliation));
+            }
         }
         public void AddUnit(Unit unit)
         {

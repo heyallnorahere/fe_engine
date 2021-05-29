@@ -104,6 +104,41 @@ namespace FEEngine
                     }
                 }
             }
+            public bool OK
+            {
+                get => mOK.Pressed;
+                set
+                {
+                    if (!value)
+                    {
+                        mOK.Pressed = false;
+                    }
+                    double currentTime = 0;
+                    if (ShouldSetValue(mOK, ref currentTime))
+                    {
+                        mOK.LastPressed = currentTime;
+                        mOK.Pressed = value;
+                    }
+                }
+            }
+            public bool Back
+            {
+                get => mBack.Pressed;
+                set
+                {
+                    if (!value)
+                    {
+                        mBack.Pressed = false;
+                    }
+                    double currentTime = 0;
+                    if (ShouldSetValue(mBack, ref currentTime))
+                    {
+                        mBack.LastPressed = currentTime;
+                        mBack.Pressed = value;
+                    }
+                }
+            }
+
             public void Reset()
             {
                 mUp.Reset();
@@ -111,6 +146,8 @@ namespace FEEngine
                 mLeft.Reset();
                 mRight.Reset();
                 mQuit.Reset();
+                mOK.Reset();
+                mBack.Reset();
             }
             public State()
             {
@@ -119,6 +156,8 @@ namespace FEEngine
                 mLeft = new();
                 mRight = new();
                 mQuit = new();
+                mOK = new();
+                mBack = new();
             }
             static State()
             {
@@ -139,7 +178,7 @@ namespace FEEngine
                     LastPressed = 0;
                 }
             }
-            private readonly ButtonState mUp, mDown, mLeft, mRight, mQuit;
+            private readonly ButtonState mUp, mDown, mLeft, mRight, mQuit, mOK, mBack;
         }
         [JsonObject]
         public struct KeyBindings
@@ -154,6 +193,10 @@ namespace FEEngine
             public ConsoleKey Right { get; set; }
             [JsonConverter(typeof(StringEnumConverter))]
             public ConsoleKey Quit { get; set; }
+            [JsonConverter(typeof(StringEnumConverter))]
+            public ConsoleKey OK { get; set; }
+            [JsonConverter(typeof(StringEnumConverter))]
+            public ConsoleKey Back { get; set; }
         }
         public static KeyBindings Bindings { get; set; }
         private delegate void SetStateCallback();
@@ -166,7 +209,9 @@ namespace FEEngine
                 [Bindings.Down] = () => { state.Down = true; },
                 [Bindings.Left] = () => { state.Left = true; },
                 [Bindings.Right] = () => { state.Right = true; },
-                [Bindings.Quit] = () => { state.Quit = true; }
+                [Bindings.Quit] = () => { state.Quit = true; },
+                [Bindings.OK] = () => { state.OK = true; },
+                [Bindings.Back] = () => { state.Back = true; }
             };
             foreach (var pair in keys)
             {
@@ -184,6 +229,8 @@ namespace FEEngine
             bindings.Left = ConsoleKey.A;
             bindings.Right = ConsoleKey.D;
             bindings.Quit = ConsoleKey.Q;
+            bindings.OK = ConsoleKey.Enter;
+            bindings.Back = ConsoleKey.Escape;
             Bindings = bindings;
         }
         internal static void Update()

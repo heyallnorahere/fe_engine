@@ -77,7 +77,6 @@ namespace FEEngine
             renderQueue.Submit(map);
             // 2. player (cursor)
             renderQueue.Submit(player);
-
             renderQueue.Close();
             Renderer.Render(renderQueue);
         }

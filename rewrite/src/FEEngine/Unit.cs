@@ -17,6 +17,22 @@ namespace FEEngine
             ThirdEnemy,
             Ally
         }
+        public static Color GetColorForAffiliation(UnitAffiliation affiliation)
+        {
+            switch (affiliation)
+            {
+                case UnitAffiliation.Player:
+                    return Color.Blue;
+                case UnitAffiliation.Enemy:
+                    return Color.Red;
+                case UnitAffiliation.ThirdEnemy:
+                    return Color.Yellow;
+                case UnitAffiliation.Ally:
+                    return Color.Green;
+                default:
+                    return Color.White;
+            }
+        }
         public enum MovementType
         {
             ConsumeMovement,

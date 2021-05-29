@@ -46,7 +46,13 @@ namespace SchemaGenerator
             WriteSchema<Register<Item>>("Items");
             WriteSchema<InputManager.KeyBindings>();
         }
+        private static JSchemaGenerator CreateGenerator()
+        {
+            JSchemaGenerator jSchemaGenerator = new();
+            jSchemaGenerator.GenerationProviders.Add(new StringEnumGenerationProvider());
+            return jSchemaGenerator;
+        }
         private static Settings settings;
-        private static readonly JSchemaGenerator generator = new();
+        private static readonly JSchemaGenerator generator = CreateGenerator();
     }
 }
