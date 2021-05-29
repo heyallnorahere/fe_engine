@@ -76,14 +76,14 @@ namespace FEEngine
                         unit.Move(CursorPosition);
                         mSelectedIndex = -1;
                         UIController.SelectedUnit = unit;
-                        UIController.OpenUnitMenu();
+                        UIController.IsUnitContextMenuOpen = true;
                     }
                 }
             }
         }
         public void Render()
         {
-            if (CursorPosition.Y < Map.Height - 1)
+            if (CursorPosition.Y < Map.Height - 1 && !UIController.IsUnitContextMenuOpen)
             {
                 Color cursorColor = Color.White;
                 if (mSelectedIndex != -1)

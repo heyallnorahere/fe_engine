@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using FEEngine.Math;
+using FEEngine.Menus;
 
 namespace FEEngine
 {
@@ -69,10 +70,7 @@ namespace FEEngine
                 selectedUnitIndex = value.RegisterIndex;
             }
         }
-        public static void OpenUnitMenu()
-        {
-            // todo: search for unit menu, and send the open signal
-        }
+        public static bool IsUnitContextMenuOpen { get; set; }
         public static void ResetSelectedUnit()
         {
             selectedUnitIndex = -1;
@@ -96,7 +94,9 @@ namespace FEEngine
         public static void Init(Game game)
         {
             gameInstance = game;
+            IsUnitContextMenuOpen = false;
             initialized = true;
+            AddMenu<UnitContextMenu>();
         }
         private static Game gameInstance;
         private static bool initialized = false;

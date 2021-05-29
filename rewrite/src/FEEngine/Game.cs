@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
+using FEEngine.Menus;
 
 namespace FEEngine
 {
@@ -69,7 +70,14 @@ namespace FEEngine
         private void Update(Player player)
         {
             InputManager.Update();
-            player.Update();
+            if (UIController.IsUnitContextMenuOpen)
+            {
+                UIController.FindMenu<UnitContextMenu>().Update();
+            }
+            else
+            {
+                player.Update();
+            }
             Map map = mRegistry.GetRegister<Map>()[CurrentMapIndex];
             map.Update(PhaseManager.CurrentPhase);
             if (ShouldCyclePhase(map))

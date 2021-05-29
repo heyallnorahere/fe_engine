@@ -124,6 +124,17 @@ namespace FEEngine
             colorBuffer[bufferIndex] = color;
             return true;
         }
+        public static bool RenderString(IVec2<int> position, string text, Color color = Color.White)
+        {
+            foreach (char character in text)
+            {
+                if (!RenderChar(position, character, color))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
         public static IVec2<int> BufferSize
         {
             get => bufferSize;
