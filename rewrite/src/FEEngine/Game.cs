@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace FEEngine
 {
@@ -29,7 +30,10 @@ namespace FEEngine
             mRegistry = new Registry();
             if (mKeyBindingsFile != null)
             {
-                InputManager.ReadBindings(mKeyBindingsFile);
+                if (File.Exists(mKeyBindingsFile))
+                {
+                    InputManager.ReadBindings(mKeyBindingsFile);
+                }
             }
         }
         ~Game()

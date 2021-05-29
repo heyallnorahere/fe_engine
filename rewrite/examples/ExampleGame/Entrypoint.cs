@@ -31,17 +31,17 @@ namespace ExampleGame
         public static void Main(bool debug) // todo: add args parameter
         {
             Game.Debug = debug;
-            Game game = new Game();
-            game.SetupRegisters();
             if (!Directory.Exists("data"))
             {
                 Directory.CreateDirectory("data");
             }
+            Game game = new("data/bindings.json");
+            game.SetupRegisters();
             InitRegister<Item>("data/items.json", game);
             InitRegister<Unit>("data/units.json", game);
             InitRegister<Map>("data/maps.json", game, () =>
             {
-                var map = new Map(20, 10);
+                Map map = new(20, 10);
                 game.Registry.GetRegister<Map>().Add(map);
                 return true;
             });
