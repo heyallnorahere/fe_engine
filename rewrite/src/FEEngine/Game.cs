@@ -5,18 +5,30 @@ using FEEngine.Menus;
 
 namespace FEEngine
 {
+    /// <summary>
+    /// An object that oversees the entire game's state
+    /// </summary>
     public class Game
     {
+        /// <summary>
+        /// Whether the game is in debug mode; enables functions such as <see cref="BreakDebugger"/>
+        /// </summary>
         public static bool Debug
         {
             get => debug;
             set => debug = value;
         }
+        /// <summary>
+        /// Whether the game is being run from the C++ host application
+        /// </summary>
         public static bool HasNativeImplementation
         {
             get => hasNativeImplementation;
             set => hasNativeImplementation = value;
         }
+        /// <summary>
+        /// Breaks the debugger; only available when both <see cref="Debug"/> and <see cref="HasNativeImplementation"/> are set to "true"
+        /// </summary>
         public static void BreakDebugger()
         {
             if (Debug && HasNativeImplementation)
@@ -24,7 +36,13 @@ namespace FEEngine
                 BreakDebugger_Native();
             }
         }
+        /// <summary>
+        /// The game's <see cref="FEEngine.PhaseManager"/>
+        /// </summary>
         public PhaseManager PhaseManager { get; private set; }
+        /// <summary>
+        /// The index of the current <see cref="Map"/> that is being played
+        /// </summary>
         public int CurrentMapIndex { get; set; }
         public Game(string bindingsFile = null)
         {
@@ -49,6 +67,9 @@ namespace FEEngine
                 InputManager.WriteBindings(mKeyBindingsFile);
             }
         }
+        /// <summary>
+        /// The game's <see cref="FEEngine.Registry"/>
+        /// </summary>
         public Registry Registry
         {
             get
@@ -56,6 +77,9 @@ namespace FEEngine
                 return mRegistry;
             }
         }
+        /// <summary>
+        /// The game's <see cref="FEEngine.Renderer"/>
+        /// </summary>
         public Renderer Renderer
         {
             get
@@ -63,6 +87,10 @@ namespace FEEngine
                 return mRenderer;
             }
         }
+        /// <summary>
+        /// Starts the game loop
+        /// </summary>
+        /// <param name="player">The <see cref="Player"/> object</param>
         public void Loop(Player player)
         {
             while (true)
@@ -112,6 +140,9 @@ namespace FEEngine
             Renderer.ClearBuffer();
             Renderer.Render();
         }
+        /// <summary>
+        /// Initializes the standard registers
+        /// </summary>
         public void SetupRegisters()
         {
             mRegistry.CreateRegister<Map>();
