@@ -1,21 +1,55 @@
 newoption {
-    trigger = "pathfinder",
-    value = "algorithm",
-    description = "Choose an algorithm for pathfinding",
-    default = "astar",
-    allowed = {
-        { "astar", "A*" }
-    }
-}
-newoption {
     trigger = "architecture",
     value = "ARCH",
-    description = "Architecture to target",
+    description = "The architecture to target",
     default = "x64"
 }
+architecture_ = _OPTIONS["architecture"]
+include "premake/mono.lua"
+default_mono_includedir = determine_mono_include(architecture_)
+default_mono_libdir = determine_mono_libdir(architecture_)
+newoption {
+    trigger = "mono-include",
+    value = "PATH",
+    description = "The path to the Mono include directory",
+    default = (default_mono_includedir)
+}
+newoption {
+    trigger = "mono-libdir",
+    value = "PATH",
+    description = "The path to the Mono library directory",
+    default = (default_mono_libdir)
+}
+newoption {
+    trigger = "cs-version",
+    value = "VER",
+    description = "C# version to compile code as",
+    default = "9.0"
+}
+newoption {
+    trigger = "clear-mode",
+    value = "MODE",
+    description = "How to clear the screen each frame",
+    default = "cursor-position",
+    allowed = {
+        { "cursor-position", "Reset the cursor position" },
+        { "full-clear", "Clear every character on the screen (worse display)" }
+    }
+}
+includedirs_table = {}
+libdirs_table = {}
+includedirs_table["mono"] = _OPTIONS["mono-include"]
+includedirs_table["cxxopts"] = "vendor/submodules/cxxopts/include"
+libdirs_table["mono"] = _OPTIONS["mono-libdir"]
+cs_version = _OPTIONS["cs-version"]
+dotnet_framework_version = "4.5" -- sorry, option removed
+dotnet_assembly_path = "%{libdirs_table.mono}/mono"
+version_table = {}
+version_table["System"] = "2.0.0.0"
+version_table["SystemCore"] = "3.5.0.0"
 workspace "fe_engine"
-    architecture (_OPTIONS["architecture"])
-    targetdir "build"
+    architecture (architecture_)
+    targetdir "bin"
     configurations {
         "Debug",
         "Release"
@@ -23,7 +57,7 @@ workspace "fe_engine"
     flags {
         "MultiProcessorCompile"
     }
-    startproject "entrypoint"
+    startproject "host"
     filter "system:windows"
         defines {
             "FEENGINE_WINDOWS"
@@ -36,143 +70,145 @@ workspace "fe_engine"
         defines {
             "FEENGINE_LINUX"
         }
+    filter "options:clear-mode=full-clear"
+        defines {
+            "CLEAR_MODE_FULL_CLEAR"
+        }
     filter "configurations:Debug"
         defines {
             "FEENGINE_DEBUG"
         }
+        symbols "on"
     filter "configurations:Release"
         defines {
             "FEENGINE_RELEASE"
         }
+        optimize "on"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+include "premake/dependencies"
 group "engine"
-project "engine"
-    location "engine"
-    kind "StaticLib"
-    language "C++"
-    cppdialect "C++17"
-    staticruntime "on"
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
-    files {
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp",
-        "%{prj.name}/include/**.h",
-    }
-    includedirs {
-        "%{prj.name}/include"
-    }
-    sysincludedirs {
-        "vendor/include",
-        "vendor/submodules/json/include",
-        "vendor/other/discord-game-sdk/include"
-    }
-    filter "system:windows"
-        files {
-            "vendor/other/discord-game-sdk/src/**.cpp",
-            "vendor/other/discord-game-sdk/src/**.h",
-            "vendor/other/discord-game-sdk/include/**.h",    
-        }
-        links {
-            "vendor/binaries/windows/%{cfg.buildcfg}/lib/*.lib",
-            "vendor/binaries/%{cfg.system}/other/lib/*.lib"
-        }
-    filter "options:pathfinder=astar"
-        defines {
-            "FEENGINE_PATHFINDING_ALGORITHM_ASTAR"
-        }
-    filter "configurations:Debug"
-        symbols "On"
-    filter "configurations:Release"
-        optimize "On"
-project "scriptcore"
-    location "scriptcore"
+project "FEEngine"
+    location "src/FEEngine"
     kind "SharedLib"
     language "C#"
+    csversion (cs_version)
+    framework (dotnet_framework_version)
+    clr "unsafe"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
     files {
-        "%{prj.name}/src/**.cs"
-    }
-group ""
-group "examples"
-project "sample-scripts"
-    location "sample-scripts"
-    kind "SharedLib"
-    language "C#"
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
-    files {
-        "%{prj.name}/src/**.cs"
+        "src/%{prj.name}/**.cs",
+        _SCRIPT
     }
     links {
-        "scriptcore"
+        "Newtonsoft.Json",
+        "System"
     }
-project "entrypoint"
-    location "entrypoint"
+project "host"
+    location "src/host"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
     staticruntime "on"
-    targetname "demo"
+    targetname "FEEngine"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
     files {
-        "%{prj.name}/src/**.h",
-        "%{prj.name}/src/**.cpp",
-        "%{prj.name}/data/**.json",
-        _SCRIPT
+        "src/%{prj.name}/**.cpp",
+        "src/%{prj.name}/**.h"
     }
-    sysincludedirs {
-        "engine/include",
-        "vendor/submodules/json/include"
+    includedirs {
+        "%{includedirs_table.mono}",
+        "%{includedirs_table.cxxopts}",
+    }
+    libdirs {
+        "%{libdirs_table.mono}",
+    }
+    defines {
+        'MONO_CS_LIBDIR="%{libdirs_table.mono}"'
+    }
+    postbuildcommands {
+        '{MOVE} "%{cfg.targetdir}/FEEngine.dll" "."',
+        '{MOVE} "%{cfg.targetdir}/ExampleGame.exe" "."',
+        '{MOVE} "%{cfg.targetdir}/Newtonsoft.Json.dll" "."',
+        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.dll" "."',
+        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Core.dll" "."',
+        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Data.dll" "."',
+        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Numerics.dll" "."',
+        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Runtime.Serialization.dll" "."',
+        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Xml.dll" "."',
+        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Xml.Linq.dll" "."',
     }
     links {
-        "engine"
-    }
-    dependson {
-        "scriptcore",
-        "sample-scripts"
+        "FEEngine",
+        "ExampleGame",
+        "Newtonsoft.Json"
     }
     filter "configurations:Debug"
-        symbols "On"
-    filter "configurations:Release"
-        optimize "On"
+        targetsuffix "-d"
     filter "system:windows"
-        prelinkcommands {
-            'del /q "script-assemblies\\*.dll"',
+        links {
+            "mono-2.0-sgen.lib"
+        }
+        defines {
+            "_CRT_SECURE_NO_WARNINGS"
         }
         postbuildcommands {
-            '{COPY} "../vendor/binaries/windows/%{cfg.buildcfg}/bin/*.dll" "%{cfg.targetdir}\\"',
-            '{COPY} "../vendor/binaries/windows/other/bin/*.dll" "%{cfg.targetdir}\\"',
-            '{COPY} "%{cfg.targetdir}/../scriptcore/scriptcore.dll" "script-assemblies\\"',
-            '{COPY} "%{cfg.targetdir}/../sample-scripts/sample-scripts.dll" "script-assemblies\\"'
-        }
-    filter "system:not windows"
-        postbuildcommands {
-            '{COPY} "%{cfg.targetdir}/../scriptcore/scriptcore.dll" "script-assemblies/"',
-            '{COPY} "%{cfg.targetdir}/../sample-scripts/sample-scripts.dll" "script-assemblies/"'
+            '{COPY} "%{libdirs_table.mono}/../bin/mono-2.0-sgen.dll" "%{cfg.targetdir}"',
         }
     filter "system:not windows"
         links {
             "monosgen-2.0"
-        }
-        libdirs {
-            "/usr/local/lib",
         }
     filter "system:macosx"
         links {
             "z"
         }
         libdirs {
-            "/usr/local/opt/zlib/lib",
-            "/Library/Frameworks/Mono.framework/Libraries"
+            "/usr/local/opt/zlib/lib"
         }
     filter "system:linux"
-        linkoptions {
-            "-pthread"
-        }
         links {
+            "pthread",
             "stdc++fs"
         }
+    filter "action:not gmake*"
+        pchheader "pch.h"
+        pchsource "src/%{prj.name}/pch.cpp"
+group ""
+group "tools"
+project "SchemaGenerator"
+    location "src/SchemaGenerator"
+    kind "ConsoleApp"
+    language "C#"
+    csversion (cs_version)
+    framework (dotnet_framework_version)
+    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+    files {
+        "src/%{prj.name}/**.cs"
+    }
+    links {
+        "FEEngine",
+        "Newtonsoft.Json",
+        "Newtonsoft.Json.Schema",
+        "System"
+    }
+group ""
+group "examples"
+project "ExampleGame"
+    location "examples/ExampleGame"
+    kind "ConsoleApp"
+    language "C#"
+    csversion (cs_version)
+    framework (dotnet_framework_version)
+    targetdir ("bin/" .. outputdir .. "/examples/%{prj.name}")
+    objdir ("bin-int/" .. outputdir .. "/examples/%{prj.name}")
+    files {
+        "examples/%{prj.name}/**.cs"
+    }
+    links {
+        "FEEngine",
+        "System"
+    }
 group ""

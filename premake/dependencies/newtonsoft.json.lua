@@ -1,11 +1,11 @@
 project "Newtonsoft.Json"
-    location "../../rewrite/dependencies"
+    location "../../dependencies"
     kind "SharedLib"
     language "C#"
     csversion (cs_version)
     framework (dotnet_framework_version)
-    targetdir ("../../bin/" .. outputdir .. "/rewrite/dependencies/%{prj.name}")
-    objdir ("../../bin-int/" .. outputdir .. "/rewrite/dependencies/%{prj.name}")
+    targetdir ("../../bin/" .. outputdir .. "/dependencies/%{prj.name}")
+    objdir ("../../bin-int/" .. outputdir .. "/dependencies/%{prj.name}")
     files {
         "../../vendor/submodules/%{prj.name}/Src/%{prj.name}/**.cs"
     }
