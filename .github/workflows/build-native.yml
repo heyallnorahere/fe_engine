@@ -1,4 +1,4 @@
-name: build
+name: build-native
 on: [ push ]
 jobs:
   ubuntu-build:
