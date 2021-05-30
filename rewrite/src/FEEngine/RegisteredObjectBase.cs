@@ -2,6 +2,10 @@
 
 namespace FEEngine
 {
+    /// <summary>
+    /// A template class for <see cref="IRegisteredObject{T}"/>
+    /// </summary>
+    /// <typeparam name="T">The derived class</typeparam>
     public abstract class RegisteredObjectBase<T> : IRegisteredObject<T> where T : RegisteredObjectBase<T>, IRegisteredObject<T>
     {
         [JsonIgnore]

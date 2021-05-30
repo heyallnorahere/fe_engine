@@ -6,6 +6,9 @@ using FEEngine.Math;
 
 namespace FEEngine
 {
+    /// <summary>
+    /// The object through which <see cref="Unit"/>s interact
+    /// </summary>
     [JsonObject]
     public class Map : RegisteredObjectBase<Map>, IEnumerable<Unit>, IRenderable
     {
@@ -52,8 +55,17 @@ namespace FEEngine
             private int mPosition;
             private Map mParent;
         }
+        /// <summary>
+        /// The width of the <see cref="Map"/>
+        /// </summary>
         public int Width { get; set; }
+        /// <summary>
+        /// The height of the <see cref="Map"/>
+        /// </summary>
         public int Height { get; set; }
+        /// <summary>
+        /// The culmination <see cref="Width"/> and <see cref="Height"/>
+        /// </summary>
         [JsonIgnore]
         public IVec2<int> Dimensions
         {
@@ -67,10 +79,18 @@ namespace FEEngine
                 Height = value.Y;
             }
         }
+        /// <summary>
+        /// A list of <see cref="Register{T}"/> indices that point to active <see cref="Unit"/>. DO NOT add units through this; use <see cref="AddUnit(Unit)"/>
+        /// </summary>
         public List<int> Units { get; set; }
         [JsonIgnore]
-        public Player Player { get; set; }
+        internal Player Player { get; set; }
         public IVec2<int> MinSize { get => Dimensions; }
+        /// <summary>
+        /// Finds a <see cref="Unit"/> at the specified position
+        /// </summary>
+        /// <param name="position">The position to search at</param>
+        /// <returns>A <see cref="Unit"/> object if found; otherwise, null</returns>
         public Unit GetUnitAt(IVec2<int> position)
         {
             foreach (Unit unit in this)
@@ -89,7 +109,7 @@ namespace FEEngine
                 unit.Parent = this;
             }
         }
-        public void Update(Unit.UnitAffiliation currentPhase)
+        internal void Update(Unit.UnitAffiliation currentPhase)
         {
             List<Unit> units = GetAllUnitsOfAffiliation(currentPhase);
             foreach (Unit unit in units)
@@ -100,6 +120,11 @@ namespace FEEngine
                 }
             }
         }
+        /// <summary>
+        /// Gets all <see cref="Unit"/>s on the map of the specified affiliation
+        /// </summary>
+        /// <param name="affiliation">See summary</param>
+        /// <returns>See summary</returns>
         public List<Unit> GetAllUnitsOfAffiliation(Unit.UnitAffiliation affiliation)
         {
             List<Unit> units = new();
@@ -121,6 +146,10 @@ namespace FEEngine
             }
             Player.Render(context);
         }
+        /// <summary>
+        /// Adds a <see cref="Unit"/> to the list of units
+        /// </summary>
+        /// <param name="unit">The <see cref="Unit"/> to add</param>
         public void AddUnit(Unit unit)
         {
             unit.Parent = this;
@@ -136,7 +165,7 @@ namespace FEEngine
         }
         public void SetSize(IVec2<int> size)
         {
-            // we dont care about this for niow
+            // we dont care about this for now
         }
         [JsonConstructor]
         public Map(int width, int height, List<int> units = null)

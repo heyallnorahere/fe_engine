@@ -3,6 +3,9 @@ using FEEngine.Math;
 
 namespace FEEngine
 {
+    /// <summary>
+    /// A renderable object to help position other renderable objects
+    /// </summary>
     public class BorderLayout : IRenderable
     {
         public enum Alignment
@@ -119,6 +122,11 @@ namespace FEEngine
         {
             mSize = size;
         }
+        /// <summary>
+        /// Adds an object to the <see cref="BorderLayout"/> to render after the existing children with the remaining space
+        /// </summary>
+        /// <param name="renderable">The object to add</param>
+        /// <param name="alignment">Where to place the object</param>
         public void AddChild(IRenderable renderable, Alignment alignment)
         {
             mChildren.Add(new ChildAlignmentPair()

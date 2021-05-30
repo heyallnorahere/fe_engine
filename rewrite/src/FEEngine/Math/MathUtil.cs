@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections;
-
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace FEEngine.Math
@@ -29,9 +29,13 @@ namespace FEEngine.Math
         {
             return MathUtil.Add<T, T, T>(MathUtil.Abs(X), MathUtil.Abs(Y));
         }
-        public IEnumerator GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
             return new VectorEnumerator<T>(this);
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
         public GenericVec2(T x, T y)
         {

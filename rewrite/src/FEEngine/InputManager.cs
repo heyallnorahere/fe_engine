@@ -5,8 +5,14 @@ using Newtonsoft.Json.Converters;
 
 namespace FEEngine
 {
+    /// <summary>
+    /// The class that handles all the inputs
+    /// </summary>
     public class InputManager
     {
+        /// <summary>
+        /// An object that specifies which buttons have been pressed
+        /// </summary>
         public class State
         {
             /// <summary>
@@ -19,6 +25,9 @@ namespace FEEngine
                 t1 = DateTime.Now.TimeOfDay.TotalSeconds;
                 return t1 - t0 > MinimumButtonInterval;
             }
+            /// <summary>
+            /// The button that corresponds to the "Up" binding
+            /// </summary>
             public bool Up
             {
                 get => mUp.Pressed;
@@ -36,6 +45,9 @@ namespace FEEngine
                     }
                 }
             }
+            /// <summary>
+            /// The button that corresponds to the "Down" binding
+            /// </summary>
             public bool Down
             {
                 get => mDown.Pressed;
@@ -53,6 +65,9 @@ namespace FEEngine
                     }
                 }
             }
+            /// <summary>
+            /// The button that corresponds to the "Left" binding
+            /// </summary>
             public bool Left
             {
                 get => mLeft.Pressed;
@@ -70,6 +85,9 @@ namespace FEEngine
                     }
                 }
             }
+            /// <summary>
+            /// The button that corresponds to the "Right" binding
+            /// </summary>
             public bool Right
             {
                 get => mRight.Pressed;
@@ -87,6 +105,9 @@ namespace FEEngine
                     }
                 }
             }
+            /// <summary>
+            /// The button that corresponds to the "Quit" binding
+            /// </summary>
             public bool Quit
             {
                 get => mQuit.Pressed;
@@ -104,6 +125,9 @@ namespace FEEngine
                     }
                 }
             }
+            /// <summary>
+            /// The button that corresponds to the "OK" binding
+            /// </summary>
             public bool OK
             {
                 get => mOK.Pressed;
@@ -121,6 +145,9 @@ namespace FEEngine
                     }
                 }
             }
+            /// <summary>
+            /// The button that corresponds to the "Back" binding
+            /// </summary>
             public bool Back
             {
                 get => mBack.Pressed;
@@ -138,8 +165,7 @@ namespace FEEngine
                     }
                 }
             }
-
-            public void Reset()
+            internal void Reset()
             {
                 mUp.Reset();
                 mDown.Reset();
@@ -149,7 +175,7 @@ namespace FEEngine
                 mOK.Reset();
                 mBack.Reset();
             }
-            public State()
+            internal State()
             {
                 mUp = new();
                 mDown = new();
@@ -183,21 +209,45 @@ namespace FEEngine
         [JsonObject]
         public struct KeyBindings
         {
+            /// <summary>
+            /// Default: <see cref="ConsoleKey.W"/>
+            /// </summary>
             [JsonConverter(typeof(StringEnumConverter))]
             public ConsoleKey Up { get; set; }
+            /// <summary>
+            /// Default: <see cref="ConsoleKey.S"/>
+            /// </summary>
             [JsonConverter(typeof(StringEnumConverter))]
             public ConsoleKey Down { get; set; }
+            /// <summary>
+            /// Default: <see cref="ConsoleKey.A"/>
+            /// </summary>
             [JsonConverter(typeof(StringEnumConverter))]
             public ConsoleKey Left { get; set; }
+            /// <summary>
+            /// Default: <see cref="ConsoleKey.D"/>
+            /// </summary>
             [JsonConverter(typeof(StringEnumConverter))]
             public ConsoleKey Right { get; set; }
+            /// <summary>
+            /// Default: <see cref="ConsoleKey.Q"/>
+            /// </summary>
             [JsonConverter(typeof(StringEnumConverter))]
             public ConsoleKey Quit { get; set; }
+            /// <summary>
+            /// Default: <see cref="ConsoleKey.Enter"/>
+            /// </summary>
             [JsonConverter(typeof(StringEnumConverter))]
             public ConsoleKey OK { get; set; }
+            /// <summary>
+            /// Default: <see cref="ConsoleKey.Escape"/>
+            /// </summary>
             [JsonConverter(typeof(StringEnumConverter))]
             public ConsoleKey Back { get; set; }
         }
+        /// <summary>
+        /// The current <see cref="KeyBindings"/>
+        /// </summary>
         public static KeyBindings Bindings { get; set; }
         private delegate void SetStateCallback();
         private static void ParseKey(ConsoleKey key)
@@ -242,19 +292,31 @@ namespace FEEngine
                 ParseKey(keyInfo.Key);
             }
         }
+        /// <summary>
+        /// Gets the current <see cref="State"/>
+        /// </summary>
+        /// <returns>The current <see cref="State"/></returns>
         public static State GetState()
         {
             return state;
         }
+        /// <summary>
+        /// Reads the bindings from the specified JSON file
+        /// </summary>
+        /// <param name="path">The path of the file to read from</param>
         public static void ReadBindings(string path)
         {
             Bindings = JsonSerializer.Deserialize<KeyBindings>(path);
         }
+        /// <summary>
+        /// Writes the bindings to the specified JSON file
+        /// </summary>
+        /// <param name="path">The path of the file to write to</param>
         public static void WriteBindings(string path)
         {
             JsonSerializer.Serialize(path, Bindings);
         }
         private InputManager() { }
-        private static State state = new();
+        private readonly static State state = new();
     }
 }

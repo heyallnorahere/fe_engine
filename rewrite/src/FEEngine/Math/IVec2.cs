@@ -11,8 +11,18 @@ namespace FEEngine.Math
     [JsonObject]
     public interface IVec2<T> : IVector<T> where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
     {
+        /// <summary>
+        /// The X, or R, field of a vector
+        /// </summary>
         T X { get; set; }
+        /// <summary>
+        /// The Y, or G, field of a vector
+        /// </summary>
         T Y { get; set; }
+        /// <summary>
+        /// Calculates the taxicab length of a vector
+        /// </summary>
+        /// <returns>The taxicab length</returns>
         T TaxicabLength();
     }
 }

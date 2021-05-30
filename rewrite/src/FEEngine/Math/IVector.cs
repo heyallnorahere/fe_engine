@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace FEEngine.Math
 {
-    public interface IVector<T> : IEnumerable where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
+    /// <summary>
+    /// An interface for a generic vector
+    /// </summary>
+    /// <typeparam name="T">The type of number to store</typeparam>
+    public interface IVector<T> : IEnumerable<T> where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
     {
         [JsonIgnore]
         int Count { get; }
         T this[int index] { get; }
     }
-    public struct VectorEnumerator<T> : IEnumerator where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
+    public struct VectorEnumerator<T> : IEnumerator<T> where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
     {
         public bool MoveNext()
         {
@@ -25,11 +30,22 @@ namespace FEEngine.Math
         {
             mPosition = -1;
         }
-        public object Current
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+        }
+        public T Current
         {
             get
             {
                 return mParent[mPosition];
+            }
+        }
+        object IEnumerator.Current
+        {
+            get
+            {
+                return Current;
             }
         }
         public VectorEnumerator(IVector<T> parent)

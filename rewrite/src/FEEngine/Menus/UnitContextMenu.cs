@@ -1,10 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FEEngine.Math;
 
 namespace FEEngine.Menus
 {
+    /// <summary>
+    /// A menu for controlling <see cref="Unit"/>s
+    /// </summary>
     public class UnitContextMenu : IRenderable
     {
+        /// <summary>
+        /// A page of a <see cref="UnitContextMenu"/>
+        /// </summary>
         public abstract class Page
         {
             public Page()
@@ -78,13 +85,27 @@ namespace FEEngine.Menus
                 return true;
             }
             protected virtual void OnSelect() { }
-            protected abstract void UpdatePage();
+            protected virtual void UpdatePage() { }
             protected abstract string GetTitle();
             private int mCurrentChildIndex, mCurrentSelection;
             private readonly List<Page> mChildren;
             protected Page Parent { get; private set; }
             protected List<Page> Children { get => mChildren; }
             protected bool CanGoBack { get; set; }
+            internal virtual bool IsInternal { get { return false; } }
+        }
+        private class WaitPage : Page
+        {
+            protected override string GetTitle()
+            {
+                return "Wait";
+            }
+            protected override void OnSelect()
+            {
+                UIController.SelectedUnit.Wait();
+                UIController.ResetSelectedUnit();
+                UIController.IsUnitContextMenuOpen = false;
+            }
         }
         private class BasePage : Page
         {
@@ -95,7 +116,7 @@ namespace FEEngine.Menus
             }
             protected override void UpdatePage()
             {
-                // todo: refresh menu items
+                RefreshMenuItems();
                 InputManager.State state = InputManager.GetState();
                 if (state.Back)
                 {
@@ -104,8 +125,30 @@ namespace FEEngine.Menus
                     UIController.IsUnitContextMenuOpen = false;
                 }
             }
+            private void RefreshMenuItems()
+            {
+                bool goAgain = true;
+                while (goAgain)
+                {
+                    goAgain = false;
+                    foreach (Page page in Children)
+                    {
+                        if (page.IsInternal)
+                        {
+                            goAgain = true;
+                            Children.Remove(page);
+                            break; // to stop the enumerator from throwing an exception
+                        }
+                    }
+                }
+                // todo: run calculations for pages: attack, item, etc.
+                Children.Add(new WaitPage());
+            }
             private readonly UnitContextMenu mParent;
-            protected override string GetTitle() { return null; } // noone's gonna call this anyway
+            protected override string GetTitle()
+            {
+                throw new NotImplementedException(); // noones gonna call this anyway
+            }
         }
         public IVec2<int> MinSize { get { return new Vec2I(10, 20); } }
         public UnitContextMenu()
@@ -119,7 +162,23 @@ namespace FEEngine.Menus
         }
         public void Render(RenderContext context)
         {
+            if (mRenderSize.X < MinSize.X || mRenderSize.Y < MinSize.Y)
+            {
+                return;
+            }
+            int xDifference = mRenderSize.X - MinSize.X;
+            if (xDifference % 2 > 0)
+            {
+                xDifference--;
+            }
+            int padding = xDifference / 2;
+            context.PushPair(new RenderContext.OffsetClipPair()
+            {
+                Offset = new Vec2I(padding, 0),
+                Clip = MathUtil.SubVectors(mRenderSize, new Vec2I(padding, 0))
+            });
             mBasePage.Render(context);
+            context.PopPair();
         }
         public bool AddPage(Page page)
         {
@@ -127,9 +186,10 @@ namespace FEEngine.Menus
         }
         public void SetSize(IVec2<int> size)
         {
-            throw new System.NotImplementedException();
+            mRenderSize = size;
         }
         public IVec2<int> OriginalUnitPosition { private get; set; }
+        private IVec2<int> mRenderSize;
         private readonly Page mBasePage;
     }
 }

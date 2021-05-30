@@ -1,11 +1,17 @@
 ﻿using System.Collections.Generic;
-using FEEngine.Math;
 using FEEngine.Menus;
 
 namespace FEEngine
 {
+    /// <summary>
+    /// A controller for renderable menus
+    /// </summary>
     public class UIController
     {
+        /// <summary>
+        /// Adds a new menu to the index of menus
+        /// </summary>
+        /// <typeparam name="T">The type of menu to add</typeparam>
         public static void AddMenu<T>() where T : IRenderable, new()
         {
             if (!initialized)
@@ -14,6 +20,10 @@ namespace FEEngine
             }
             menus.Add(new T());
         }
+        /// <summary>
+        /// Adds an existing menu to the index of menus
+        /// </summary>
+        /// <param name="menu">The existing menu to add</param>
         public static void AddMenu(IRenderable menu)
         {
             if (!initialized)
@@ -22,6 +32,11 @@ namespace FEEngine
             }
             menus.Add(menu);
         }
+        /// <summary>
+        /// Finds the first menu of the specified type
+        /// </summary>
+        /// <typeparam name="T">The type of menu to find</typeparam>
+        /// <returns>A menu of the specified type, or null if none was found</returns>
         public static T FindMenu<T>() where T : class, IRenderable
         {
             T menu = null;
@@ -38,6 +53,9 @@ namespace FEEngine
             }
             return menu;
         }
+        /// <summary>
+        /// The unit selected by the <see cref="Player"/> instance, to be used by the <see cref="UnitContextMenu"/>
+        /// </summary>
         public static Unit SelectedUnit
         {
             get
@@ -54,11 +72,21 @@ namespace FEEngine
                 selectedUnitIndex = value.RegisterIndex;
             }
         }
+        /// <summary>
+        /// Whether or not the <see cref="UnitContextMenu"/> is open
+        /// </summary>
         public static bool IsUnitContextMenuOpen { get; set; }
+        /// <summary>
+        /// Unselects the object referenced by <see cref="SelectedUnit"/>
+        /// </summary>
         public static void ResetSelectedUnit()
         {
             selectedUnitIndex = -1;
         }
+        /// <summary>
+        /// Initializes the <see cref="UIController"/> class
+        /// </summary>
+        /// <param name="game">The instance of the <see cref="Game"/> class</param>
         public static void Init(Game game)
         {
             gameInstance = game;

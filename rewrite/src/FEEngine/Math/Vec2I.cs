@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections;
-
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace FEEngine.Math
 {
+    /// <summary>
+    /// A default <see cref="int"/> implementation for <see cref="IVec2{T}"/>
+    /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public struct Vec2I : IVec2<int>
     {
@@ -29,9 +32,13 @@ namespace FEEngine.Math
         {
             return System.Math.Abs(X) + System.Math.Abs(Y);
         }
-        public IEnumerator GetEnumerator()
+        public IEnumerator<int> GetEnumerator()
         {
             return new VectorEnumerator<int>(this);
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
         public Vec2I(int x, int y)
         {

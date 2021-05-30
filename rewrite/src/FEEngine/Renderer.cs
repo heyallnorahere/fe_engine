@@ -5,6 +5,9 @@ using FEEngine.Math;
 
 namespace FEEngine
 {
+    /// <summary>
+    /// An interface to a renderable object
+    /// </summary>
     public interface IRenderable
     {
         void Render(RenderContext context);
@@ -22,6 +25,9 @@ namespace FEEngine
         White = 7,
         Black = 0,
     }
+    /// <summary>
+    /// An object that provides information about the available, renderable space and carries out instructions on that space
+    /// </summary>
     public class RenderContext
     {
         public RenderContext(List<char> characterBuffer, List<Color> colorBuffer, IVec2<int> bufferSize)
@@ -31,18 +37,35 @@ namespace FEEngine
             mColorBuffer = colorBuffer;
             mBufferSize = bufferSize;
         }
+        /// <summary>
+        /// A set of an offset and a clip, for positioning renderable objects
+        /// </summary>
         public struct OffsetClipPair
         {
             public IVec2<int> Offset, Clip;
         }
+        /// <summary>
+        /// Pushes a <see cref="OffsetClipPair"/> onto the stack
+        /// </summary>
+        /// <param name="pair">The <see cref="OffsetClipPair"/> to push</param>
         public void PushPair(OffsetClipPair pair)
         {
             mStack.Push(pair);
         }
+        /// <summary>
+        /// Pops a <see cref="OffsetClipPair"/> off of the stack
+        /// </summary>
         public void PopPair()
         {
             mStack.Pop();
         }
+        /// <summary>
+        /// Renders a character at the specified position with the specified <see cref="Color"/>.
+        /// </summary>
+        /// <param name="position">Where to render the character</param>
+        /// <param name="character">What character to render</param>
+        /// <param name="color">The <see cref="Color"/> to render the character as</param>
+        /// <returns></returns>
         public bool RenderChar(IVec2<int> position, char character, Color color = Color.White)
         {
             OffsetClipPair currentData = GetCurrentOffsetClipData();
@@ -55,6 +78,13 @@ namespace FEEngine
             mColorBuffer[bufferIndex] = color;
             return true;
         }
+        /// <summary>
+        /// Renders a string at the specified position with the specified <see cref="Color"/>.
+        /// </summary>
+        /// <param name="position">Where to render the text</param>
+        /// <param name="text">What text to render</param>
+        /// <param name="color">The <see cref="Color"/> to render the text as</param>
+        /// <returns></returns>
         public bool RenderString(IVec2<int> position, string text, Color color = Color.White)
         {
             foreach (char character in text)
@@ -94,7 +124,13 @@ namespace FEEngine
     }
     public class Renderer
     {
+        /// <summary>
+        /// The root renderable object
+        /// </summary>
         public BorderLayout Root { get; set; }
+        /// <summary>
+        /// Renders the root object (<see cref="Root"/>) and all of its children.
+        /// </summary>
         public void Render()
         {
             RenderContext context = new(mCharacterBuffer, mColorBuffer, mBufferSize);
@@ -143,6 +179,9 @@ namespace FEEngine
                 }
             }
         }
+        /// <summary>
+        /// The size of the allocated buffer
+        /// </summary>
         public IVec2<int> BufferSize
         {
             get => mBufferSize;
@@ -163,6 +202,9 @@ namespace FEEngine
                 ClearBuffer();
             }
         }
+        /// <summary>
+        /// Clears the <see cref="Renderer"/>'s buffer
+        /// </summary>
         public void ClearBuffer()
         {
             for (int x = 0; x < mBufferSize.X; x++)
@@ -175,6 +217,12 @@ namespace FEEngine
                 }
             }
         }
+        /// <summary>
+        /// A utility function for getting an index in a 1-dimensional array with a 2D vector
+        /// </summary>
+        /// <param name="position">The position to calculate</param>
+        /// <param name="bufferSize">The virtual 2D size of the buffer</param>
+        /// <returns>The computed index</returns>
         public static int GetBufferIndex(IVec2<int> position, IVec2<int> bufferSize)
         {
             return (position.Y * bufferSize.X) + position.X;
@@ -194,7 +242,6 @@ namespace FEEngine
         private readonly List<char> mCharacterBuffer = new();
         private readonly List<Color> mColorBuffer = new();
         private IVec2<int> mBufferSize = new Vec2I(0);
-        // native methods
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void WriteColoredChar_Native(char character, Color color);
         [MethodImpl(MethodImplOptions.InternalCall)]

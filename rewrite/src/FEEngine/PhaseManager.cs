@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-
-namespace FEEngine
+﻿namespace FEEngine
 {
+    /// <summary>
+    /// An object for keeping track of the current phase (whose turn it is)
+    /// </summary>
     public class PhaseManager
     {
         public Unit.UnitAffiliation CurrentPhase { get; private set; }
@@ -27,7 +28,7 @@ namespace FEEngine
                     CurrentPhase = Unit.UnitAffiliation.Player;
                     break;
             }
-            List<Unit> units = map.GetAllUnitsOfAffiliation(CurrentPhase);
+            var units = map.GetAllUnitsOfAffiliation(CurrentPhase);
             foreach (Unit unit in units)
             {
                 unit.RefreshMovement();

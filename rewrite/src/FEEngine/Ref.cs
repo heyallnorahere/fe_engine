@@ -1,5 +1,9 @@
 ﻿namespace FEEngine
 {
+    /// <summary>
+    /// An unsafe class for storing references to unmanaged objects
+    /// </summary>
+    /// <typeparam name="T">The type of reference to store</typeparam>
     public unsafe class Ref<T> where T : unmanaged
     {
         public Ref(ref T value)
@@ -9,6 +13,9 @@
                 m = pointer;
             }
         }
+        /// <summary>
+        /// Gets the reference from the stored pointer
+        /// </summary>
         public ref T Value
         {
             get

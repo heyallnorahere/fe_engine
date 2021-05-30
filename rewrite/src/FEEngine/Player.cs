@@ -4,6 +4,9 @@ using FEEngine.Menus;
 
 namespace FEEngine
 {
+    /// <summary>
+    /// An object that controls the <see cref="Game"/>
+    /// </summary>
     public class Player
     {
         public Player(Game game)
@@ -14,8 +17,11 @@ namespace FEEngine
             CursorPosition = new Vec2I(0);
             mGame = game;
         }
+        /// <summary>
+        /// The current cursor position on the <see cref="FEEngine.Map"/>
+        /// </summary>
         public IVec2<int> CursorPosition { get; private set; }
-        public void Update()
+        internal void Update()
         {
             if (Map.Player == null)
             {
@@ -87,7 +93,7 @@ namespace FEEngine
                 }
             }
         }
-        public void Render(RenderContext context)
+        internal void Render(RenderContext context)
         {
             if (CursorPosition.Y < Map.Height - 1 && !UIController.IsUnitContextMenuOpen)
             {

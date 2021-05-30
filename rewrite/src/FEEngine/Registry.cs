@@ -6,6 +6,10 @@ using Newtonsoft.Json.Converters;
 
 namespace FEEngine
 {
+    /// <summary>
+    /// An interface to an object stored in a <see cref="Register{T}"/>
+    /// </summary>
+    /// <typeparam name="T">The type of object</typeparam>
     [JsonObject]
     public interface IRegisteredObject<T> where T : class, IRegisteredObject<T>
     {
@@ -23,12 +27,20 @@ namespace FEEngine
     {
         public RegisterAlreadyExistsException() : base("The specified register already exists") { }
     }
+    /// <summary>
+    /// An index of <see cref="Register{T}"/> objects
+    /// </summary>
     public class Registry
     {
         public Registry()
         {
             mRegisters = new List<IRegister>();
         }
+        /// <summary>
+        /// Checks if the <see cref="Register{T}"/> of the specified type exists
+        /// </summary>
+        /// <typeparam name="T">The type of object that the register contains</typeparam>
+        /// <returns>If the specified <see cref="Register{T}"/> exists</returns>
         public bool RegisterExists<T>() where T : class, IRegisteredObject<T>
         {
             foreach (IRegister register in mRegisters)
@@ -40,6 +52,12 @@ namespace FEEngine
             }
             return false;
         }
+        /// <summary>
+        /// Retrieves the <see cref="Register{T}"/> of the specified type
+        /// </summary>
+        /// <typeparam name="T">The type of object that the register contains</typeparam>
+        /// <returns>The specified <see cref="Register{T}"/></returns>
+        /// <exception cref="RegisterDoesNotExistException"/>
         public Register<T> GetRegister<T>() where T : class, IRegisteredObject<T>
         {
             if (!RegisterExists<T>())
@@ -56,6 +74,11 @@ namespace FEEngine
             }
             return null;
         }
+        /// <summary>
+        /// Creates a register of the specified type
+        /// </summary>
+        /// <typeparam name="T">The type of object the register will hold</typeparam>
+        /// <exception cref="RegisterAlreadyExistsException"/>
         public void CreateRegister<T>() where T : class, IRegisteredObject<T>
         {
             if (RegisterExists<T>())
@@ -64,6 +87,12 @@ namespace FEEngine
             }
             mRegisters.Add(new Register<T>(this));
         }
+        /// <summary>
+        /// Serializes a register into a JSON file
+        /// </summary>
+        /// <typeparam name="T">The type of object the serialized register holds</typeparam>
+        /// <param name="jsonFilePath">The output file's path</param>
+        /// <exception cref="RegisterDoesNotExistException"/>
         public void SerializeRegister<T>(string jsonFilePath) where T : class, IRegisteredObject<T>
         {
             if (!RegisterExists<T>())
@@ -91,6 +120,11 @@ namespace FEEngine
             }
             private Registry mParent;
         }
+        /// <summary>
+        /// Deserializes a register from a JSON file
+        /// </summary>
+        /// <typeparam name="T">The type of object the deserialized register will hold</typeparam>
+        /// <param name="jsonFilePath">The input file's path</param>
         public void DeserializeRegister<T>(string jsonFilePath) where T : class, IRegisteredObject<T>
         {
             if (!RegisterExists<T>())
@@ -101,7 +135,7 @@ namespace FEEngine
             {
                 if (mRegisters[i].IsOfType<T>())
                 {
-                    mRegisters[i] = JsonSerializer.Deserialize<Register<T>>(jsonFilePath, (ref Newtonsoft.Json.JsonSerializer serializer) =>
+                    mRegisters[i] = JsonSerializer.Deserialize<Register<T>>(jsonFilePath, (Newtonsoft.Json.JsonSerializer serializer) =>
                     {
                         serializer.Converters.Add(new Converter<T>(this));
                     });
@@ -119,6 +153,10 @@ namespace FEEngine
         bool IsOfType<T>() where T : class, IRegisteredObject<T>;
         void OnDeserialization();
     }
+    /// <summary>
+    /// A glorified <see cref="List{T}"/> of <see cref="IRegisteredObject{T}"/> objects
+    /// </summary>
+    /// <typeparam name="T">The type of <see cref="IRegisteredObject{T}"/> the register holds</typeparam>
     [JsonArray]
     public class Register<T> : IRegister, IEnumerable<T>, ICollection<T> where T : class, IRegisteredObject<T>
     {
@@ -168,10 +206,18 @@ namespace FEEngine
             mElements = new List<T>();
             mRegistry = registry;
         }
+        /// <summary>
+        /// Checks if this register holds objects of the specified type
+        /// </summary>
+        /// <typeparam name="U">The type of <see cref="IRegisteredObject{T}"/> the register is checking against</typeparam>
+        /// <returns>See summary</returns>
         public bool IsOfType<U>() where U : class, IRegisteredObject<U>
         {
             return typeof(T).FullName == typeof(U).FullName;
         }
+        /// <summary>
+        /// The number of objects currently stored
+        /// </summary>
         public int Count
         {
             get
@@ -179,6 +225,9 @@ namespace FEEngine
                 return mElements.Count;
             }
         }
+        /// <summary>
+        /// The parent <see cref="Registry"/>
+        /// </summary>
         public Registry Parent
         {
             get
@@ -186,6 +235,12 @@ namespace FEEngine
                 return mRegistry;
             }
         }
+        /// <summary>
+        /// Retrieves an object at the specified index
+        /// </summary>
+        /// <param name="index">The index to search at</param>
+        /// <returns>The object found</returns>
+        /// <exception cref="IndexOutOfRangeException"/>
         public T this[int index]
         {
             get
@@ -216,11 +271,18 @@ namespace FEEngine
                 element.OnDeserialization();
             }
         }
+        /// <summary>
+        /// Adds an object to the <see cref="Register{T}"/>
+        /// </summary>
+        /// <param name="element"></param>
         public void Add(T element)
         {
             element.SetRegister(Count, this);
             mElements.Add(element);
         }
+        /// <summary>
+        /// Clears the objects from the <see cref="Register{T}"/>
+        /// </summary>
         public void Clear()
         {
             mElements.Clear();
@@ -245,7 +307,7 @@ namespace FEEngine
         {
             return GetEnumerator();
         }
-        private List<T> mElements;
-        private Registry mRegistry;
+        private readonly List<T> mElements;
+        private readonly Registry mRegistry;
     }
 }

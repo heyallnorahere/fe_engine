@@ -7,6 +7,9 @@ using FEEngine.Scripting;
 
 namespace FEEngine
 {
+    /// <summary>
+    /// A unit, to be placed on a <see cref="Map"/>
+    /// </summary>
     [JsonObject]
     public class Unit : RegisteredObjectBase<Unit>
     {
@@ -35,8 +38,17 @@ namespace FEEngine
         }
         public enum MovementType
         {
+            /// <summary>
+            /// Consumes movement points
+            /// </summary>
             ConsumeMovement,
+            /// <summary>
+            /// Does not consume any movement points
+            /// </summary>
             IgnoreMovement,
+            /// <summary>
+            /// Restores movement points
+            /// </summary>
             RefundMovement
         }
         [JsonObject]
@@ -44,20 +56,52 @@ namespace FEEngine
         {
             public int HP, Str, Mag, Dex, Spd, Lck, Def, Res, Cha, Mv;
         }
+        /// <summary>
+        /// The name of the <see cref="Unit"/>
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// The <see cref="Unit"/>'s stats
+        /// </summary>
         public UnitStats Stats { get; set; }
+        /// <summary>
+        /// The position of the <see cref="Unit"/> on the map
+        /// </summary>
         public IVec2<int> Position { get; private set; }
+        /// <summary>
+        /// A list, containing <see cref="Register{T}"/> indexes of <see cref="Item"/>s
+        /// </summary>
         public List<int> Inventory { get; private set; }
+        /// <summary>
+        /// How many tiles the <see cref="Unit"/> can move, until the next turn
+        /// </summary>
         [JsonIgnore]
         public int CurrentMovement { get; private set; }
+        /// <summary>
+        /// Whether or not the <see cref="Unit"/> can move
+        /// </summary>
         [JsonIgnore]
         public bool CanMove { get; private set; }
+        /// <summary>
+        /// The <see cref="Unit"/>'s current HP (hit points)
+        /// </summary>
         [JsonIgnore]
         public int CurrentHP { get; private set; }
+        /// <summary>
+        /// The allegiance of the <see cref="Unit"/>
+        /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
         public UnitAffiliation Affiliation { get; set; }
+        /// <summary>
+        /// The <see cref="Map"/> the <see cref="Unit"/> was placed on
+        /// </summary>
         [JsonIgnore]
         public Map Parent { get; set; }
+        /// <summary>
+        /// Attaches a <see cref="IUnitBehavior"/> onto the unit
+        /// </summary>
+        /// <typeparam name="B">The type of <see cref="IUnitBehavior"/> to add</typeparam>
+        /// <param name="behavior">The behavior instance</param>
         public void AttachBehavior<B>(B behavior) where B : IUnitBehavior, new()
         {
             mBehavior = behavior;
@@ -71,15 +115,27 @@ namespace FEEngine
                 BehaviorName = typeof(B).AssemblyQualifiedName;
             }
         }
+        /// <summary>
+        /// Gets the <see cref="Unit"/>'s attached <see cref="IUnitBehavior"/>
+        /// </summary>
+        /// <typeparam name="B">The type of <see cref="IUnitBehavior"/> to cast to</typeparam>
+        /// <returns>The <see cref="Unit"/>'s behavior instance</returns>
         public B GetBehavior<B>() where B : IUnitBehavior, new()
         {
             return (B)mBehavior;
         }
+        /// <summary>
+        /// Resets the <see cref="Unit"/>'s current movement
+        /// </summary>
         public void RefreshMovement()
         {
             CurrentMovement = Stats.Mv;
             CanMove = true;
         }
+        /// <summary>
+        /// Adds an <see cref="Item"/> to the <see cref="Unit"/>'s inventory
+        /// </summary>
+        /// <param name="item">The <see cref="Item"/> to add</param>
         public void Add(Item item)
         {
             item.Parent = this;
@@ -93,6 +149,12 @@ namespace FEEngine
                 itemRegister[index].Parent = this;
             }
         }
+        /// <summary>
+        /// Moves the <see cref="Unit"/> to the specified position
+        /// </summary>
+        /// <param name="newPos">The position to move to</param>
+        /// <param name="movementType">How to move the <see cref="Unit"/></param>
+        /// <returns>Whether or not the <see cref="Unit"/> succeeded to move</returns>
         public bool Move(IVec2<int> newPos, MovementType movementType = MovementType.ConsumeMovement)
         {
             if (!CanMove)
@@ -125,6 +187,9 @@ namespace FEEngine
             Position = newPos;
             return true;
         }
+        /// <summary>
+        /// Does nothing; just disables any further action for this turn
+        /// </summary>
         public void Wait()
         {
             CanMove = false;
@@ -136,6 +201,9 @@ namespace FEEngine
                 CanMove = false;
             }
         }
+        /// <summary>
+        /// The <see cref="Type.AssemblyQualifiedName"/> of the <see cref="Unit"/>'s behavior type
+        /// </summary>
         public string BehaviorName { get; set; }
         [JsonConstructor]
         public Unit(IVec2<int> position, UnitAffiliation affiliation, UnitStats stats, string behaviorName = null, string name = "Soldier")

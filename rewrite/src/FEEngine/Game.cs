@@ -123,7 +123,6 @@ namespace FEEngine
         private readonly Renderer mRenderer;
         private static bool debug = false;
         private static bool hasNativeImplementation = true;
-        // native methods
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void BreakDebugger_Native();
     }
