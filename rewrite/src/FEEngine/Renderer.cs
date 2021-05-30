@@ -7,44 +7,9 @@ namespace FEEngine
 {
     public interface IRenderable
     {
-        void Render();
-    }
-    public class RenderQueue
-    {
-        public bool Open { get; private set; }
-        public RenderQueue()
-        {
-            Open = true;
-            mQueue = new();
-        }
-        public void Submit(IRenderable renderable)
-        {
-            if (!Open)
-            {
-                throw new Exception("You cannot submit an object to a closed RenderQueue");
-            }
-            mQueue.Enqueue(renderable);
-        }
-        public void Close()
-        {
-            Open = false;
-        }
-        public IRenderable Peek()
-        {
-            return mQueue.Peek();
-        }
-        public IRenderable Pop()
-        {
-            try
-            {
-                return mQueue.Dequeue();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-        private Queue<IRenderable> mQueue;
+        void Render(RenderContext context);
+        IVec2<int> MinSize { get; }
+        void SetSize(IVec2<int> size);
     }
     public enum Color
     {
@@ -57,33 +22,98 @@ namespace FEEngine
         White = 7,
         Black = 0,
     }
+    public class RenderContext
+    {
+        public RenderContext(List<char> characterBuffer, List<Color> colorBuffer, IVec2<int> bufferSize)
+        {
+            mStack = new();
+            mCharacterBuffer = characterBuffer;
+            mColorBuffer = colorBuffer;
+            mBufferSize = bufferSize;
+        }
+        public struct OffsetClipPair
+        {
+            public IVec2<int> Offset, Clip;
+        }
+        public void PushPair(OffsetClipPair pair)
+        {
+            mStack.Push(pair);
+        }
+        public void PopPair()
+        {
+            mStack.Pop();
+        }
+        public bool RenderChar(IVec2<int> position, char character, Color color = Color.White)
+        {
+            OffsetClipPair currentData = GetCurrentOffsetClipData();
+            if (MathUtil.IsVectorOutOfBounds(position, currentData.Clip))
+            {
+                return false;
+            }
+            int bufferIndex = Renderer.GetBufferIndex(MathUtil.AddVectors(position, currentData.Offset), mBufferSize);
+            mCharacterBuffer[bufferIndex] = character;
+            mColorBuffer[bufferIndex] = color;
+            return true;
+        }
+        public bool RenderString(IVec2<int> position, string text, Color color = Color.White)
+        {
+            foreach (char character in text)
+            {
+                if (!RenderChar(position, character, color))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        private OffsetClipPair GetCurrentOffsetClipData()
+        {
+            OffsetClipPair data = new()
+            {
+                Offset = new Vec2I(0),
+                Clip = new Vec2I(mBufferSize)
+            };
+            foreach (OffsetClipPair pair in mStack)
+            {
+                MathUtil.AddVectors(ref data.Offset, pair.Offset);
+                if (pair.Clip.X < data.Clip.X)
+                {
+                    data.Clip.X = pair.Clip.X;
+                }
+                if (pair.Clip.Y < data.Clip.Y)
+                {
+                    data.Clip.Y = pair.Clip.Y;
+                }
+            }
+            return data;
+        }
+        private readonly Stack<OffsetClipPair> mStack;
+        private readonly List<char> mCharacterBuffer;
+        private readonly List<Color> mColorBuffer;
+        private readonly IVec2<int> mBufferSize;
+    }
     public class Renderer
     {
-        public static void Render(RenderQueue renderQueue)
+        public BorderLayout Root { get; set; }
+        public void Render()
         {
-            if (renderQueue.Open)
-            {
-                renderQueue.Close();
-            }
-            IRenderable currentObject;
-            while ((currentObject = renderQueue.Pop()) != null)
-            {
-                currentObject.Render();
-            }
+            RenderContext context = new(mCharacterBuffer, mColorBuffer, mBufferSize);
+            Root.SetSize(BufferSize);
+            Root.Render(context);
             Present();
         }
-        private static void Present()
+        private void Present()
         {
             if (Game.HasNativeImplementation)
             {
                 ClearNativeBuffer_Native();
-                for (int y = bufferSize.Y - 1; y >= 0; y--)
+                for (int y = mBufferSize.Y - 1; y >= 0; y--)
                 {
-                    for (int x = 0; x < bufferSize.X; x++)
+                    for (int x = 0; x < mBufferSize.X; x++)
                     {
-                        int bufferIndex = GetBufferIndex(new Vec2I(x, y));
-                        char character = characterBuffer[bufferIndex];
-                        Color color = colorBuffer[bufferIndex];
+                        int bufferIndex = GetBufferIndex(new Vec2I(x, y), mBufferSize);
+                        char character = mCharacterBuffer[bufferIndex];
+                        Color color = mColorBuffer[bufferIndex];
                         WriteColoredChar_Native(character, color);
                     }
                     WriteColoredChar_Native('\n', Color.White);
@@ -97,12 +127,12 @@ namespace FEEngine
 #endif
                 Console.SetCursorPosition(0, 0);
                 string text = "";
-                for (int y = bufferSize.Y - 1; y >= 0; y--)
+                for (int y = mBufferSize.Y - 1; y >= 0; y--)
                 {
-                    for (int x = 0; x < bufferSize.X; x++)
+                    for (int x = 0; x < mBufferSize.X; x++)
                     {
-                        int bufferIndex = GetBufferIndex(new Vec2I(x, y));
-                        char character = characterBuffer[bufferIndex];
+                        int bufferIndex = GetBufferIndex(new Vec2I(x, y), mBufferSize);
+                        char character = mCharacterBuffer[bufferIndex];
                         text += character;
                     }
                     text += '\n';
@@ -113,76 +143,57 @@ namespace FEEngine
                 }
             }
         }
-        public static bool RenderChar(IVec2<int> position, char character, Color color = Color.White)
+        public IVec2<int> BufferSize
         {
-            if (MathUtil.IsVectorOutOfBounds(position, bufferSize))
-            {
-                return false;
-            }
-            int bufferIndex = GetBufferIndex(position);
-            characterBuffer[bufferIndex] = character;
-            colorBuffer[bufferIndex] = color;
-            return true;
-        }
-        public static bool RenderString(IVec2<int> position, string text, Color color = Color.White)
-        {
-            foreach (char character in text)
-            {
-                if (!RenderChar(position, character, color))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-        public static IVec2<int> BufferSize
-        {
-            get => bufferSize;
+            get => mBufferSize;
             set
             {
                 int length = value.X * value.Y;
-                int currentLength = bufferSize.X * bufferSize.Y;
-                bufferSize = value;
+                int currentLength = mBufferSize.X * mBufferSize.Y;
+                mBufferSize = value;
                 int difference = length - currentLength;
                 if (difference > 0)
                 {
                     for (int i = currentLength; i < length; i++)
                     {
-                        characterBuffer.Add((char)0);
-                        colorBuffer.Add(Color.Black);
+                        mCharacterBuffer.Add((char)0);
+                        mColorBuffer.Add(Color.Black);
                     }
                 }
                 ClearBuffer();
             }
         }
-        public static void ClearBuffer()
+        public void ClearBuffer()
         {
-            for (int x = 0; x < bufferSize.X; x++)
+            for (int x = 0; x < mBufferSize.X; x++)
             {
-                for (int y = 0; y < bufferSize.Y; y++)
+                for (int y = 0; y < mBufferSize.Y; y++)
                 {
-                    int bufferIndex = GetBufferIndex(new Vec2I(x, y));
-                    characterBuffer[bufferIndex] = ' ';
-                    colorBuffer[bufferIndex] = Color.Black;
+                    int bufferIndex = GetBufferIndex(new Vec2I(x, y), mBufferSize);
+                    mCharacterBuffer[bufferIndex] = ' ';
+                    mColorBuffer[bufferIndex] = Color.Black;
                 }
             }
         }
-        private static int GetBufferIndex(IVec2<int> position)
+        public static int GetBufferIndex(IVec2<int> position, IVec2<int> bufferSize)
         {
             return (position.Y * bufferSize.X) + position.X;
         }
-        private Renderer() { }
+        public Renderer()
+        {
+            BufferSize = new Vec2I(60, 30);
+            Root = new BorderLayout();
+        }
         static Renderer()
         {
             if (Game.HasNativeImplementation)
             {
                 DisableCursor_Native();
             }
-            BufferSize = new Vec2I(60, 30);
         }
-        private static readonly List<char> characterBuffer = new();
-        private static readonly List<Color> colorBuffer = new();
-        private static IVec2<int> bufferSize = new Vec2I(0);
+        private readonly List<char> mCharacterBuffer = new();
+        private readonly List<Color> mColorBuffer = new();
+        private IVec2<int> mBufferSize = new Vec2I(0);
         // native methods
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void WriteColoredChar_Native(char character, Color color);

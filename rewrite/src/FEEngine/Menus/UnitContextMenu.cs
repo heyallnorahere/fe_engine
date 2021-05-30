@@ -3,7 +3,7 @@ using FEEngine.Math;
 
 namespace FEEngine.Menus
 {
-    public class UnitContextMenu : IMenu
+    public class UnitContextMenu : IRenderable
     {
         public abstract class Page
         {
@@ -44,28 +44,27 @@ namespace FEEngine.Menus
                     mChildren[mCurrentChildIndex].Update();
                 }
             }
-            public void Render(IVec2<int> originPoint)
+            public void Render(RenderContext context)
             {
                 if (mCurrentChildIndex == -1)
                 {
-                    RenderPage(originPoint);
+                    RenderPage(context);
                 }
                 else
                 {
-                    mChildren[mCurrentChildIndex].Render(originPoint);
+                    mChildren[mCurrentChildIndex].Render(context);
                 }
             }
-            private void RenderPage(IVec2<int> originPoint)
+            private void RenderPage(RenderContext context)
             {
                 for (int i = 0; i < mChildren.Count; i++)
                 {
-                    int yOffset = (i * 2) + 1;
-                    IVec2<int> absoluteTextPosition = MathUtil.AddVectors(originPoint, new Vec2I(3, -yOffset));
+                    IVec2<int> position = new Vec2I(3, (i * 2) + 1);
                     if (mCurrentSelection == i)
                     {
-                        Renderer.RenderChar(MathUtil.SubVectors(absoluteTextPosition, new Vec2I(2, 0)), '>', Color.Red);
+                        context.RenderChar(MathUtil.SubVectors(position, new Vec2I(2, 0)), '>', Color.Red);
                     }
-                    Renderer.RenderString(absoluteTextPosition, mChildren[i].GetTitle());
+                    context.RenderString(position, mChildren[i].GetTitle());
                 }
             }
             public bool AddChild(Page page)
@@ -108,7 +107,7 @@ namespace FEEngine.Menus
             private readonly UnitContextMenu mParent;
             protected override string GetTitle() { return null; } // noone's gonna call this anyway
         }
-        public IVec2<int> Size { get { return new Vec2I(10, 20); } }
+        public IVec2<int> MinSize { get { return new Vec2I(10, 20); } }
         public UnitContextMenu()
         {
             OriginalUnitPosition = null;
@@ -118,13 +117,17 @@ namespace FEEngine.Menus
         {
             mBasePage.Update();
         }
-        public void Render(IVec2<int> originPoint)
+        public void Render(RenderContext context)
         {
-            mBasePage.Render(originPoint);
+            mBasePage.Render(context);
         }
         public bool AddPage(Page page)
         {
             return mBasePage.AddChild(page);
+        }
+        public void SetSize(IVec2<int> size)
+        {
+            throw new System.NotImplementedException();
         }
         public IVec2<int> OriginalUnitPosition { private get; set; }
         private readonly Page mBasePage;

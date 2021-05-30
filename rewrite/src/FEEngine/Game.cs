@@ -24,12 +24,13 @@ namespace FEEngine
                 BreakDebugger_Native();
             }
         }
-        public PhaseManager PhaseManager { get; set; }
+        public PhaseManager PhaseManager { get; private set; }
         public int CurrentMapIndex { get; set; }
         public Game(string bindingsFile = null)
         {
             UIController.Init(this);
             PhaseManager = new();
+            mRenderer = new();
             CurrentMapIndex = 0;
             mKeyBindingsFile = bindingsFile;
             mRegistry = new Registry();
@@ -55,6 +56,13 @@ namespace FEEngine
                 return mRegistry;
             }
         }
+        public Renderer Renderer
+        {
+            get
+            {
+                return mRenderer;
+            }
+        }
         public void Loop(Player player)
         {
             while (true)
@@ -64,7 +72,7 @@ namespace FEEngine
                 {
                     break;
                 }
-                Render(player);
+                Render();
             }
         }
         private void Update(Player player)
@@ -99,20 +107,10 @@ namespace FEEngine
             }
             return shouldCycle;
         }
-        private void Render(Player player)
+        private void Render()
         {
             Renderer.ClearBuffer();
-            RenderQueue renderQueue = new();
-            // render order:
-            // 1. map
-            Map map = mRegistry.GetRegister<Map>()[CurrentMapIndex];
-            renderQueue.Submit(map);
-            // 2. player (cursor)
-            renderQueue.Submit(player);
-            // 3. uicontroller
-            renderQueue.Submit(new UIController.RenderAgent());
-            renderQueue.Close();
-            Renderer.Render(renderQueue);
+            Renderer.Render();
         }
         public void SetupRegisters()
         {
@@ -120,8 +118,9 @@ namespace FEEngine
             mRegistry.CreateRegister<Unit>();
             mRegistry.CreateRegister<Item>();
         }
-        private Registry mRegistry;
-        private string mKeyBindingsFile;
+        private readonly Registry mRegistry;
+        private readonly string mKeyBindingsFile;
+        private readonly Renderer mRenderer;
         private static bool debug = false;
         private static bool hasNativeImplementation = true;
         // native methods

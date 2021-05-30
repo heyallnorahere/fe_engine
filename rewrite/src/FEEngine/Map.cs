@@ -7,7 +7,7 @@ using FEEngine.Math;
 namespace FEEngine
 {
     [JsonObject]
-    public class Map : RegistedObjectTemplate<Map>, IEnumerable<Unit>, IRenderable
+    public class Map : RegistedObjectBase<Map>, IEnumerable<Unit>, IRenderable
     {
         private struct Enumerator : IEnumerator<Unit>
         {
@@ -68,6 +68,9 @@ namespace FEEngine
             }
         }
         public List<int> Units { get; set; }
+        [JsonIgnore]
+        public Player Player { get; set; }
+        public IVec2<int> MinSize { get => Dimensions; }
         public Unit GetUnitAt(IVec2<int> position)
         {
             foreach (Unit unit in this)
@@ -109,14 +112,14 @@ namespace FEEngine
             }
             return units;
         }
-        public void Render()
+        public void Render(RenderContext context)
         {
-            int yOffset = Renderer.BufferSize.Y - Height;
             foreach (Unit unit in this)
             {
                 // todo: replace 'U' with character corresponding to the units weapon type
-                Renderer.RenderChar(MathUtil.AddVectors(unit.Position, new Vec2I(0, yOffset)), 'U', Unit.GetColorForAffiliation(unit.Affiliation));
+                context.RenderChar(unit.Position, 'U', Unit.GetColorForAffiliation(unit.Affiliation));
             }
+            Player.Render(context);
         }
         public void AddUnit(Unit unit)
         {
@@ -131,12 +134,17 @@ namespace FEEngine
         {
             return GetEnumerator();
         }
+        public void SetSize(IVec2<int> size)
+        {
+            // we dont care about this for niow
+        }
         [JsonConstructor]
         public Map(int width, int height, List<int> units = null)
         {
             Width = width;
             Height = height;
             Units = units ?? new List<int>();
+            Player = null;
         }
     }
 }

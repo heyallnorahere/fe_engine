@@ -4,9 +4,8 @@ using FEEngine.Menus;
 
 namespace FEEngine
 {
-    public class Player : IRenderable
+    public class Player
     {
-        public IVec2<int> CursorPosition { get; private set; }
         public Player(Game game)
         {
             mLastColorFlip = 0.0;
@@ -15,8 +14,13 @@ namespace FEEngine
             CursorPosition = new Vec2I(0);
             mGame = game;
         }
+        public IVec2<int> CursorPosition { get; private set; }
         public void Update()
         {
+            if (Map.Player == null)
+            {
+                Map.Player = this;
+            }
             InputManager.State state = InputManager.GetState();
             IVec2<int> dimensions = Map.Dimensions;
             CursorPosition = MathUtil.ClampVector(CursorPosition, new Vec2I(0), MathUtil.SubVectors(dimensions, new Vec2I(1)));
@@ -83,7 +87,7 @@ namespace FEEngine
                 }
             }
         }
-        public void Render()
+        public void Render(RenderContext context)
         {
             if (CursorPosition.Y < Map.Height - 1 && !UIController.IsUnitContextMenuOpen)
             {
@@ -99,8 +103,7 @@ namespace FEEngine
                     }
                     cursorColor = mRed ? Color.Red : Color.Black;
                 }
-                int yOffset = Renderer.BufferSize.Y - Map.Height;
-                Renderer.RenderChar(MathUtil.AddVectors(CursorPosition, new Vec2I(0, yOffset + 1)), 'v', cursorColor);
+                context.RenderChar(MathUtil.AddVectors(CursorPosition, new Vec2I(0, 1)), 'v', cursorColor);
             }
         }
         private Map Map

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using FEEngine;
+using FEEngine.Math;
 using FEEngine.Scripting;
 
 namespace ExampleGame
@@ -38,15 +39,28 @@ namespace ExampleGame
             }
             Game game = new("data/bindings.json");
             game.SetupRegisters();
+            Map map = null;
             InitRegister<Item>("data/items.json", game);
             InitRegister<Unit>("data/units.json", game);
             InitRegister<Map>("data/maps.json", game, () =>
             {
-                Map map = new(20, 10);
+                map = new(20, 10);
                 game.Registry.GetRegister<Map>().Add(map);
                 return true;
+            }, () =>
+            {
+                try
+                {
+                    map = game.Registry.GetRegister<Map>()[0];
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
             });
             Player player = new(game);
+            game.Renderer.Root.Center = map;
             Console.WriteLine("Successfully initialized!");
             game.Loop(player);
         }

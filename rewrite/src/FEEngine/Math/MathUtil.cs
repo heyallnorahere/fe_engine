@@ -78,22 +78,22 @@ namespace FEEngine.Math
         {
             return v1.X.Equals(v2.X) && v1.Y.Equals(v2.Y);
         }
-        public static bool IsVectorOutOfBounds<T>(IVec2<T> vector, IVec2<T> bounds) where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
+        public static bool IsVectorOutOfBounds<T>(IVec2<T> vector, IVec2<T> boundsMax, IVec2<T> boundsMin = null) where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
         {
-            if (vector.X.CompareTo(bounds.X) >= 0)
+            if (vector.X.CompareTo(boundsMax.X) >= 0)
             {
                 return true;
             }
-            if (vector.Y.CompareTo(bounds.Y) >= 0)
+            if (vector.Y.CompareTo(boundsMax.Y) >= 0)
             {
                 return true;
             }
             T zero = (T)Convert.ChangeType(0, typeof(T));
-            if (vector.X.CompareTo(zero) < 0)
+            if (vector.X.CompareTo(boundsMin?.X ?? zero) < 0)
             {
                 return true;
             }
-            if (vector.Y.CompareTo(zero) < 0)
+            if (vector.Y.CompareTo(boundsMin?.Y ?? zero) < 0)
             {
                 return true;
             }
@@ -101,7 +101,9 @@ namespace FEEngine.Math
         }
         public static IVec2<T> AddVectors<T>(IVec2<T> v1, IVec2<T> v2) where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
         {
-            return new GenericVec2<T>(Add<T, T, T>(v1.X, v2.X), Add<T, T, T>(v1.Y, v2.Y));
+            T x = Add<T, T, T>(v1.X, v2.X);
+            T y = Add<T, T, T>(v1.Y, v2.Y);
+            return new GenericVec2<T>(x, y);
         }
         public static void AddVectors<T>(ref IVec2<T> v1, IVec2<T> v2) where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
         {
