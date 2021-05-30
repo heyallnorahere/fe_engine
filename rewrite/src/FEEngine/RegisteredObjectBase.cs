@@ -2,7 +2,7 @@
 
 namespace FEEngine
 {
-    public abstract class RegistedObjectBase<T> : IRegisteredObject<T> where T : RegistedObjectBase<T>, IRegisteredObject<T>
+    public abstract class RegisteredObjectBase<T> : IRegisteredObject<T> where T : RegisteredObjectBase<T>, IRegisteredObject<T>
     {
         [JsonIgnore]
         public int RegisterIndex { get { return mRegisterIndex; } }

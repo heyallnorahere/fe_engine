@@ -8,7 +8,7 @@ using FEEngine.Scripting;
 namespace FEEngine
 {
     [JsonObject]
-    public class Unit : RegistedObjectBase<Unit>
+    public class Unit : RegisteredObjectBase<Unit>
     {
         public enum UnitAffiliation
         {

@@ -7,7 +7,7 @@ using FEEngine.Math;
 namespace FEEngine
 {
     [JsonObject]
-    public class Map : RegistedObjectBase<Map>, IEnumerable<Unit>, IRenderable
+    public class Map : RegisteredObjectBase<Map>, IEnumerable<Unit>, IRenderable
     {
         private struct Enumerator : IEnumerator<Unit>
         {

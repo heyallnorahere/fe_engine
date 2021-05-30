@@ -5,7 +5,7 @@ using FEEngine.Scripting;
 namespace FEEngine
 {
     [JsonObject]
-    public class Item : RegistedObjectBase<Item>
+    public class Item : RegisteredObjectBase<Item>
     {
         public delegate void OnUseHandler(Item item, Unit itemParent);
         public bool Usable { get; set; }
