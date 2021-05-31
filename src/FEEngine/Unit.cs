@@ -328,7 +328,7 @@ namespace FEEngine
             bool iAmInRange = false;
             if (otherWeapon != null) {
                 IVec2<int> otherRange = otherWeapon.WeaponStats.Range;
-                iAmInRange = distance > range.X && distance < range.Y;
+                iAmInRange = distance > otherRange.X && distance < otherRange.Y;
             }
             int attackSpeed = Stats.Spd - myWeapon.WeaponStats.Weight;
             int otherAttackSpeed = toAttack.Stats.Spd - otherWeapon?.WeaponStats.Weight ?? 0;
