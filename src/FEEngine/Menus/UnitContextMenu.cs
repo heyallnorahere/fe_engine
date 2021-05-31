@@ -155,7 +155,7 @@ namespace FEEngine.Menus
                         }
                     }
                 }
-                if (UIController.SelectedUnit.Inventory.Count > 0)
+                if (UIController.SelectedUnit.Inventory.Count > 0 || UIController.SelectedUnit.EquippedWeapon != null)
                 {
                     AddChild(new ItemPage());
                 }
