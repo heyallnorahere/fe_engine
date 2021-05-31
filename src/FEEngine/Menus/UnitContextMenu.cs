@@ -96,12 +96,12 @@ namespace FEEngine.Menus
                     Parent.mCurrentChildIndex = -1;
                 }
             }
+            public Page Parent { get; private set; }
             protected virtual void OnSelect() { }
             protected virtual void UpdatePage() { }
             protected abstract string GetTitle();
             private int mCurrentChildIndex, mCurrentSelection;
             private readonly List<Page> mChildren;
-            protected Page Parent { get; private set; }
             protected List<Page> Children { get => mChildren; }
             protected bool CanGoBack { get; set; }
             internal virtual bool IsInternal { get { return false; } }
@@ -154,6 +154,10 @@ namespace FEEngine.Menus
                             break; // to stop the enumerator from throwing an exception
                         }
                     }
+                }
+                if (AttackPage.AreUnitsInRange())
+                {
+                    AddChild(new AttackPage());
                 }
                 if (UIController.SelectedUnit.Inventory.Count > 0 || UIController.SelectedUnit.EquippedWeapon != null)
                 {
