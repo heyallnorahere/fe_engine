@@ -24,6 +24,11 @@ namespace FEEngine.Menus
             }
             public void Update()
             {
+                if (mCurrentChildIndex != -1)
+                {
+                    mChildren[mCurrentChildIndex].Update();
+                    return;
+                }
                 UpdatePage();
                 if (mCurrentSelection >= mChildren.Count)
                 {
@@ -46,10 +51,6 @@ namespace FEEngine.Menus
                 if (state.Back)
                 {
                     GoBack();
-                }
-                if (mCurrentChildIndex != -1)
-                {
-                    mChildren[mCurrentChildIndex].Update();
                 }
             }
             public void Render(RenderContext context, IVec2<int> availableSize)

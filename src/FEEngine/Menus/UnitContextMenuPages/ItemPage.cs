@@ -41,6 +41,8 @@ namespace FEEngine.Menus.UnitContextMenuPages
             public ItemSubPage(Item item)
             {
                 mItem = item;
+                AddChild(new ItemUsePage(mItem));
+                AddChild(new ItemBackPage());
             }
             protected override string GetTitle()
             {
@@ -64,7 +66,7 @@ namespace FEEngine.Menus.UnitContextMenuPages
             foreach (int index in unit.Inventory)
             {
                 Item item = itemRegister[index];
-                Children.Add(new ItemSubPage(item));
+                AddChild(new ItemSubPage(item));
             }
         }
         internal override bool IsInternal { get { return true; } }

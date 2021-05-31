@@ -18,6 +18,7 @@ namespace FEEngine
         /// <summary>
         /// Specifies if <see cref="Use"/> has been called on this object
         /// </summary>
+        [JsonIgnore]
         public bool Used { get; private set; }
         /// <summary>
         /// Specifies if this object is a weapon (not implemented yet)

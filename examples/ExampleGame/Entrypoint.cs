@@ -1,26 +1,18 @@
 ﻿using System;
 using System.IO;
 using FEEngine;
+using FEEngine.Math;
 using FEEngine.Menus;
 using FEEngine.Scripting;
 
 namespace ExampleGame
 {
-    public class TestUnitBehavior : IUnitBehavior
-    {
-        public Unit Parent { get; set; }
-        public bool Update()
-        {
-            Console.WriteLine("Testing...");
-            return true;
-        }
-    }
     public class TestItemBehavior : IItemBehavior
     {
         public Item Parent { get; set; }
         public void OnUse()
         {
-            Console.WriteLine("Testing again, but from IItemBehavior");
+            Parent.Parent.Move(new Vec2I(0, 1), Unit.MovementType.IgnoreMovement);
         }
     }
     public class Entrypoint
