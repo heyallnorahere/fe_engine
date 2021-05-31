@@ -314,7 +314,8 @@ namespace FEEngine
         public bool Attack(Unit toAttack)
         {
             // check if the attacker can move, and if the recipient is a valid target
-            if (!CanMove || IsAllied(toAttack) || EquippedWeapon == null)
+            Item myWeapon = EquippedWeapon;
+            if (!CanMove || IsAllied(toAttack) || myWeapon == null)
             {
                 return false;
             }
@@ -325,8 +326,104 @@ namespace FEEngine
             {
                 return false;
             }
-
+            Item otherWeapon = toAttack.EquippedWeapon;
+            bool iAmInRange = false;
+            if (otherWeapon != null) {
+                IVec2<int> otherRange = otherWeapon.WeaponStats.Range;
+                iAmInRange = distance > range.X && distance < range.Y;
+            }
+            int attackSpeed = Stats.Spd - myWeapon.WeaponStats.Weight;
+            int otherAttackSpeed = toAttack.Stats.Spd - otherWeapon?.WeaponStats.Weight ?? 0;
+            AttackImpl(toAttack, myWeapon, otherWeapon);
+            if (iAmInRange)
+            {
+                toAttack.AttackImpl(this, otherWeapon, myWeapon);
+            }
+            if (attackSpeed - otherAttackSpeed >= 4)
+            {
+                AttackImpl(toAttack, myWeapon, otherWeapon);
+            }
+            else if (otherAttackSpeed - attackSpeed >= 4 && iAmInRange)
+            {
+                toAttack.AttackImpl(this, otherWeapon, myWeapon);
+            }
             return true;
+        }
+        private struct AttackPacket
+        {
+            public int Might { get; set; }
+            public int Hit { get; set; }
+            public int Crit { get; set; }
+        }
+        private struct AttackResult
+        {
+            public int Might { get; set; }
+            public bool DidHit { get; set; }
+            public bool DidCrit { get; set; }
+        }
+        private void AttackImpl(Unit toAttack, Item myWeapon, Item otherWeapon)
+        {
+            AttackPacket packet = CreateAttackPacket(toAttack.Stats, myWeapon);
+            AttackResult result = ParseAttackPacket(packet);
+            toAttack.ReceiveAttackResult(result, this);
+        }
+        private AttackPacket CreateAttackPacket(UnitStats otherStats, Item myWeapon)
+        {
+            AttackPacket packet = new();
+            bool isMagic;
+            WeaponStats weaponStats = myWeapon.WeaponStats;
+            switch (weaponStats.Type)
+            {
+                case WeaponType.WhiteMagic:
+                    isMagic = true;
+                    break;
+                case WeaponType.BlackMagic:
+                    isMagic = true;
+                    break;
+                case WeaponType.DarkMagic:
+                    isMagic = true;
+                    break;
+                default:
+                    isMagic = false;
+                    break;
+            }
+            int strength = isMagic ? Stats.Mag : Stats.Str;
+            int defense = isMagic ? otherStats.Res : otherStats.Def;
+            packet.Might = weaponStats.Attack + strength - defense;
+            packet.Hit = weaponStats.HitRate + Stats.Dex - otherStats.Dex;
+            packet.Crit = weaponStats.CritRate + Stats.Lck - otherStats.Lck;
+            return packet;
+        }
+        private static AttackResult ParseAttackPacket(AttackPacket packet)
+        {
+            AttackResult result = new();
+            Random randomNumberGenerator = new();
+            const int maxValue = 101;
+            result.Might = packet.Might;
+            result.DidHit = randomNumberGenerator.Next(maxValue) <= packet.Hit;
+            result.DidCrit = randomNumberGenerator.Next(maxValue) <= packet.Crit;
+            return result;
+        }
+        private void ReceiveAttackResult(AttackResult result, Unit attacker)
+        {
+            if (result.DidHit)
+            {
+                int might = result.Might;
+                string message = "{0} dealt {1} damage to {2}!";
+                if (result.DidCrit)
+                {
+                    // todo: log "Critical Hit!" in red
+                    message += string.Format(" ({0} * 3)", might);
+                    might *= 3;
+                }
+                CurrentHP -= might;
+                string toLog = string.Format(message, attacker.Name, might, Name);
+                // todo: log "toLog"
+            }
+            else
+            {
+                // todo: log "{0} missed {1}!" with params "attacker.Name" and "Name"
+            }
         }
         /// <summary>
         /// The <see cref="Type.AssemblyQualifiedName"/> of the <see cref="Unit"/>'s behavior type

@@ -23,7 +23,7 @@ namespace FEEngine
         /// <summary>
         /// The base damage of the weapon
         /// </summary>
-        public int Might { get; set; }
+        public int Attack { get; set; }
         /// <summary>
         /// The hit rate of the weapon
         /// </summary>
@@ -41,6 +41,10 @@ namespace FEEngine
         /// The range of the weapon; X is min, Y is max
         /// </summary>
         public IVec2<int> Range { get; set; }
+        /// <summary>
+        /// The weight of the weapon
+        /// </summary>
+        public int Weight { get; set; }
     }
     /// <summary>
     /// An object that represents an item in a <see cref="Unit"/>'s inventory
