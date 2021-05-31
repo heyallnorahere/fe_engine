@@ -238,7 +238,8 @@ namespace FEEngine
         }
         public Renderer()
         {
-            BufferSize = new Vec2I(60, 30);
+            // 119 x 30 is the default win32 console size, if i recall
+            BufferSize = new Vec2I(100, 30);
             Root = new BorderLayout();
         }
         static Renderer()

@@ -177,7 +177,8 @@ namespace FEEngine
             foreach (Unit unit in this)
             {
                 // todo: replace 'U' with character corresponding to the units weapon type
-                context.RenderChar(unit.Position, 'U', Unit.GetColorForAffiliation(unit.Affiliation));
+                Item equippedWeapon = unit.EquippedWeapon;
+                context.RenderChar(unit.Position, WeaponStats.GetCharacterForWeapon(equippedWeapon?.WeaponStats ?? null), Unit.GetColorForAffiliation(unit.Affiliation));
             }
             Player.Render(context);
         }

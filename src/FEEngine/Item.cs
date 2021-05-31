@@ -21,6 +21,37 @@ namespace FEEngine
     public class WeaponStats
     {
         /// <summary>
+        /// Gets the <see cref="char"/> value associated with the passed weapon data
+        /// </summary>
+        /// <param name="stats">An object of type <see cref="WeaponStats"/>, containing the weapon's type. Can be null</param>
+        /// <returns>The associated <see cref="char"/></returns>
+        public static char GetCharacterForWeapon(WeaponStats stats)
+        {
+            if (stats != null)
+            {
+                switch (stats.Type)
+                {
+                    case WeaponType.Sword:
+                        return 'S';
+                    case WeaponType.Axe:
+                        return 'A';
+                    case WeaponType.Lance:
+                        return 'L';
+                    case WeaponType.Bow:
+                        return 'B';
+                    case WeaponType.Gauntlets:
+                        return 'G';
+                    case WeaponType.WhiteMagic:
+                        return 'W';
+                    case WeaponType.BlackMagic:
+                        return 'M';
+                    case WeaponType.DarkMagic:
+                        return 'D';
+                }
+            }
+            return 'U';
+        }
+        /// <summary>
         /// The base damage of the weapon
         /// </summary>
         public int Attack { get; set; }

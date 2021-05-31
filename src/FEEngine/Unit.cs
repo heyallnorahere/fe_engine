@@ -20,6 +20,11 @@ namespace FEEngine
             ThirdEnemy,
             Ally
         }
+        /// <summary>
+        /// Gets the <see cref="Color"/> associated with the passed <see cref="UnitAffiliation"/>
+        /// </summary>
+        /// <param name="affiliation">A enum value, corresponding to a unit's allegiance</param>
+        /// <returns>The associated <see cref="Color"/></returns>
         public static Color GetColorForAffiliation(UnitAffiliation affiliation)
         {
             switch (affiliation)
