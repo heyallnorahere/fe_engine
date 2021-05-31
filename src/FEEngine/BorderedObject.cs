@@ -2,6 +2,9 @@
 
 namespace FEEngine
 {
+    /// <summary>
+    /// A renderable object that takes child <see cref="IRenderable"/> objects, and renders them with a border
+    /// </summary>
     public class BorderedObject : IRenderable
     {
         public BorderedObject(IRenderable child)
