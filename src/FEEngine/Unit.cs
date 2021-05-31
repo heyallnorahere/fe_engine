@@ -234,6 +234,7 @@ namespace FEEngine
                     break;
             }
             Position = newPos;
+            CanMove = false;
             return true;
         }
         /// <summary>
