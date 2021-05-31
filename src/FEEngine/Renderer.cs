@@ -155,7 +155,10 @@ namespace FEEngine
                         Color color = mColorBuffer[bufferIndex];
                         WriteColoredChar_Native(character, color);
                     }
-                    WriteColoredChar_Native('\n', Color.White);
+                    if (y > 0)
+                    {
+                        WriteColoredChar_Native('\n', Color.White);
+                    }
                 }
                 Present_Native();
             }
@@ -174,7 +177,10 @@ namespace FEEngine
                         char character = mCharacterBuffer[bufferIndex];
                         text += character;
                     }
-                    text += '\n';
+                    if (y > 0)
+                    {
+                        text += '\n';
+                    }
                 }
                 foreach (char character in text)
                 {
