@@ -54,7 +54,8 @@ namespace ExampleGame
             Player player = new(game);
             game.Renderer.Root.Center = new BorderedObject(map);
             game.Renderer.Root.AddChild(new BorderedObject(new Logger.RenderAgent()), BorderLayout.Alignment.Bottom);
-            game.Renderer.Root.AddChild(new BorderedObject(UIController.FindMenu<UnitContextMenu>()), BorderLayout.Alignment.Right);
+            game.Renderer.Root.AddChild(new BorderedMenu(UIController.FindMenu<UnitContextMenu>()), BorderLayout.Alignment.Right);
+            game.Renderer.Root.AddChild(new BorderedMenu(UIController.FindMenu<TileInfoMenu>()), BorderLayout.Alignment.Left);
             Logger.Print(Color.Green, "Successfully initialized!");
             game.Loop(player);
         }

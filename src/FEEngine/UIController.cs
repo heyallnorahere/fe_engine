@@ -3,6 +3,10 @@ using FEEngine.Menus;
 
 namespace FEEngine
 {
+    public interface IMenu : IRenderable
+    {
+        string GetTitle();
+    }
     /// <summary>
     /// A controller for renderable menus
     /// </summary>
@@ -12,7 +16,7 @@ namespace FEEngine
         /// Adds a new menu to the index of menus
         /// </summary>
         /// <typeparam name="T">The type of menu to add</typeparam>
-        public static void AddMenu<T>() where T : IRenderable, new()
+        public static void AddMenu<T>() where T : IMenu, new()
         {
             if (!initialized)
             {
@@ -24,7 +28,7 @@ namespace FEEngine
         /// Adds an existing menu to the index of menus
         /// </summary>
         /// <param name="menu">The existing menu to add</param>
-        public static void AddMenu(IRenderable menu)
+        public static void AddMenu(IMenu menu)
         {
             if (!initialized)
             {
@@ -37,12 +41,12 @@ namespace FEEngine
         /// </summary>
         /// <typeparam name="T">The type of menu to find</typeparam>
         /// <returns>A menu of the specified type, or null if none was found</returns>
-        public static T FindMenu<T>() where T : class, IRenderable
+        public static T FindMenu<T>() where T : class, IMenu
         {
             T menu = null;
             if (initialized)
             {
-                foreach (IRenderable element in menus)
+                foreach (IMenu element in menus)
                 {
                     if (element.GetType() == typeof(T))
                     {
@@ -92,12 +96,13 @@ namespace FEEngine
             gameInstance = game;
             IsUnitContextMenuOpen = false;
             initialized = true;
-            AddMenu<UnitContextMenu>();
+            AddMenu(new UnitContextMenu());
+            AddMenu(new TileInfoMenu());
         }
         internal static Game GameInstance { get => gameInstance; }
         private static Game gameInstance;
         private static bool initialized = false;
-        private static readonly List<IRenderable> menus = new();
+        private static readonly List<IMenu> menus = new();
         private static int selectedUnitIndex = -1;
     }
 }

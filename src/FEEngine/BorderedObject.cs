@@ -25,7 +25,7 @@ namespace FEEngine
             mChild.Render(context);
             context.PopPair();
         }
-        private void DrawHorizontalLine(int y, RenderContext context)
+        protected virtual void DrawHorizontalLine(int y, RenderContext context)
         {
             for (int x = 0; x < mRenderSize.X - 2; x++)
             {
@@ -59,6 +59,7 @@ namespace FEEngine
             mRenderSize = size;
         }
         private IVec2<int> mRenderSize;
+        protected IVec2<int> RenderSize => mRenderSize;
         private readonly IRenderable mChild;
     }
 }

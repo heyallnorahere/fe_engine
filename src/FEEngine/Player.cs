@@ -65,6 +65,7 @@ namespace FEEngine
                         IVec2<int> temp = CursorPosition;
                         MathUtil.AddVectors(ref temp, delta);
                         CursorPosition = temp;
+                        UIController.FindMenu<TileInfoMenu>().SelectedTile = new Vec2I(CursorPosition);
                     }
                 }
                 if (state.OK)

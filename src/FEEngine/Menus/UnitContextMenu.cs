@@ -8,7 +8,7 @@ namespace FEEngine.Menus
     /// <summary>
     /// A menu for controlling <see cref="Unit"/>s
     /// </summary>
-    public class UnitContextMenu : IRenderable
+    public class UnitContextMenu : IMenu
     {
         /// <summary>
         /// A page of a <see cref="UnitContextMenu"/>
@@ -172,7 +172,7 @@ namespace FEEngine.Menus
             }
         }
         public IVec2<int> MinSize { get { return new Vec2I(25, 26 - Logger.MaxLogSize); } }
-        public UnitContextMenu()
+        internal UnitContextMenu()
         {
             OriginalUnitPosition = null;
             mBasePage = new BasePage(this);
@@ -211,6 +211,10 @@ namespace FEEngine.Menus
         public void SetSize(IVec2<int> size)
         {
             mRenderSize = size;
+        }
+        public string GetTitle()
+        {
+            return "Unit Context Menu";
         }
         public IVec2<int> OriginalUnitPosition { private get; set; }
         private IVec2<int> mRenderSize;
