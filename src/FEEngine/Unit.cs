@@ -234,7 +234,6 @@ namespace FEEngine
                     break;
             }
             Position = newPos;
-            CanMove = false;
             return true;
         }
         /// <summary>
@@ -346,6 +345,7 @@ namespace FEEngine
             {
                 toAttack.AttackImpl(this, otherWeapon, myWeapon);
             }
+            CanMove = false;
             return true;
         }
         private struct AttackPacket
