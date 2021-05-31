@@ -154,6 +154,26 @@ namespace FEEngine
         }
         public void Render(RenderContext context)
         {
+            if (mRenderSize.X < Width || mRenderSize.Y < Height)
+            {
+                return;
+            }
+            int xDifference = mRenderSize.X - Width;
+            if (xDifference % 2 > 0)
+            {
+                xDifference--;
+            }
+            int padding = xDifference / 2;
+            context.PushPair(new RenderContext.OffsetClipPair()
+            {
+                Offset = new Vec2I(padding, 0),
+                Clip = MathUtil.SubVectors(mRenderSize, new Vec2I(padding, 0))
+            });
+            RenderMap(context);
+            context.PopPair();
+        }
+        private void RenderMap(RenderContext context)
+        {
             foreach (Unit unit in this)
             {
                 // todo: replace 'U' with character corresponding to the units weapon type
@@ -180,7 +200,7 @@ namespace FEEngine
         }
         public void SetSize(IVec2<int> size)
         {
-            // we dont care about this for now
+            mRenderSize = size;
         }
         [JsonConstructor]
         public Map(int width, int height, List<int> units = null)
@@ -190,5 +210,6 @@ namespace FEEngine
             Units = units ?? new List<int>();
             Player = null;
         }
+        private IVec2<int> mRenderSize;
     }
 }

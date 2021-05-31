@@ -52,9 +52,9 @@ namespace ExampleGame
                 }
             });
             Player player = new(game);
-            game.Renderer.Root.Center = map;
-            game.Renderer.Root.AddChild(new Logger.RenderAgent(), BorderLayout.Alignment.Bottom);
-            game.Renderer.Root.AddChild(UIController.FindMenu<UnitContextMenu>(), BorderLayout.Alignment.Right);
+            game.Renderer.Root.Center = new BorderedObject(map);
+            game.Renderer.Root.AddChild(new BorderedObject(new Logger.RenderAgent()), BorderLayout.Alignment.Bottom);
+            game.Renderer.Root.AddChild(new BorderedObject(UIController.FindMenu<UnitContextMenu>()), BorderLayout.Alignment.Right);
             Logger.Print(Color.Green, "Successfully initialized!");
             game.Loop(player);
         }

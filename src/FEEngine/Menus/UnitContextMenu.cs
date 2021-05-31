@@ -171,7 +171,7 @@ namespace FEEngine.Menus
                 throw new NotImplementedException(); // noones gonna call this anyway
             }
         }
-        public IVec2<int> MinSize { get { return new Vec2I(20, 30 - Logger.MaxLogSize); } }
+        public IVec2<int> MinSize { get { return new Vec2I(20, 15); } }
         public UnitContextMenu()
         {
             OriginalUnitPosition = null;

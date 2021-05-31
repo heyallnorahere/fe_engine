@@ -254,7 +254,7 @@ namespace FEEngine
                     Inventory.Remove(index);
                 }
             }
-            if (mBehavior?.Update() ?? false)
+            if (mBehavior?.Update() ?? Affiliation != UnitAffiliation.Player)
             {
                 CanMove = false;
             }
