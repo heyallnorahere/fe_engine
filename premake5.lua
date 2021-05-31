@@ -58,6 +58,19 @@ workspace "fe_engine"
         "MultiProcessorCompile"
     }
     startproject "host"
+    filter "language:C#"
+        disablewarnings {
+            "CS8632",
+            "CS0436",
+            "CS0028",
+        }
+    filter "language:C++"
+        disablewarnings {
+            "4244",
+            "4267",
+            "26451",
+            "26812"
+        }
     filter "system:windows"
         defines {
             "FEENGINE_WINDOWS"
