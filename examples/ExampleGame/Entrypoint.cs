@@ -53,8 +53,9 @@ namespace ExampleGame
             });
             Player player = new(game);
             game.Renderer.Root.Center = map;
+            game.Renderer.Root.AddChild(new Logger.RenderAgent(), BorderLayout.Alignment.Bottom);
             game.Renderer.Root.AddChild(UIController.FindMenu<UnitContextMenu>(), BorderLayout.Alignment.Right);
-            Console.WriteLine("Successfully initialized!");
+            Logger.Print(Color.Green, "Successfully initialized!");
             game.Loop(player);
         }
         private static void InitRegister<T>(string filename, Game game, Func<bool> beforeSerializationCallback = null, Func<bool> afterDeserializationCallback = null) where T : class, IRegisteredObject<T>

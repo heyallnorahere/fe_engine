@@ -69,11 +69,13 @@ namespace FEEngine.Menus
                 for (int i = 0; i < mChildren.Count; i++)
                 {
                     IVec2<int> position = new Vec2I(3, availableSize.Y - ((i + 1) * 2));
+                    Color color = Color.White;
                     if (mCurrentSelection == i)
                     {
-                        context.RenderChar(MathUtil.SubVectors(position, new Vec2I(2, 0)), '>', Color.Red);
+                        color = Color.Red;
+                        context.RenderChar(MathUtil.SubVectors(position, new Vec2I(2, 0)), '>', color);
                     }
-                    context.RenderString(position, mChildren[i].GetTitle());
+                    context.RenderString(position, mChildren[i].GetTitle(), color);
                 }
             }
             public bool AddChild(Page page)
@@ -165,7 +167,7 @@ namespace FEEngine.Menus
                 throw new NotImplementedException(); // noones gonna call this anyway
             }
         }
-        public IVec2<int> MinSize { get { return new Vec2I(10, 20); } }
+        public IVec2<int> MinSize { get { return new Vec2I(20, 30 - Logger.MaxLogSize); } }
         public UnitContextMenu()
         {
             OriginalUnitPosition = null;

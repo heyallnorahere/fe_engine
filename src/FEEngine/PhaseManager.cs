@@ -28,6 +28,12 @@
                     CurrentPhase = Unit.UnitAffiliation.Player;
                     break;
             }
+            string phaseName = CurrentPhase.ToString();
+            if (CurrentPhase == Unit.UnitAffiliation.ThirdEnemy)
+            {
+                phaseName = "Enemy"; // i am so sorry
+            }
+            Logger.Print(Unit.GetColorForAffiliation(CurrentPhase), "{0} phase", phaseName);
             var units = map.GetAllUnitsOfAffiliation(CurrentPhase);
             foreach (Unit unit in units)
             {

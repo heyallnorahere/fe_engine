@@ -47,7 +47,7 @@ namespace FEEngine
         public Game(string bindingsFile = null)
         {
             UIController.Init(this);
-            PhaseManager = new();
+            PhaseManager = new(Unit.UnitAffiliation.Ally);
             mRenderer = new();
             CurrentMapIndex = 0;
             mKeyBindingsFile = bindingsFile;
@@ -93,6 +93,7 @@ namespace FEEngine
         /// <param name="player">The <see cref="Player"/> object</param>
         public void Loop(Player player)
         {
+            PhaseManager.CyclePhase(Registry.GetRegister<Map>()[CurrentMapIndex]);
             while (true)
             {
                 Update(player);
@@ -137,6 +138,7 @@ namespace FEEngine
         }
         private void Render()
         {
+            Logger.PurgeLog();
             Renderer.ClearBuffer();
             Renderer.Render();
         }

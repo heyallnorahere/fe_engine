@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -16,6 +17,7 @@ namespace FEEngine
         int RegisterIndex { get; }
         Register<T> GetRegister();
         void SetRegister(int index, Register<T> register);
+        void OnDeserialized();
     }
     // todo: add content to these classes
     public class RegisterDoesNotExistException : Exception
@@ -292,6 +294,16 @@ namespace FEEngine
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context)
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                T element = this[i];
+                element.SetRegister(i, this);
+                element.OnDeserialized();
+            }
         }
         private readonly List<T> mElements;
         private readonly Registry mRegistry;

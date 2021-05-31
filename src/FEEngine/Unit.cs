@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using FEEngine.Math;
@@ -191,8 +190,7 @@ namespace FEEngine
             item.Parent = this;
             Inventory.Add(item.RegisterIndex);
         }
-        [OnDeserialized]
-        private void OnDeserialization()
+        public override void OnDeserialized()
         {
             Register<Item> itemRegister = mRegister.Parent.GetRegister<Item>();
             foreach (int index in Inventory)
@@ -412,17 +410,16 @@ namespace FEEngine
                 string message = "{0} dealt {1} damage to {2}!";
                 if (result.DidCrit)
                 {
-                    // todo: log "Critical Hit!" in red
+                    Logger.Print(Color.Red, "CRITICAL HIT!");
                     message += string.Format(" ({0} * 3)", might);
                     might *= 3;
                 }
                 CurrentHP -= might;
-                string toLog = string.Format(message, attacker.Name, might, Name);
-                // todo: log "toLog"
+                Logger.Print(Color.White, message, attacker.Name, might, Name);
             }
             else
             {
-                // todo: log "{0} missed {1}!" with params "attacker.Name" and "Name"
+                Logger.Print(Color.White, "{0} missed {1}!", attacker.Name, Name);
             }
         }
         /// <summary>
