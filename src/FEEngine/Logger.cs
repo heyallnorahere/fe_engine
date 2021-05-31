@@ -61,6 +61,7 @@ namespace FEEngine
                     {
                         log.RemoveAt(i);
                         keepGoing = true;
+                        lastValidMessage--;
                         break;
                     }
                 }
