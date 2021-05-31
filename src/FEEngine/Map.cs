@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using FEEngine.Math;
 
@@ -102,7 +103,8 @@ namespace FEEngine
             }
             return null;
         }
-        public override void OnDeserialization()
+        [OnDeserialized]
+        private void OnDeserialization()
         {
             foreach (Unit unit in this)
             {

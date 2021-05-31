@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using FEEngine.Math;
@@ -93,6 +94,55 @@ namespace FEEngine
         [JsonConverter(typeof(StringEnumConverter))]
         public UnitAffiliation Affiliation { get; set; }
         /// <summary>
+        /// The object of the equipped weapon. Use this to equip/unequip weapons.
+        /// </summary>
+        [JsonIgnore]
+        public Item EquippedWeapon
+        {
+            get
+            {
+                if (mEquippedWeaponIndex == -1)
+                {
+                    return null;
+                }
+                else
+                {
+                    Register<Item> itemRegister = mRegister.Parent.GetRegister<Item>();
+                    return itemRegister[mEquippedWeaponIndex];
+                }
+            }
+            set
+            {
+                if (value == null)
+                {
+                    Item previouslyEquipped = EquippedWeapon;
+                    mEquippedWeaponIndex = -1;
+                    previouslyEquipped.Parent = null;
+                }
+                else
+                {
+                    if (!Inventory.Contains(value.RegisterIndex) || !value.IsWeapon)
+                    {
+                        return; // the value is not a valid equippable weapon
+                    }
+                    else
+                    {
+                        // transfer the item from the units inventory into the equipped weapon slot
+                        Inventory.Remove(value.RegisterIndex);
+                        mEquippedWeaponIndex = value.RegisterIndex;
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// The <see cref="Register{T}"/> index of the equipped weapon. Do not set this, as Newtonsoft.Json will do so
+        /// </summary>
+        public int EquippedWeaponIndex
+        {
+            get => mEquippedWeaponIndex;
+            set => mEquippedWeaponIndex = value;
+        }
+        /// <summary>
         /// The <see cref="Map"/> the <see cref="Unit"/> was placed on
         /// </summary>
         [JsonIgnore]
@@ -141,7 +191,8 @@ namespace FEEngine
             item.Parent = this;
             Inventory.Add(item.RegisterIndex);
         }
-        public override void OnDeserialization()
+        [OnDeserialized]
+        private void OnDeserialization()
         {
             Register<Item> itemRegister = mRegister.Parent.GetRegister<Item>();
             foreach (int index in Inventory)
@@ -153,7 +204,7 @@ namespace FEEngine
         /// Moves the <see cref="Unit"/> to the specified position
         /// </summary>
         /// <param name="newPos">The position to move to</param>
-        /// <param name="movementType">How to move the <see cref="Unit"/></param>
+        /// <param name="movementType">How to deal with the <see cref="Unit"/>'s movement points</param>
         /// <returns>Whether or not the <see cref="Unit"/> succeeded to move</returns>
         public bool Move(IVec2<int> newPos, MovementType movementType = MovementType.ConsumeMovement)
         {
@@ -194,7 +245,7 @@ namespace FEEngine
         {
             CanMove = false;
         }
-        public void Update()
+        internal void Update()
         {
             Register<Item> itemRegister = mRegister.Parent.GetRegister<Item>();
             foreach (int index in Inventory)
@@ -211,11 +262,78 @@ namespace FEEngine
             }
         }
         /// <summary>
+        /// Checks if the specified unit is allied to the calling one
+        /// </summary>
+        /// <param name="other">The unit to check</param>
+        /// <returns>If the specified unit is allied</returns>
+        public bool IsAllied(Unit other)
+        {
+            Dictionary<UnitAffiliation, bool> alliedDict, playerAllyAllegiance;
+            alliedDict = new(); // were just going to initialize this to an empty dictionary
+            playerAllyAllegiance = new()
+            {
+                [UnitAffiliation.Player] = true,
+                [UnitAffiliation.Ally] = true,
+                [UnitAffiliation.Enemy] = false,
+                [UnitAffiliation.ThirdEnemy] = false
+            };
+            switch (Affiliation)
+            {
+                case UnitAffiliation.Player:
+                    alliedDict = playerAllyAllegiance;
+                    break;
+                case UnitAffiliation.Ally:
+                    alliedDict = playerAllyAllegiance;
+                    break;
+                case UnitAffiliation.Enemy:
+                    alliedDict = new()
+                    {
+                        [UnitAffiliation.Player] = false,
+                        [UnitAffiliation.Ally] = false,
+                        [UnitAffiliation.Enemy] = true,
+                        [UnitAffiliation.ThirdEnemy] = false
+                    };
+                    break;
+                case UnitAffiliation.ThirdEnemy:
+                    alliedDict = new()
+                    {
+                        [UnitAffiliation.Player] = false,
+                        [UnitAffiliation.Ally] = false,
+                        [UnitAffiliation.Enemy] = false,
+                        [UnitAffiliation.ThirdEnemy] = true
+                    };
+                    break;
+            }
+            return alliedDict[other.Affiliation];
+        }
+        /// <summary>
+        /// Attacks an enemy unit
+        /// </summary>
+        /// <param name="toAttack">The <see cref="Unit"/> to attack</param>
+        /// <returns>Whether the attack succeeded</returns>
+        public bool Attack(Unit toAttack)
+        {
+            // check if the attacker can move, and if the recipient is a valid target
+            if (!CanMove || IsAllied(toAttack) || EquippedWeapon == null)
+            {
+                return false;
+            }
+            int distance = MathUtil.SubVectors(Position, toAttack.Position).TaxicabLength();
+            WeaponStats stats = EquippedWeapon.WeaponStats;
+            IVec2<int> range = stats.Range;
+            if (distance < range.X || distance > range.Y)
+            {
+                return false;
+            }
+
+            return true;
+        }
+        /// <summary>
         /// The <see cref="Type.AssemblyQualifiedName"/> of the <see cref="Unit"/>'s behavior type
         /// </summary>
         public string BehaviorName { get; set; }
         [JsonConstructor]
-        public Unit(IVec2<int> position, UnitAffiliation affiliation, UnitStats stats, string behaviorName = null, string name = "Soldier")
+        public Unit(IVec2<int> position, UnitAffiliation affiliation, UnitStats stats, string behaviorName = null, Item equippedWeapon = null, string name = "Soldier")
         {
             Inventory = new List<int>();
             Name = name;
@@ -225,6 +343,21 @@ namespace FEEngine
             BehaviorName = behaviorName;
             RefreshMovement();
             CurrentHP = Stats.HP;
+            if (equippedWeapon == null)
+            {
+                mEquippedWeaponIndex = -1;
+            }
+            else
+            {
+                if (equippedWeapon.IsWeapon)
+                {
+                    mEquippedWeaponIndex = equippedWeapon.RegisterIndex;
+                }
+                else
+                {
+                    mEquippedWeaponIndex = -1;
+                }
+            }
             if (BehaviorName == null)
             {
                 mBehavior = null;
@@ -244,5 +377,6 @@ namespace FEEngine
             }
         }
         private IUnitBehavior mBehavior;
+        private int mEquippedWeaponIndex;
     }
 }

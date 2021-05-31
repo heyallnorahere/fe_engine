@@ -1,9 +1,47 @@
 ﻿using System;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using FEEngine.Math;
 using FEEngine.Scripting;
 
 namespace FEEngine
 {
+    public enum WeaponType
+    {
+        Sword,
+        Axe,
+        Lance,
+        Bow,
+        Gauntlets,
+        WhiteMagic,
+        BlackMagic,
+        DarkMagic
+    }
+    [JsonObject]
+    public class WeaponStats
+    {
+        /// <summary>
+        /// The base damage of the weapon
+        /// </summary>
+        public int Might { get; set; }
+        /// <summary>
+        /// The hit rate of the weapon
+        /// </summary>
+        public int HitRate { get; set; }
+        /// <summary>
+        /// The critical rate of the weapon
+        /// </summary>
+        public int CritRate { get; set; }
+        /// <summary>
+        /// The type of the weapon
+        /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
+        public WeaponType Type { get; set; }
+        /// <summary>
+        /// The range of the weapon; X is min, Y is max
+        /// </summary>
+        public IVec2<int> Range { get; set; }
+    }
     /// <summary>
     /// An object that represents an item in a <see cref="Unit"/>'s inventory
     /// </summary>
@@ -21,9 +59,14 @@ namespace FEEngine
         [JsonIgnore]
         public bool Used { get; private set; }
         /// <summary>
-        /// Specifies if this object is a weapon (not implemented yet)
+        /// Specifies if this <see cref="Item"/> is a weapon
         /// </summary>
-        public bool IsWeapon { get; protected set; }
+        [JsonIgnore]
+        public bool IsWeapon { get { return WeaponStats != null; } }
+        /// <summary>
+        /// The stats of the weapon; is null if the <see cref="Item"/> is not a weapon
+        /// </summary>
+        public WeaponStats WeaponStats { get; set; }
         /// <summary>
         /// The name of this item
         /// </summary>
@@ -77,11 +120,12 @@ namespace FEEngine
             mBehavior?.OnUse();
             return true;
         }
-        public Item(bool usable, string behaviorName = null, string name = "RESERVE")
+        [JsonConstructor]
+        public Item(bool usable, string behaviorName = null, WeaponStats weaponStats = null, string name = "RESERVE")
         {
             Usable = usable;
-            IsWeapon = false;
             Name = name;
+            WeaponStats = weaponStats;
             Parent = null;
             Used = false;
             BehaviorName = behaviorName;

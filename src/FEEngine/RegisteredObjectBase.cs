@@ -19,7 +19,6 @@ namespace FEEngine
             mRegisterIndex = index;
             mRegister = register;
         }
-        public virtual void OnDeserialization() { }
         protected int mRegisterIndex;
         protected Register<T> mRegister;
     }
