@@ -167,7 +167,7 @@ namespace FEEngine
                 return false;
             }
             int deltaLength = delta.TaxicabLength();
-            if (deltaLength > CurrentMovement)
+            if (movementType == MovementType.ConsumeMovement && deltaLength > CurrentMovement)
             {
                 return false;
             }
@@ -196,6 +196,15 @@ namespace FEEngine
         }
         public void Update()
         {
+            Register<Item> itemRegister = mRegister.Parent.GetRegister<Item>();
+            foreach (int index in Inventory)
+            {
+                Item item = itemRegister[index];
+                if (item.Used)
+                {
+                    Inventory.Remove(index);
+                }
+            }
             if (mBehavior?.Update() ?? false)
             {
                 CanMove = false;

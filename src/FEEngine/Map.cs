@@ -119,6 +119,21 @@ namespace FEEngine
                     unit.Update();
                 }
             }
+            // go again, to remove units with 0 hp
+            bool keepGoing = true;
+            while (keepGoing)
+            {
+                keepGoing = false;
+                foreach (Unit unit in this)
+                {
+                    if (unit.CurrentHP <= 0)
+                    {
+                        keepGoing = true;
+                        Units.Remove(unit.RegisterIndex);
+                        break;
+                    }
+                }
+            }
         }
         /// <summary>
         /// Gets all <see cref="Unit"/>s on the map of the specified affiliation

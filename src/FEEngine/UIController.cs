@@ -94,6 +94,7 @@ namespace FEEngine
             initialized = true;
             AddMenu<UnitContextMenu>();
         }
+        internal static Game GameInstance { get => gameInstance; }
         private static Game gameInstance;
         private static bool initialized = false;
         private static readonly List<IRenderable> menus = new();

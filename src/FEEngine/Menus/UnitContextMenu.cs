@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FEEngine.Math;
+using FEEngine.Menus.UnitContextMenuPages;
 
 namespace FEEngine.Menus
 {
@@ -42,31 +43,31 @@ namespace FEEngine.Menus
                     mCurrentChildIndex = mCurrentSelection;
                     mChildren[mCurrentChildIndex].OnSelect();
                 }
-                if (state.Back && CanGoBack)
+                if (state.Back)
                 {
-                    Parent.mCurrentChildIndex = -1;
+                    GoBack();
                 }
                 if (mCurrentChildIndex != -1)
                 {
                     mChildren[mCurrentChildIndex].Update();
                 }
             }
-            public void Render(RenderContext context)
+            public void Render(RenderContext context, IVec2<int> availableSize)
             {
                 if (mCurrentChildIndex == -1)
                 {
-                    RenderPage(context);
+                    RenderPage(context, availableSize);
                 }
                 else
                 {
-                    mChildren[mCurrentChildIndex].Render(context);
+                    mChildren[mCurrentChildIndex].Render(context, availableSize);
                 }
             }
-            private void RenderPage(RenderContext context)
+            private void RenderPage(RenderContext context, IVec2<int> availableSize)
             {
                 for (int i = 0; i < mChildren.Count; i++)
                 {
-                    IVec2<int> position = new Vec2I(3, (i * 2) + 1);
+                    IVec2<int> position = new Vec2I(3, availableSize.Y - ((i + 1) * 2));
                     if (mCurrentSelection == i)
                     {
                         context.RenderChar(MathUtil.SubVectors(position, new Vec2I(2, 0)), '>', Color.Red);
@@ -83,6 +84,14 @@ namespace FEEngine.Menus
                 page.Parent = this;
                 mChildren.Add(page);
                 return true;
+            }
+            // i meant for this to be protected, but ItemPage.ItemUsePage couldn't access it as protected, so...
+            public void GoBack()
+            {
+                if (CanGoBack)
+                {
+                    Parent.mCurrentChildIndex = -1;
+                }
             }
             protected virtual void OnSelect() { }
             protected virtual void UpdatePage() { }
@@ -103,9 +112,11 @@ namespace FEEngine.Menus
             protected override void OnSelect()
             {
                 UIController.SelectedUnit.Wait();
+                GoBack();
                 UIController.ResetSelectedUnit();
                 UIController.IsUnitContextMenuOpen = false;
             }
+            internal override bool IsInternal { get { return true; } }
         }
         private class BasePage : Page
         {
@@ -141,8 +152,11 @@ namespace FEEngine.Menus
                         }
                     }
                 }
-                // todo: run calculations for pages: attack, item, etc.
-                Children.Add(new WaitPage());
+                if (UIController.SelectedUnit.Inventory.Count > 0)
+                {
+                    AddChild(new ItemPage());
+                }
+                AddChild(new WaitPage());
             }
             private readonly UnitContextMenu mParent;
             protected override string GetTitle()
@@ -162,23 +176,26 @@ namespace FEEngine.Menus
         }
         public void Render(RenderContext context)
         {
-            if (mRenderSize.X < MinSize.X || mRenderSize.Y < MinSize.Y)
+            if (UIController.IsUnitContextMenuOpen)
             {
-                return;
+                if (mRenderSize.X < MinSize.X || mRenderSize.Y < MinSize.Y)
+                {
+                    return;
+                }
+                int xDifference = mRenderSize.X - MinSize.X;
+                if (xDifference % 2 > 0)
+                {
+                    xDifference--;
+                }
+                int padding = xDifference / 2;
+                context.PushPair(new RenderContext.OffsetClipPair()
+                {
+                    Offset = new Vec2I(padding, 0),
+                    Clip = MathUtil.SubVectors(mRenderSize, new Vec2I(padding, 0))
+                });
+                mBasePage.Render(context, new Vec2I(MinSize.X, mRenderSize.Y));
+                context.PopPair();
             }
-            int xDifference = mRenderSize.X - MinSize.X;
-            if (xDifference % 2 > 0)
-            {
-                xDifference--;
-            }
-            int padding = xDifference / 2;
-            context.PushPair(new RenderContext.OffsetClipPair()
-            {
-                Offset = new Vec2I(padding, 0),
-                Clip = MathUtil.SubVectors(mRenderSize, new Vec2I(padding, 0))
-            });
-            mBasePage.Render(context);
-            context.PopPair();
         }
         public bool AddPage(Page page)
         {

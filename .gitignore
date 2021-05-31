@@ -23,4 +23,4 @@ Makefile
 !sample-scripts/sample-scripts.net.csproj
 .vs/
 build-*/
-rewrite/**/*.json
+src/host/data/*.json

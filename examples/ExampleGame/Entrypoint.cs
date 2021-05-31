@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using FEEngine;
-using FEEngine.Math;
+using FEEngine.Menus;
 using FEEngine.Scripting;
 
 namespace ExampleGame
@@ -61,6 +61,7 @@ namespace ExampleGame
             });
             Player player = new(game);
             game.Renderer.Root.Center = map;
+            game.Renderer.Root.AddChild(UIController.FindMenu<UnitContextMenu>(), BorderLayout.Alignment.Right);
             Console.WriteLine("Successfully initialized!");
             game.Loop(player);
         }

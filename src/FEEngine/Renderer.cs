@@ -87,12 +87,14 @@ namespace FEEngine
         /// <returns></returns>
         public bool RenderString(IVec2<int> position, string text, Color color = Color.White)
         {
+            int xOffset = 0;
             foreach (char character in text)
             {
-                if (!RenderChar(position, character, color))
+                if (!RenderChar(MathUtil.AddVectors(position, new Vec2I(xOffset, 0)), character, color))
                 {
                     return false;
                 }
+                xOffset++;
             }
             return true;
         }
@@ -106,13 +108,14 @@ namespace FEEngine
             foreach (OffsetClipPair pair in mStack)
             {
                 MathUtil.AddVectors(ref data.Offset, pair.Offset);
-                if (pair.Clip.X < data.Clip.X)
+                IVec2<int> clipWithOffset = MathUtil.AddVectors(data.Offset, pair.Clip);
+                if (pair.Clip.X < clipWithOffset.X)
                 {
-                    data.Clip.X = pair.Clip.X;
+                    data.Clip.X = clipWithOffset.X;
                 }
-                if (pair.Clip.Y < data.Clip.Y)
+                if (pair.Clip.Y < clipWithOffset.Y)
                 {
-                    data.Clip.Y = pair.Clip.Y;
+                    data.Clip.Y = clipWithOffset.Y;
                 }
             }
             return data;
@@ -237,6 +240,10 @@ namespace FEEngine
             if (Game.HasNativeImplementation)
             {
                 DisableCursor_Native();
+            }
+            else
+            {
+                Console.CursorVisible = false;
             }
         }
         private readonly List<char> mCharacterBuffer = new();
