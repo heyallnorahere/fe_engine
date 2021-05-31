@@ -69,7 +69,7 @@ namespace FEEngine
         /// </summary>
         public IVec2<int> Position { get; private set; }
         /// <summary>
-        /// A list, containing <see cref="Register{T}"/> indexes of <see cref="Item"/>s
+        /// A list, containing <see cref="Register{T}"/> indexes of <see cref="Item"/>s. Do not use this to add items, use <see cref="Add(Item)"/> instead
         /// </summary>
         public List<int> Inventory { get; private set; }
         /// <summary>
