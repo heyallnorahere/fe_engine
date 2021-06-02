@@ -51,6 +51,7 @@ namespace ExampleGame
                     return false;
                 }
             });
+            InitRegister<Tile>("data/tiles.json", game);
             Player player = new(game);
             game.Renderer.Root.Center = new BorderedObject(map);
             game.Renderer.Root.AddChild(new BorderedObject(new Logger.RenderAgent()), BorderLayout.Alignment.Bottom);
@@ -58,6 +59,7 @@ namespace ExampleGame
             game.Renderer.Root.AddChild(new BorderedMenu(UIController.FindMenu<TileInfoMenu>()), BorderLayout.Alignment.Left);
             Logger.Print(Color.Green, "Successfully initialized!");
             game.Loop(player);
+            game.Registry.SerializeRegister<Tile>("data/tiles.json");
             game.Registry.SerializeRegister<Map>("data/maps.json");
             game.Registry.SerializeRegister<Unit>("data/units.json");
             game.Registry.SerializeRegister<Item>("data/items.json");

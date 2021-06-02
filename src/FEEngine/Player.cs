@@ -52,16 +52,37 @@ namespace FEEngine
                 if (delta.TaxicabLength() > 0)
                 {
                     bool canMoveCursor = true;
+                    Register<Unit> unitRegister = mGame.Registry.GetRegister<Unit>();
+                    // check if the unit can move to the cursor's new position
                     if (mSelectedIndex != -1)
                     {
-                        Register<Unit> unitRegister = mGame.Registry.GetRegister<Unit>();
                         Unit unit = unitRegister[mSelectedIndex];
                         int futureLength = MathUtil.SubVectors(MathUtil.AddVectors(delta, CursorPosition), unit.Position).TaxicabLength();
                         canMoveCursor = futureLength <= unit.CurrentMovement;
                     }
+                    // check if the currently selected unit can pass the next tile
+                    if (canMoveCursor && mSelectedIndex != -1)
+                    {
+                        Tile nextTile = Map.GetTileAt(MathUtil.AddVectors(delta, CursorPosition));
+                        if (nextTile != null)
+                        {
+                            Unit unit = unitRegister[mSelectedIndex];
+                            canMoveCursor = nextTile.CanPass(unit);
+                        }
+                    }
+                    // check if there is an enemy unit at the cursor's new position
+                    if (canMoveCursor && mSelectedIndex != -1)
+                    {
+                        Unit candidateUnit = Map.GetUnitAt(MathUtil.AddVectors(delta, CursorPosition));
+                        if (candidateUnit != null)
+                        {
+                            Unit unit = unitRegister[mSelectedIndex];
+                            canMoveCursor = unit.IsAllied(candidateUnit);
+                        }
+                    }
                     if (canMoveCursor)
                     {
-                        delta = MathUtil.SubVectors(MathUtil.ClampVector(MathUtil.AddVectors(delta, CursorPosition), new Vec2I(0), MathUtil.SubVectors(dimensions, new Vec2I(0))), CursorPosition);
+                        delta = MathUtil.SubVectors(MathUtil.ClampVector(MathUtil.AddVectors(delta, CursorPosition), new Vec2I(0), MathUtil.SubVectors(dimensions, new Vec2I(1))), CursorPosition);
                         IVec2<int> temp = CursorPosition;
                         MathUtil.AddVectors(ref temp, delta);
                         CursorPosition = temp;
@@ -91,6 +112,10 @@ namespace FEEngine
                         UIController.SelectedUnit = unit;
                         UIController.IsUnitContextMenuOpen = true;
                     }
+                }
+                if (state.Back && mSelectedIndex != -1)
+                {
+                    mSelectedIndex = -1; // just unselect the unit
                 }
             }
         }

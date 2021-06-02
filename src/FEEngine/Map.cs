@@ -80,9 +80,13 @@ namespace FEEngine
             }
         }
         /// <summary>
-        /// A list of <see cref="Register{T}"/> indices that point to active <see cref="Unit"/>. DO NOT add units through this; use <see cref="AddUnit(Unit)"/>
+        /// A list of <see cref="Register{T}"/> indices that point to active <see cref="Unit"/>s. DO NOT add units through this; use <see cref="AddUnit(Unit)"/>
         /// </summary>
         public List<int> Units { get; set; }
+        /// <summary>
+        /// A list of <see cref="Register{T}"/> indices that point to special <see cref="Tile"/>s to add to the map. It is acceptable to add tiles through this method
+        /// </summary>
+        public List<int> SpecialTiles { get; set; }
         [JsonIgnore]
         internal Player Player { get; set; }
         public IVec2<int> MinSize { get => Dimensions; }
@@ -98,6 +102,24 @@ namespace FEEngine
                 if (MathUtil.AreVectorsEqual(unit.Position, position))
                 {
                     return unit;
+                }
+            }
+            return null;
+        }
+        /// <summary>
+        /// Finds a <see cref="Tile"/> at the specified position
+        /// </summary>
+        /// <param name="position">The position to search at</param>
+        /// <returns>A <see cref="Tile"/> object if found; otherwise, null</returns>
+        public Tile GetTileAt(IVec2<int> position)
+        {
+            Register<Tile> tileRegister = mRegister.Parent.GetRegister<Tile>();
+            foreach (int index in SpecialTiles)
+            {
+                Tile tile = tileRegister[index];
+                if (MathUtil.AreVectorsEqual(tile.Position, position))
+                {
+                    return tile;
                 }
             }
             return null;
@@ -204,11 +226,12 @@ namespace FEEngine
             mRenderSize = size;
         }
         [JsonConstructor]
-        public Map(int width, int height, List<int> units = null)
+        public Map(int width, int height, List<int> units = null, List<int> specialTiles = null)
         {
             Width = width;
             Height = height;
             Units = units ?? new List<int>();
+            SpecialTiles = specialTiles ?? new List<int>();
             Player = null;
         }
         private IVec2<int> mRenderSize;

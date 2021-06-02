@@ -14,6 +14,15 @@ namespace FEEngine.Menus
         {
             return "Tile info";
         }
+        private string GetStringForMovementLimit(Tile.MovementLimitEnum movementLimit)
+        {
+            return movementLimit switch
+            {
+                Tile.MovementLimitEnum.Flying => "Flying units",
+                Tile.MovementLimitEnum.All => "All units",
+                _ => "No units",
+            };
+        }
         public void Render(RenderContext context)
         {
             IVec2<int> origin = new Vec2I(0, mRenderSize.Y - 1);
@@ -43,6 +52,20 @@ namespace FEEngine.Menus
             IVec2<int> classTextPos = MathUtil.AddVectors(origin, new Vec2I(1, -6));
             context.RenderString(classTextPos, "Class:");
             context.RenderString(MathUtil.AddVectors(classTextPos, new Vec2I(2, -1)), className);
+            Tile tile = map.GetTileAt(SelectedTile);
+            string tileContentText = "Plain";
+            string whoCanPassTile = GetStringForMovementLimit(Tile.MovementLimitEnum.All);
+            if (tile != null)
+            {
+                // todo: figure out the tiles content
+                whoCanPassTile = GetStringForMovementLimit(tile.MovementLimit);
+            }
+            IVec2<int> tileContentTextPos = MathUtil.AddVectors(origin, new Vec2I(1, -9));
+            context.RenderString(tileContentTextPos, "Tile:");
+            context.RenderString(MathUtil.AddVectors(tileContentTextPos, new Vec2I(2, -1)), tileContentText);
+            IVec2<int> whoCanPassTileTextPos = MathUtil.SubVectors(tileContentTextPos, new Vec2I(0, 2));
+            context.RenderString(whoCanPassTileTextPos, "Supports:");
+            context.RenderString(MathUtil.AddVectors(whoCanPassTileTextPos, new Vec2I(2, -1)), whoCanPassTile);
         }
         public void SetSize(IVec2<int> size)
         {

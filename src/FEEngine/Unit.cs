@@ -254,6 +254,7 @@ namespace FEEngine
             {
                 return false;
             }
+            // todo: use pathfinding algorithm to figure out how much movement to consume/refund
             switch (movementType)
             {
                 case MovementType.ConsumeMovement:

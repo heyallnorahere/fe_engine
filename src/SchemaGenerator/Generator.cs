@@ -44,6 +44,7 @@ namespace SchemaGenerator
             WriteSchema<Register<Map>>("Maps");
             WriteSchema<Register<Unit>>("Units");
             WriteSchema<Register<Item>>("Items");
+            WriteSchema<Register<Tile>>("Tiles");
             WriteSchema<InputManager.KeyBindings>();
         }
         private static JSchemaGenerator CreateGenerator()

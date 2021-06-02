@@ -150,6 +150,7 @@ namespace FEEngine
             mRegistry.CreateRegister<Map>();
             mRegistry.CreateRegister<Unit>();
             mRegistry.CreateRegister<Item>();
+            mRegistry.CreateRegister<Tile>();
         }
         private readonly Registry mRegistry;
         private readonly string mKeyBindingsFile;
