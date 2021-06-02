@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using FEEngine.Classes;
 using FEEngine.Math;
 using FEEngine.Scripting;
 
@@ -60,6 +61,34 @@ namespace FEEngine
         public struct UnitStats
         {
             public int HP, Str, Mag, Dex, Spd, Lck, Def, Res, Cha, Mv;
+        }
+        /// <summary>
+        /// See <see cref="FEEngine.Class"/>
+        /// </summary>
+        [JsonIgnore]
+        public Class Class
+        {
+            get => mClass;
+            set
+            {
+                mClass = value; // todo: call events on reclass
+            }
+        }
+        public string ClassName
+        {
+            get
+            {
+                return Class.GetType().AssemblyQualifiedName;
+            }
+            set
+            {
+                string typeName = value ?? typeof(DefaultClass).AssemblyQualifiedName;
+                Type type = Type.GetType(typeName);
+                if (type != null)
+                {
+                    Class = (Class)type.GetConstructor(new Type[0]).Invoke(new object[0]);
+                }
+            }
         }
         /// <summary>
         /// The name of the <see cref="Unit"/>
@@ -433,7 +462,7 @@ namespace FEEngine
         /// </summary>
         public string BehaviorName { get; set; }
         [JsonConstructor]
-        public Unit(IVec2<int> position, UnitAffiliation affiliation, UnitStats stats, string behaviorName = null, Item equippedWeapon = null, string name = "Soldier")
+        public Unit(IVec2<int> position, UnitAffiliation affiliation, UnitStats stats, string behaviorName = null, Item equippedWeapon = null, string className = null, string name = "Soldier")
         {
             Inventory = new List<int>();
             Name = name;
@@ -443,6 +472,7 @@ namespace FEEngine
             BehaviorName = behaviorName;
             RefreshMovement();
             CurrentHP = Stats.HP;
+            ClassName = className; // doesnt matter if its null, ClassName will handle null values
             if (equippedWeapon == null)
             {
                 mEquippedWeaponIndex = -1;
@@ -477,6 +507,7 @@ namespace FEEngine
             }
         }
         private IUnitBehavior mBehavior;
+        private Class mClass;
         private int mEquippedWeaponIndex;
     }
 }

@@ -58,6 +58,9 @@ namespace ExampleGame
             game.Renderer.Root.AddChild(new BorderedMenu(UIController.FindMenu<TileInfoMenu>()), BorderLayout.Alignment.Left);
             Logger.Print(Color.Green, "Successfully initialized!");
             game.Loop(player);
+            game.Registry.SerializeRegister<Map>("data/maps.json");
+            game.Registry.SerializeRegister<Unit>("data/units.json");
+            game.Registry.SerializeRegister<Item>("data/items.json");
         }
         private static void InitRegister<T>(string filename, Game game, Func<bool> beforeSerializationCallback = null, Func<bool> afterDeserializationCallback = null) where T : class, IRegisteredObject<T>
         {

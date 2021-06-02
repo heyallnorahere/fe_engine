@@ -23,6 +23,7 @@ namespace FEEngine.Menus
             Unit unit = map.GetUnitAt(SelectedTile);
             string unitDescText = "None";
             string affiliationName = "NA";
+            string className = "NA";
             Color affiliationColor = Color.White;
             if (unit != null)
             {
@@ -33,12 +34,15 @@ namespace FEEngine.Menus
                     affiliationName = "Third army";
                 }
                 affiliationColor = Unit.GetColorForAffiliation(unit.Affiliation);
+                className = unit.Class.Name;
             }
             context.RenderString(MathUtil.AddVectors(origin, new Vec2I(1, -1)), string.Format("Unit: {0}", unitDescText));
             IVec2<int> affiliationTextPos = MathUtil.AddVectors(origin, new Vec2I(1, -3));
-            string label = "Affiliation:";
-            context.RenderString(affiliationTextPos, label);
+            context.RenderString(affiliationTextPos, "Affiliation:");
             context.RenderString(MathUtil.AddVectors(affiliationTextPos, new Vec2I(2, -1)), affiliationName, affiliationColor);
+            IVec2<int> classTextPos = MathUtil.AddVectors(origin, new Vec2I(1, -6));
+            context.RenderString(classTextPos, "Class:");
+            context.RenderString(MathUtil.AddVectors(classTextPos, new Vec2I(2, -1)), className);
         }
         public void SetSize(IVec2<int> size)
         {

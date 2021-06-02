@@ -48,7 +48,7 @@ static void clear_screen_unix() {
     std::cout << "\033[2J\033[H" << std::flush;
 }
 static void disable_cursor_unix() {
-    // todo: implement
+    std::cout << "\033[?1c" << std::flush;
 }
 #define write_char write_char_unix
 #define clear_screen clear_screen_unix
