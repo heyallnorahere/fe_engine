@@ -4,10 +4,13 @@
     {
         public DefaultClass()
         {
-            mMovementProperties = Defaults.DefaultBeginnerFootProperties;
+            mMovementProperties = ClassUtil.DefaultBeginnerFootProperties;
+            mStats = ClassUtil.CreateStatBoosts();
         }
         public override MovementProperties MovementProperties => mMovementProperties;
         public override string Name => "None";
+        public override Unit.UnitStats StatBoosts => mStats;
         private MovementProperties mMovementProperties;
+        private Unit.UnitStats mStats;
     }
 }

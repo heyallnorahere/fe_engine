@@ -36,7 +36,7 @@ namespace FEEngine.Menus
             Color affiliationColor = Color.White;
             if (unit != null)
             {
-                unitDescText = string.Format("{0} ({1}/{2})", unit.Name, unit.CurrentHP, unit.Stats.HP);
+                unitDescText = string.Format("{0} ({1}/{2})", unit.Name, unit.CurrentHP, unit.BoostedStats.HP);
                 affiliationName = unit.Affiliation.ToString();
                 if (unit.Affiliation == Unit.UnitAffiliation.ThirdEnemy)
                 {

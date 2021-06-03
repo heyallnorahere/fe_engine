@@ -30,6 +30,7 @@ namespace FEEngine
         /// The name of the <see cref="Class"/>
         /// </summary>
         public abstract string Name { get; }
-        // todo: add move class properties later
+        public abstract Unit.UnitStats StatBoosts { get; }
+        // todo: add more class properties later
     }
 }

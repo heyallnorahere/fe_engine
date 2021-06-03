@@ -71,7 +71,8 @@ namespace FEEngine
             get => mClass;
             set
             {
-                mClass = value; // todo: call events on reclass
+                mClass = value ?? new DefaultClass();
+                // todo: call events on reclass
             }
         }
         public string ClassName
@@ -98,6 +99,30 @@ namespace FEEngine
         /// The <see cref="Unit"/>'s stats
         /// </summary>
         public UnitStats Stats { get; set; }
+        /// <summary>
+        /// The unit's <see cref="Stats"/>, plus boosts from things such as classes, and equipment
+        /// </summary>
+        [JsonIgnore]
+        public UnitStats BoostedStats
+        {
+            get
+            {
+                UnitStats classBoosts = Class.StatBoosts;
+                return new()
+                {
+                    HP = Stats.HP + classBoosts.HP,
+                    Str = Stats.Str + classBoosts.Str,
+                    Mag = Stats.Mag + classBoosts.Mag,
+                    Dex = Stats.Dex + classBoosts.Dex,
+                    Spd = Stats.Spd + classBoosts.Spd,
+                    Lck = Stats.Lck + classBoosts.Lck,
+                    Def = Stats.Def + classBoosts.Def,
+                    Res = Stats.Res + classBoosts.Res,
+                    Cha = Stats.Cha + classBoosts.Cha,
+                    Mv = Stats.Mv + classBoosts.Mv
+                };
+            }
+        }
         /// <summary>
         /// The position of the <see cref="Unit"/> on the map
         /// </summary>
@@ -212,7 +237,7 @@ namespace FEEngine
         /// </summary>
         public void RefreshMovement()
         {
-            CurrentMovement = Stats.Mv;
+            CurrentMovement = BoostedStats.Mv;
             CanMove = true;
         }
         /// <summary>
@@ -262,9 +287,9 @@ namespace FEEngine
                     break;
                 case MovementType.RefundMovement:
                     CurrentMovement += deltaLength;
-                    if (CurrentMovement > Stats.Mv)
+                    if (CurrentMovement > BoostedStats.Mv)
                     {
-                        CurrentMovement = Stats.Mv;
+                        CurrentMovement = BoostedStats.Mv;
                     }
                     break;
             }
@@ -346,6 +371,8 @@ namespace FEEngine
         /// <returns>Whether the attack succeeded</returns>
         public bool Attack(Unit toAttack)
         {
+            UnitStats boostedStats = BoostedStats;
+            UnitStats otherBoostedStats = toAttack.BoostedStats;
             // check if the attacker can move, and if the recipient is a valid target
             Item myWeapon = EquippedWeapon;
             if (!CanMove || IsAllied(toAttack) || myWeapon == null)
@@ -365,8 +392,8 @@ namespace FEEngine
                 IVec2<int> otherRange = otherWeapon.WeaponStats.Range;
                 iAmInRange = distance > otherRange.X && distance < otherRange.Y;
             }
-            int attackSpeed = Stats.Spd - myWeapon.WeaponStats.Weight;
-            int otherAttackSpeed = toAttack.Stats.Spd - otherWeapon?.WeaponStats.Weight ?? 0;
+            int attackSpeed = boostedStats.Spd - myWeapon.WeaponStats.Weight;
+            int otherAttackSpeed = otherBoostedStats.Spd - otherWeapon?.WeaponStats.Weight ?? 0;
             AttackImpl(toAttack, myWeapon, otherWeapon);
             if (iAmInRange)
             {
@@ -397,35 +424,27 @@ namespace FEEngine
         }
         private void AttackImpl(Unit toAttack, Item myWeapon, Item otherWeapon)
         {
-            AttackPacket packet = CreateAttackPacket(toAttack.Stats, myWeapon);
+            AttackPacket packet = CreateAttackPacket(toAttack.BoostedStats, myWeapon);
             AttackResult result = ParseAttackPacket(packet);
             toAttack.ReceiveAttackResult(result, this);
         }
         private AttackPacket CreateAttackPacket(UnitStats otherStats, Item myWeapon)
         {
+            UnitStats boostedStats = BoostedStats;
             AttackPacket packet = new();
-            bool isMagic;
             WeaponStats weaponStats = myWeapon.WeaponStats;
-            switch (weaponStats.Type)
+            var isMagic = weaponStats.Type switch
             {
-                case WeaponType.WhiteMagic:
-                    isMagic = true;
-                    break;
-                case WeaponType.BlackMagic:
-                    isMagic = true;
-                    break;
-                case WeaponType.DarkMagic:
-                    isMagic = true;
-                    break;
-                default:
-                    isMagic = false;
-                    break;
-            }
-            int strength = isMagic ? Stats.Mag : Stats.Str;
+                WeaponType.WhiteMagic => true,
+                WeaponType.BlackMagic => true,
+                WeaponType.DarkMagic => true,
+                _ => false,
+            };
+            int strength = isMagic ? boostedStats.Mag : boostedStats.Str;
             int defense = isMagic ? otherStats.Res : otherStats.Def;
             packet.Might = weaponStats.Attack + strength - defense;
-            packet.Hit = weaponStats.HitRate + Stats.Dex - otherStats.Dex;
-            packet.Crit = weaponStats.CritRate + Stats.Lck - otherStats.Lck;
+            packet.Hit = weaponStats.HitRate + boostedStats.Dex - otherStats.Dex;
+            packet.Crit = weaponStats.CritRate + boostedStats.Lck - otherStats.Lck;
             return packet;
         }
         private static AttackResult ParseAttackPacket(AttackPacket packet)
@@ -471,9 +490,9 @@ namespace FEEngine
             Affiliation = affiliation;
             Stats = stats;
             BehaviorName = behaviorName;
-            RefreshMovement();
-            CurrentHP = Stats.HP;
             ClassName = className; // doesnt matter if its null, ClassName will handle null values
+            CurrentHP = BoostedStats.HP;
+            RefreshMovement();
             if (equippedWeapon == null)
             {
                 mEquippedWeaponIndex = -1;
