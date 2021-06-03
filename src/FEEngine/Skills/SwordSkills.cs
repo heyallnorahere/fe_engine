@@ -21,6 +21,9 @@ namespace FEEngine.Skills
         public override Unit.UnitStats StatBoosts => ClassUtil.CreateStatBoosts();
         public override string FriendlyName => "Sword Critical +10";
     }
+    /// <summary>
+    /// Grants Atk +5 when using a sword.
+    /// </summary>
     public class Swordfaire : FaireSkillBase
     {
         public Swordfaire() : base(WeaponType.Sword) { }
