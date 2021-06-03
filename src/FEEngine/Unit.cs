@@ -61,6 +61,35 @@ namespace FEEngine
         public struct UnitStats
         {
             public int HP, Str, Mag, Dex, Spd, Lck, Def, Res, Cha, Mv;
+            public UnitStats(UnitStats stats)
+            {
+                HP = stats.HP;
+                Str = stats.Str;
+                Mag = stats.Mag;
+                Dex = stats.Dex;
+                Spd = stats.Spd;
+                Lck = stats.Lck;
+                Def = stats.Def;
+                Res = stats.Res;
+                Cha = stats.Cha;
+                Mv = stats.Mv;
+            }
+            public static UnitStats operator+(UnitStats a, UnitStats b)
+            {
+                return new UnitStats
+                {
+                    HP = a.HP + b.HP,
+                    Str = a.Str + b.Str,
+                    Mag = a.Mag + b.Mag,
+                    Dex = a.Dex + b.Dex,
+                    Spd = a.Spd + b.Spd,
+                    Lck = a.Lck + b.Lck,
+                    Def = a.Def + b.Def,
+                    Res = a.Res + b.Res,
+                    Cha = a.Cha + b.Cha,
+                    Mv = a.Mv + b.Mv
+                };
+            }
         }
         /// <summary>
         /// See <see cref="FEEngine.Class"/>
@@ -72,7 +101,8 @@ namespace FEEngine
             set
             {
                 mClass = value ?? new DefaultClass();
-                // todo: call events on reclass
+                SkillEventArgs eventArgs = new SkillReclassArgs(mClass.GetType());
+                CallEvent(SkillTriggerEvent.OnReclass, eventArgs);
             }
         }
         public string ClassName
@@ -107,20 +137,13 @@ namespace FEEngine
         {
             get
             {
-                UnitStats classBoosts = Class.StatBoosts;
-                return new()
+                UnitStats stats = new UnitStats(Stats);
+                stats += Class.StatBoosts;
+                foreach (Skill skill in mSkills)
                 {
-                    HP = Stats.HP + classBoosts.HP,
-                    Str = Stats.Str + classBoosts.Str,
-                    Mag = Stats.Mag + classBoosts.Mag,
-                    Dex = Stats.Dex + classBoosts.Dex,
-                    Spd = Stats.Spd + classBoosts.Spd,
-                    Lck = Stats.Lck + classBoosts.Lck,
-                    Def = Stats.Def + classBoosts.Def,
-                    Res = Stats.Res + classBoosts.Res,
-                    Cha = Stats.Cha + classBoosts.Cha,
-                    Mv = Stats.Mv + classBoosts.Mv
-                };
+                    stats += skill.StatBoosts;
+                }
+                return stats;
             }
         }
         /// <summary>
@@ -131,6 +154,30 @@ namespace FEEngine
         /// A list, containing <see cref="Register{T}"/> indexes of <see cref="Item"/>s. Do not use this to add items, use <see cref="Add(Item)"/> instead
         /// </summary>
         public List<int> Inventory { get; private set; }
+        /// <summary>
+        /// A list, containing <see cref="Type.AssemblyQualifiedName"/>s of <see cref="Skill"/> types.
+        /// </summary>
+        public List<string> SkillNames
+        {
+            get
+            {
+                List<string> typeNames = new();
+                foreach (Skill skill in mSkills)
+                {
+                    typeNames.Add(skill.GetType().AssemblyQualifiedName);
+                }
+                return typeNames;
+            }
+            set
+            {
+                mSkills.Clear();
+                foreach (string skillName in value)
+                {
+                    Type skillType = Type.GetType(skillName);
+                    mSkills.Add((Skill)skillType.GetConstructor(new Type[0]).Invoke(new object[0]));
+                }
+            }
+        }
         /// <summary>
         /// How many tiles the <see cref="Unit"/> can move, until the next turn
         /// </summary>
@@ -249,6 +296,20 @@ namespace FEEngine
             item.Parent = this;
             Inventory.Add(item.RegisterIndex);
         }
+        /// <summary>
+        /// Adds a <see cref="Skill"/> to the <see cref="Unit"/>'s skill list
+        /// </summary>
+        /// <typeparam name="T">The type of skill to add</typeparam>
+        /// <returns>If the skill was successfully added</returns>
+        public bool AddSkill<T>() where T : Skill, new()
+        {
+            if (mSkills.Count >= 5)
+            {
+                return false;
+            }
+            mSkills.Add(new T());
+            return true;
+        }
         public override void OnDeserialized()
         {
             Register<Item> itemRegister = mRegister.Parent.GetRegister<Item>();
@@ -294,6 +355,8 @@ namespace FEEngine
                     break;
             }
             Position = newPos;
+            SkillEventArgs eventArgs = new SkillMoveArgs(Position);
+            CallEvent(SkillTriggerEvent.OnMove, eventArgs);
             return true;
         }
         /// <summary>
@@ -317,6 +380,13 @@ namespace FEEngine
             if (mBehavior?.Update() ?? Affiliation != UnitAffiliation.Player)
             {
                 CanMove = false;
+            }
+        }
+        private void CallEvent(SkillTriggerEvent @event, SkillEventArgs eventArgs)
+        {
+            foreach (Skill skill in mSkills)
+            {
+                Skill.Invoke(skill, @event, this, eventArgs);
             }
         }
         /// <summary>
@@ -484,12 +554,13 @@ namespace FEEngine
         [JsonConstructor]
         public Unit(IVec2<int> position, UnitAffiliation affiliation, UnitStats stats, string behaviorName = null, Item equippedWeapon = null, string className = null, string name = "Soldier")
         {
-            Inventory = new List<int>();
+            Inventory = new();
             Name = name;
             Position = position;
             Affiliation = affiliation;
             Stats = stats;
             BehaviorName = behaviorName;
+            mSkills = new();
             ClassName = className; // doesnt matter if its null, ClassName will handle null values
             CurrentHP = BoostedStats.HP;
             RefreshMovement();
@@ -528,6 +599,7 @@ namespace FEEngine
         }
         private IUnitBehavior mBehavior;
         private Class mClass;
+        private List<Skill> mSkills;
         private int mEquippedWeaponIndex;
     }
 }
