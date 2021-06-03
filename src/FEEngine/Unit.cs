@@ -366,6 +366,15 @@ namespace FEEngine
         {
             CanMove = false;
         }
+        internal void UpdateWeapon()
+        {
+            Item equippedWeapon = EquippedWeapon;
+            if ((equippedWeapon?.WeaponStats.Durability ?? 1) <= 0)
+            {
+                mEquippedWeaponIndex = -1; // just stop referencing it
+                Logger.Print(Color.Yellow, "{0} broke...", equippedWeapon.Name);
+            }
+        }
         internal void Update()
         {
             Register<Item> itemRegister = mRegister.Parent.GetRegister<Item>();
@@ -464,27 +473,40 @@ namespace FEEngine
             }
             int attackSpeed = boostedStats.Spd - myWeapon.WeaponStats.Weight;
             int otherAttackSpeed = otherBoostedStats.Spd - otherWeapon?.WeaponStats.Weight ?? 0;
-            AttackImpl(toAttack, myWeapon, otherWeapon);
+            AttackImpl(toAttack, myWeapon);
+            if (toAttack.CurrentHP <= 0)
+            {
+                goto exit;
+            }
             if (iAmInRange)
             {
-                toAttack.AttackImpl(this, otherWeapon, myWeapon);
+                toAttack.AttackImpl(this, otherWeapon);
+                if (CurrentHP <= 0)
+                {
+                    goto exit;
+                }
             }
             if (attackSpeed - otherAttackSpeed >= 4)
             {
-                AttackImpl(toAttack, myWeapon, otherWeapon);
+                AttackImpl(toAttack, myWeapon);
+                if (toAttack.CurrentHP <= 0)
+                {
+                    goto exit;
+                }
             }
             else if (otherAttackSpeed - attackSpeed >= 4 && iAmInRange)
             {
-                toAttack.AttackImpl(this, otherWeapon, myWeapon);
+                toAttack.AttackImpl(this, otherWeapon);
             }
+            exit:
             CanMove = false;
             return true;
         }
         private struct AttackPacket
         {
-            public int Might { get; set; }
-            public int Hit { get; set; }
-            public int Crit { get; set; }
+            public int Might;
+            public int Hit;
+            public int Crit;
         }
         private struct AttackResult
         {
@@ -492,11 +514,17 @@ namespace FEEngine
             public bool DidHit { get; set; }
             public bool DidCrit { get; set; }
         }
-        private void AttackImpl(Unit toAttack, Item myWeapon, Item otherWeapon)
+        private void AttackImpl(Unit toAttack, Item myWeapon)
         {
             AttackPacket packet = CreateAttackPacket(toAttack.BoostedStats, myWeapon);
+            SkillAttackArgs eventArgs = new(toAttack);
+            eventArgs.Might = new Ref<int>(ref packet.Might);
+            eventArgs.HitRate = new Ref<int>(ref packet.Hit);
+            eventArgs.CritRate = new Ref<int>(ref packet.Crit);
+            CallEvent(SkillTriggerEvent.OnAttack, eventArgs);
             AttackResult result = ParseAttackPacket(packet);
             toAttack.ReceiveAttackResult(result, this);
+            myWeapon.WeaponStats.Durability--;
         }
         private AttackPacket CreateAttackPacket(UnitStats otherStats, Item myWeapon)
         {
@@ -599,7 +627,7 @@ namespace FEEngine
         }
         private IUnitBehavior mBehavior;
         private Class mClass;
-        private List<Skill> mSkills;
+        private readonly List<Skill> mSkills;
         private int mEquippedWeaponIndex;
     }
 }

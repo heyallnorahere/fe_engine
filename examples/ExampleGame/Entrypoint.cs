@@ -15,6 +15,19 @@ namespace ExampleGame
             Parent.Parent.Move(new Vec2I(0, 1), Unit.MovementType.IgnoreMovement);
         }
     }
+    [SkillTrigger(SkillTriggerEvent.OnAttack)]
+    public class TestSkill : Skill
+    {
+        public override Unit.UnitStats StatBoosts => new();
+        public override string FriendlyName => "Test skill";
+        protected override void Invoke(Unit caller, SkillEventArgs eventArgs)
+        {
+            SkillAttackArgs attackArgs = (SkillAttackArgs)eventArgs;
+            Logger.Print(Color.White, "{0} activated!", nameof(TestSkill));
+            attackArgs.Might.Value *= 3; // essentially a crit
+            attackArgs.CritRate.Value = 100; // then triple that again
+        }
+    }
     public class Entrypoint
     {
         public static void Main()

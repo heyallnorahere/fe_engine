@@ -76,6 +76,10 @@ namespace FEEngine
         /// The weight of the weapon
         /// </summary>
         public int Weight { get; set; }
+        /// <summary>
+        /// The current durability of the weapon
+        /// </summary>
+        public int Durability { get; set; }
     }
     /// <summary>
     /// An object that represents an item in a <see cref="Unit"/>'s inventory

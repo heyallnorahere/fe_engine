@@ -34,5 +34,8 @@ namespace FEEngine
             Enemy = enemyUnit;
         }
         public Unit Enemy { get; private set; }
+        public Ref<int> Might { get; internal set; }
+        public Ref<int> HitRate { get; internal set; }
+        public Ref<int> CritRate { get; internal set; }
     }
 }

@@ -134,12 +134,18 @@ namespace FEEngine
         internal void Update(Unit.UnitAffiliation currentPhase)
         {
             List<Unit> units = GetAllUnitsOfAffiliation(currentPhase);
+            // let all of the units move
             foreach (Unit unit in units)
             {
                 if (unit.CanMove)
                 {
                     unit.Update();
                 }
+            }
+            // now check for things such as weapons breaking
+            foreach (Unit unit in this)
+            {
+                unit.UpdateWeapon();
             }
             // go again, to remove units with 0 hp
             bool keepGoing = true;
