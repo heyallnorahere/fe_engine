@@ -282,9 +282,12 @@ namespace FEEngine
         /// <summary>
         /// Resets the <see cref="Unit"/>'s current movement
         /// </summary>
-        public void RefreshMovement()
+        public void RefreshMovement(bool keepCurrentMovement = false)
         {
-            CurrentMovement = BoostedStats.Mv;
+            if (!keepCurrentMovement)
+            {
+                CurrentMovement = BoostedStats.Mv;
+            }
             CanMove = true;
         }
         /// <summary>
