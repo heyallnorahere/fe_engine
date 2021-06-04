@@ -27,7 +27,7 @@ jobs:
         shell: bash
         run: |
           chmod +x create-artifact.sh
-          ./create-artifact.sh FEEngine Release windows x86_64 FEEngine
+          ./create-artifact.sh FEEngine Release windows x86_64 FEEngine.tar.gz
       - name: upload artifact
         uses: actions/upload-artifact@v2
         with:
