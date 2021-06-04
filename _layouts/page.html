@@ -1,0 +1,45 @@
+---
+copyright: Sorry, this is a programmer website. Graphic design is my passion. &copy; 2021 Lucy Beda
+---
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>FEEngine / {{ page.title }}</title>
+        <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/stylesheet.css" rel="stylesheet">
+        <script src="bootstrap/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <header class="d-flex justify-content-center py-3">
+                <ul class="nav nav-pills">
+                    {% for item in site.data.navbar %}
+                    <li class="nav-item">
+                        {% if item.name == page.title %}
+                        <a href="#body" class="nav-link active">{{ item.name }}</a>
+                        {% else %}
+                        <a href="{{ item.value }}" class="nav-link">{{ item.name }}</a>
+                        {% endif %}
+                    </li>
+                    {% else %}
+                    Whoops!
+                    {% endfor %}
+                </ul>
+            </header>    
+        </div>
+        <div class="container" id="body">
+            <h1>
+                {% if page.title != "Home" %}
+                {{ page.title }}
+                {% else %}
+                FEEngine
+                {% endif %}
+            </h1>
+            <div>
+                {{ content }}
+            </div>
+            <footer class="copyright">{{ layout.copyright }}</footer>
+        </div>
+    </body>
+</html>

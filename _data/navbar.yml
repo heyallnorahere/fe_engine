@@ -1,0 +1,6 @@
+- name: Home
+  value: index.html
+- name: Building
+  value: building.html
+- name: Source
+  value: https://github.com/yodasoda1219/fe_engine

@@ -1,0 +1,14 @@
+@import url(../bootstrap/css/bootstrap.min.css);
+h1 {
+    text-align: center;
+}
+p {
+    text-align: center;
+}
+#body {
+    width: 700px;
+    max-width: 100%;
+}
+.copyright {
+    font-size: 0.3cm;
+}
