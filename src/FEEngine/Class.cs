@@ -35,7 +35,13 @@ namespace FEEngine
         /// The name of the <see cref="Class"/>
         /// </summary>
         public abstract string Name { get; }
+        /// <summary>
+        /// The stat boosts that users of this class will receive
+        /// </summary>
         public abstract Unit.UnitStats StatBoosts { get; }
+        /// <summary>
+        /// An array of 3 <see cref="Skill"/>s that will have effect on the user of this class
+        /// </summary>
         public Skill[] ClassSkills { get; private set; }
     }
 }
