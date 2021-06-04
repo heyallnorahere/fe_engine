@@ -224,10 +224,6 @@ project "MapDesigner"
         "System",
         "MapDesigner-Internals"
     }
-    filter "system:windows"
-        postbuildcommands {
-            '{COPY} "%{cfg.targetdir}/../MapDesigner-Internals/MapDesigner-Internals.dll" "."'
-        }
 project "MapDesigner-Internals"
     location "src/MapDesigner/Internals"
     kind "SharedLib"
