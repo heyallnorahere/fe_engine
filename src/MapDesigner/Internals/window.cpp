@@ -51,7 +51,7 @@ EXPORT void RelayMessage(mapdesigner::window* window) {
     DispatchMessageA(&window->message);
 }
 EXPORT bool ShouldClose(mapdesigner::window* window) {
-    return window->message.message == WM_QUIT;
+    return (window->message.message == WM_QUIT);
 }
 EXPORT void DestroyWindow_(mapdesigner::window* window) {
     DestroyWindow(window->window);

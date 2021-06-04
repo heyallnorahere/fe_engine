@@ -6,7 +6,8 @@ jobs:
     env:
       MSBUILD_PATH: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\
     steps:
-      - uses: actions/checkout@v2
+      - name: checkout repository
+        uses: actions/checkout@v2
         with:
           submodules: recursive
       - name: install mono
@@ -22,3 +23,13 @@ jobs:
         shell: cmd
         run: |
           "%MSBUILD_PATH%\MSBuild.exe" fe_engine.sln -p:Configuration=Release -m
+      - name: create artifact
+        shell: bash
+        run: |
+          chmod +x create-artifact.sh
+          ./create-artifact.sh FEEngine Release windows x86_64 FEEngine
+      - name: upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: release-windows
+          path: FEEngine.tar.gz

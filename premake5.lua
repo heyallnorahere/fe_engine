@@ -140,18 +140,6 @@ project "host"
     defines {
         'MONO_CS_LIBDIR="%{libdirs_table.mono}"'
     }
-    postbuildcommands {
-        '{MOVE} "%{cfg.targetdir}/FEEngine.dll" "."',
-        '{MOVE} "%{cfg.targetdir}/ExampleGame.exe" "."',
-        '{MOVE} "%{cfg.targetdir}/Newtonsoft.Json.dll" "."',
-        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.dll" "."',
-        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Core.dll" "."',
-        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Data.dll" "."',
-        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Numerics.dll" "."',
-        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Runtime.Serialization.dll" "."',
-        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Xml.dll" "."',
-        '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Xml.Linq.dll" "."',
-    }
     links {
         "FEEngine",
         "ExampleGame",
@@ -159,6 +147,29 @@ project "host"
     }
     filter "configurations:Debug"
         targetsuffix "-d"
+        postbuildcommands {
+            '{MOVE} "%{cfg.targetdir}/FEEngine.dll" "."',
+            '{MOVE} "%{cfg.targetdir}/ExampleGame.exe" "."',
+            '{MOVE} "%{cfg.targetdir}/Newtonsoft.Json.dll" "."',
+            '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.dll" "."',
+            '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Core.dll" "."',
+            '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Data.dll" "."',
+            '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Numerics.dll" "."',
+            '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Runtime.Serialization.dll" "."',
+            '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Xml.dll" "."',
+            '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Xml.Linq.dll" "."',
+        }
+    filter "configurations:Release"
+        debugdir "%{cfg.targetdir}"
+        postbuildcommands {
+            '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.dll" "%{cfg.targetdir}"',
+            '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Core.dll" "%{cfg.targetdir}"',
+            '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Data.dll" "%{cfg.targetdir}"',
+            '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Numerics.dll" "%{cfg.targetdir}"',
+            '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Runtime.Serialization.dll" "%{cfg.targetdir}"',
+            '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Xml.dll" "%{cfg.targetdir}"',
+            '{COPY} "%{dotnet_assembly_path}/%{dotnet_framework_version}/System.Xml.Linq.dll" "%{cfg.targetdir}"',
+        } 
     filter "system:windows"
         links {
             "mono-2.0-sgen.lib"
