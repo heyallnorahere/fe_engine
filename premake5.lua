@@ -207,6 +207,73 @@ project "SchemaGenerator"
         "Newtonsoft.Json.Schema",
         "System"
     }
+project "MapDesigner"
+    location "src/MapDesigner/Application"
+    kind "ConsoleApp"
+    language "C#"
+    csversion (cs_version)
+    framework (dotnet_framework_version)
+    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+    files {
+        "src/MapDesigner/Application/**.cs"
+    }
+    links {
+        "FEEngine",
+        "Newtonsoft.Json",
+        "System",
+        "MapDesigner-Internals"
+    }
+    postbuildcommands {
+        '{DELETE} "%{cfg.targetdir}/*MapDesigner-Internals.*"',
+        '{COPY} "%{cfg.targetdir}/../MapDesigner-Internals/*MapDesigner-Internals.*" "."'
+    }
+project "MapDesigner-Internals"
+    location "src/MapDesigner/Internals"
+    kind "SharedLib"
+    cppdialect "C++17"
+    staticruntime "on"
+    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+    files {
+        "src/MapDesigner/Internals/**.cpp",
+        "src/MapDesigner/Internals/**.h"
+    }
+    includedirs {
+        "%{includedirs_table.mono}",
+    }
+    libdirs {
+        "%{libdirs_table.mono}",
+    }
+    filter "system:windows"
+        links {
+            "mono-2.0-sgen.lib"
+        }
+        defines {
+            "_CRT_SECURE_NO_WARNINGS"
+        }
+        postbuildcommands {
+            '{COPY} "%{libdirs_table.mono}/../bin/mono-2.0-sgen.dll" "%{cfg.targetdir}"',
+        }
+    filter "system:not windows"
+        links {
+            "monosgen-2.0"
+        }
+    filter "system:macosx"
+        links {
+            "z"
+        }
+        libdirs {
+            "/usr/local/opt/zlib/lib"
+        }
+    filter "system:linux"
+        links {
+            "pthread",
+            "stdc++fs"
+        }
+    filter "action:not gmake*"
+        pchheader "pch.h"
+        pchsource "src/MapDesigner/Internals/pch.cpp"
 group ""
 group "examples"
 project "ExampleGame"
