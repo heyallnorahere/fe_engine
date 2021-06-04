@@ -225,7 +225,6 @@ project "MapDesigner"
         "MapDesigner-Internals"
     }
     postbuildcommands {
-        '{DELETE} "%{cfg.targetdir}/*MapDesigner-Internals.*"',
         '{COPY} "%{cfg.targetdir}/../MapDesigner-Internals/*MapDesigner-Internals.*" "."'
     }
 project "MapDesigner-Internals"
