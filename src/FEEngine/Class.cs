@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace FEEngine
@@ -22,6 +23,10 @@ namespace FEEngine
     [JsonObject]
     public abstract class Class
     {
+        public Class()
+        {
+            ClassSkills = new Skill[3] { null, null, null };
+        }
         /// <summary>
         /// Whether the <see cref="Unit"/> is mounted or not
         /// </summary>
@@ -31,6 +36,6 @@ namespace FEEngine
         /// </summary>
         public abstract string Name { get; }
         public abstract Unit.UnitStats StatBoosts { get; }
-        // todo: add more class properties later
+        public Skill[] ClassSkills { get; private set; }
     }
 }

@@ -138,10 +138,17 @@ namespace FEEngine
             get
             {
                 UnitStats stats = new UnitStats(Stats);
-                stats += Class.StatBoosts;
+                stats += mClass.StatBoosts;
                 foreach (Skill skill in mSkills)
                 {
                     stats += skill.StatBoosts;
+                }
+                foreach (Skill skill in mClass.ClassSkills)
+                {
+                    if (skill != null)
+                    {
+                        stats += skill.StatBoosts;
+                    }
                 }
                 return stats;
             }
@@ -396,7 +403,16 @@ namespace FEEngine
         }
         private void CallEvent(SkillTriggerEvent @event, SkillEventArgs eventArgs)
         {
-            foreach (Skill skill in mSkills)
+            List<Skill> skills = new();
+            skills.AddRange(mSkills);
+            foreach (Skill skill in mClass.ClassSkills)
+            {
+                if (skill != null)
+                {
+                    skills.Add(skill);
+                }
+            }
+            foreach (Skill skill in skills)
             {
                 Skill.Invoke(skill, @event, this, eventArgs);
             }

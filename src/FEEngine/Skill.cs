@@ -28,9 +28,9 @@ namespace FEEngine
     public class SkillTriggerAttribute : Attribute
     {
         public SkillTriggerEvent TriggerEvent { get; set; }
-        public SkillTriggerAttribute(SkillTriggerEvent @event)
+        public SkillTriggerAttribute(SkillTriggerEvent triggerEvent)
         {
-            TriggerEvent = @event;
+            TriggerEvent = triggerEvent;
         }
     }
     /// <summary>
