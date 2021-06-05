@@ -1,0 +1,27 @@
+name: ubuntu-native
+on: [ push ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mono-devel
+      - name: generate makefiles
+        run: |
+          ./linux-genprojects.sh
+      - name: build
+        run: |
+          make -j 8 config=release
+      - name: package binaries
+        run: |
+          ./package-unix.sh build-nightly Release linux x86_64 fe_engine.tar.gz
+      - name: upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: release-ubuntu
+          path: fe_engine.tar.gz
