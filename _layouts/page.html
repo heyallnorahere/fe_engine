@@ -36,6 +36,16 @@ copyright: Sorry, this is a programmer website. Graphic design is my passion. &c
                 FEEngine
                 {% endif %}
             </h1>
+            <div class="table-of-contents">
+                <h6>Table of contents</h6>
+                <ol>
+                    {% for item in page.toc %}
+                    <li>
+                        <a href="#{{ item.id }}">{{ item.title }}</a>
+                    </li>
+                    {% endfor %}
+                </ol>
+            </div>
             <div>
                 {{ content }}
             </div>

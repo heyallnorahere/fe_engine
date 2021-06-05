@@ -1,7 +1,4 @@
-h1 {
-    text-align: center;
-}
-p {
+h1, h2, p {
     text-align: center;
 }
 #body {
@@ -10,4 +7,9 @@ p {
 }
 .copyright {
     font-size: 0.3cm;
+}
+.table-of-contents {
+    border: 1px solid #e5e5e5;
+    width: fit-content;
+    padding: 5px 25px 5px 5px;
 }
