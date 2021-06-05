@@ -2,6 +2,8 @@
 title: Building
 layout: page
 ---
+<link href="css/table.css" rel="stylesheet">
+<h2 id="instructions">Building instructions</h2>
 <p>
     FEEngine is written in C#, and requires version 9.0. Therefore, it can only be built on Windows, as of writing this document. (June 3, 2021)
     <br>
@@ -12,3 +14,44 @@ layout: page
     </ul>
     Once you have pulled the source, run "windows-genprojects.bat" to generate build files. Then build the C# and C++ projects like normal.
 </p>
+<h2 id="status">Build status</h2>
+<table>
+    <tbody>
+        <tr>
+            <th>Platform</th>
+            <th>Managed</th>
+            <th>Native</th>
+        </tr>
+        <tr>
+            <td>Windows</td>
+            <td>
+                <a href="https://github.com/yodasoda1219/fe_engine/actions/workflows/windows.yml">
+                    <img src="https://github.com/yodasoda1219/fe_engine/actions/workflows/windows.yml/badge.svg" alt="windows" style="max-width:100%;">
+                </a>
+            </td>
+            <td>
+                <a href="https://github.com/yodasoda1219/fe_engine/actions/workflows/windows-native.yml">
+                    <img src="https://github.com/yodasoda1219/fe_engine/actions/workflows/windows-native.yml/badge.svg" alt="windows-native" style="max-width:100%;">
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td>Ubuntu</td>
+            <td></td>
+            <td>
+                <a href="https://github.com/yodasoda1219/fe_engine/actions/workflows/ubuntu-native.yml">
+                    <img src="https://github.com/yodasoda1219/fe_engine/actions/workflows/ubuntu-native.yml/badge.svg" alt="ubuntu-native" style="max-width:100%;">
+                </a>                
+            </td>
+        </tr>
+        <tr>
+            <td>MacOS X</td>
+            <td></td>
+            <td>
+                <a href="https://github.com/yodasoda1219/fe_engine/actions/workflows/macosx-native.yml">
+                    <img src="https://github.com/yodasoda1219/fe_engine/actions/workflows/macosx-native.yml/badge.svg" alt="macosx-native" style="max-width:100%;">
+                </a>                
+            </td>
+        </tr>
+    </tbody>
+</table>
