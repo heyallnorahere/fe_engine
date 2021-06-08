@@ -22,20 +22,21 @@ EXPORT void InitWindow_() {
     }
 }
 EXPORT window* CreateWindow_(const char* title, int32_t width, int32_t height, int main_window) {
-    window* w = (struct window*)malloc(sizeof(window));
+    window* w = (window*)malloc(sizeof(window));
+    assert(w);
     memset(w, 0, sizeof(window));
     w->window = CreateWindow(CLASSNAME, title, WS_VISIBLE | WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, NULL, NULL, NULL, NULL);
     w->main_window = main_window;
     return w;
 }
-EXPORT int PeekMessage_(window* window) {
-    return PeekMessage(&window->message, NULL, NULL, NULL, PM_REMOVE);
+EXPORT bool PeekMessage_(window* window) {
+    return PeekMessage(&window->message, NULL, 0, 0, PM_REMOVE);
 }
 EXPORT void RelayMessage_(window* window) {
     TranslateMessage(&window->message);
     DispatchMessage(&window->message);
 }
-EXPORT int ShouldClose_(window* window) {
+EXPORT bool ShouldClose_(window* window) {
     return (window->message.message == WM_QUIT);
 }
 EXPORT void DestroyWindow_(window* window) {

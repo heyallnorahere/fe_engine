@@ -8,6 +8,10 @@
 #define EXPORT __declspec(dllexport)
 #include <mono/jit/jit.h>
 #include <malloc.h>
+#include <assert.h>
+#ifndef __cplusplus
+#define bool int
+#endif
 typedef HWND window_t;
 typedef MSG msg_t;
 #endif

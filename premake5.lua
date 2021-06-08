@@ -64,7 +64,7 @@ workspace "fe_engine"
             "CS0436",
             "CS0028",
         }
-    filter "language:C++"
+    filter "language:C++ or C"
         disablewarnings {
             "4244",
             "4267",
