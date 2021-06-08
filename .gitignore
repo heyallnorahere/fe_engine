@@ -16,6 +16,7 @@ bin-int/
 *.*proj*
 *.xcworkspace/**
 Makefile
+*.make
 .vscode/**
 !.vscode/launch.json
 !fe_engine.net.sln
