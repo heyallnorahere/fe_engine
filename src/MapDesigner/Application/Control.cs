@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Runtime.InteropServices;
+using MapDesigner.Platform;
 
 namespace MapDesigner
 {
@@ -7,20 +7,14 @@ namespace MapDesigner
     {
         public Control(INativeObject parent, string className, string text, int width, int height, int x, int y)
         {
-            mControl = CreateControl_(parent.NativeInterface, className, text, width, height, x, y);
-            mControlHandle = GetControlHandle_(mControl);
+            uint style = 0x10000000 | 0x40000000;
+            mControlHandle = PlatformWindowUtils.CreateWindowExA(0, className, text, style, x, y, width, height, parent.NativeInterface, new(0), new(0), new(0));
         }
         ~Control()
         {
-            DestroyControl_(mControl);
+            PlatformWindowUtils.DestroyWindow(mControlHandle);
         }
         public IntPtr NativeInterface => mControlHandle;
-        private readonly IntPtr mControl, mControlHandle;
-        [DllImport("MapDesigner-Internals.dll")]
-        private static extern IntPtr CreateControl_(IntPtr parent, string className, string text, int width, int height, int x, int y);
-        [DllImport("MapDesigner-Internals.dll")]
-        private static extern IntPtr GetControlHandle_(IntPtr control);
-        [DllImport("MapDesigner-Internals.dll")]
-        private static extern void DestroyControl_(IntPtr control);
+        private readonly IntPtr mControlHandle;
     }
 }

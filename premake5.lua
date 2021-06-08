@@ -222,12 +222,19 @@ project "MapDesigner"
     location "src/MapDesigner/Application"
     kind "ConsoleApp"
     language "C#"
+    clr "unsafe"
     csversion (cs_version)
     framework (dotnet_framework_version)
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
     files {
         "src/MapDesigner/Application/**.cs"
+    }
+    excludes {
+        "src/MapDesigner/Application/Platform/**.cs"
+    }
+    files {
+        "src/MapDesigner/Application/Platform/%{cfg.platform}/**.cs"
     }
     links {
         "FEEngine",
