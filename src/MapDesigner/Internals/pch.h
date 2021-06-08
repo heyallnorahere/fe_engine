@@ -5,9 +5,9 @@
 #endif
 #include <Windows.h>
 #include <CommCtrl.h>
-#define EXPORT extern "C" __declspec(dllexport)
+#define EXPORT __declspec(dllexport)
 #include <mono/jit/jit.h>
-#include <map>
-using window_t = HWND;
-using msg_t = MSG;
+#include <malloc.h>
+typedef HWND window_t;
+typedef MSG msg_t;
 #endif

@@ -238,12 +238,12 @@ project "MapDesigner"
 project "MapDesigner-Internals"
     location "src/MapDesigner/Internals"
     kind "SharedLib"
-    cppdialect "C++17"
+    language "C"
     staticruntime "on"
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
     files {
-        "src/MapDesigner/Internals/**.cpp",
+        "src/MapDesigner/Internals/**.c",
         "src/MapDesigner/Internals/**.h"
     }
     includedirs {
@@ -280,7 +280,7 @@ project "MapDesigner-Internals"
         }
     filter "action:not gmake*"
         pchheader "pch.h"
-        pchsource "src/MapDesigner/Internals/pch.cpp"
+        pchsource "src/MapDesigner/Internals/pch.c"
 group ""
 group "examples"
 project "ExampleGame"

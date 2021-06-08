@@ -9,18 +9,18 @@ namespace MapDesigner
         {
             if (!initialized)
             {
-                InitWindow();
+                InitWindow_();
                 initialized = true;
             }
-            mWindow = CreateWindow(title, width, height, mainWindow);
+            mWindow = CreateWindow_(title, width, height, mainWindow);
         }
         public void Loop()
         {
-            while (!ShouldClose(mWindow))
+            while (!ShouldClose_(mWindow))
             {
-                if (PeekMessage(mWindow))
+                if (PeekMessage_(mWindow))
                 {
-                    RelayMessage(mWindow);
+                    RelayMessage_(mWindow);
                 }
             }
         }
@@ -30,15 +30,15 @@ namespace MapDesigner
         }
         private readonly IntPtr mWindow;
         [DllImport("MapDesigner-Internals.dll")]
-        private static extern void InitWindow();
+        private static extern void InitWindow_();
         [DllImport("MapDesigner-Internals.dll")]
-        private static extern IntPtr CreateWindow(string title, int width, int height, bool mainWindow);
+        private static extern IntPtr CreateWindow_(string title, int width, int height, bool mainWindow);
         [DllImport("MapDesigner-Internals.dll")]
-        private static extern bool PeekMessage(IntPtr window);
+        private static extern bool PeekMessage_(IntPtr window);
         [DllImport("MapDesigner-Internals.dll")]
-        private static extern void RelayMessage(IntPtr window);
+        private static extern void RelayMessage_(IntPtr window);
         [DllImport("MapDesigner-Internals.dll")]
-        private static extern bool ShouldClose(IntPtr window);
+        private static extern bool ShouldClose_(IntPtr window);
         [DllImport("MapDesigner-Internals.dll")]
         private static extern void DestroyWindow_(IntPtr window);
         private static bool initialized = false;
