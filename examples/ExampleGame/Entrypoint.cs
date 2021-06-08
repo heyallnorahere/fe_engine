@@ -44,29 +44,16 @@ namespace ExampleGame
             }
             Game game = new("data/bindings.json");
             game.SetupRegisters();
-            Map map = null;
             InitRegister<Item>("data/items.json", game);
             InitRegister<Unit>("data/units.json", game);
             InitRegister<Map>("data/maps.json", game, () =>
             {
-                map = new(20, 10);
-                game.Registry.GetRegister<Map>().Add(map);
+                game.Registry.GetRegister<Map>().Add(new(20, 10));
                 return true;
-            }, () =>
-            {
-                try
-                {
-                    map = game.Registry.GetRegister<Map>()[0];
-                    return true;
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
             });
             InitRegister<Tile>("data/tiles.json", game);
             Player player = new(game);
-            game.Renderer.Root.Center = new BorderedObject(map);
+            game.Renderer.Root.Center = new BorderedObject(new Map.MapRenderer(game));
             game.Renderer.Root.AddChild(new BorderedObject(new Logger.RenderAgent()), BorderLayout.Alignment.Bottom);
             game.Renderer.Root.AddChild(new BorderedMenu(UIController.FindMenu<UnitContextMenu>()), BorderLayout.Alignment.Right);
             game.Renderer.Root.AddChild(new BorderedMenu(UIController.FindMenu<TileInfoMenu>()), BorderLayout.Alignment.Left);

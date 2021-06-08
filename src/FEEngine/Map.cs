@@ -12,6 +12,28 @@ namespace FEEngine
     [JsonObject]
     public class Map : RegisteredObjectBase<Map>, IEnumerable<Unit>, IRenderable
     {
+        /// <summary>
+        /// An object to help render the current map
+        /// </summary>
+        public class MapRenderer : IRenderable
+        {
+            public MapRenderer(Game game)
+            {
+                mGame = game;
+            }
+            public IVec2<int> MinSize => Map.MinSize;
+            public void Render(RenderContext context) => Map.Render(context);
+            public void SetSize(IVec2<int> size) => Map.SetSize(size);
+            private Map Map
+            {
+                get
+                {
+                    Register<Map> mapRegister = mGame.Registry.GetRegister<Map>();
+                    return mapRegister[mGame.CurrentMapIndex];
+                }
+            }
+            private readonly Game mGame;
+        }
         private struct Enumerator : IEnumerator<Unit>
         {
             public bool MoveNext()

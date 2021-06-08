@@ -145,6 +145,12 @@ project "host"
         "ExampleGame",
         "Newtonsoft.Json"
     }
+    debugargs {
+        "-df",
+        "ExampleGame.exe",
+        "-e",
+        "ExampleGame.Entrypoint"
+    }
     filter "configurations:Debug"
         targetsuffix "-d"
         postbuildcommands {
