@@ -91,6 +91,10 @@ namespace FEEngine
                 };
             }
         }
+        public struct EvaluatedUnitStats
+        {
+            public int Atk, Prt, Rsl, AS, Hit, Avo, Crit, CritAvo;
+        }
         /// <summary>
         /// See <see cref="FEEngine.Class"/>
         /// </summary>
@@ -152,6 +156,144 @@ namespace FEEngine
                 }
                 return stats;
             }
+        }
+        private struct StatEvaluator
+        {
+            private bool IsMagic(WeaponType type)
+            {
+                return type switch
+                {
+                    WeaponType.WhiteMagic => true,
+                    WeaponType.BlackMagic => true,
+                    WeaponType.DarkMagic => true,
+                    _ => false
+                };
+            }
+            public StatEvaluator(Unit unit)
+            {
+                mUnit = unit;
+                mStats = new();
+                Reset();
+            }
+            private void Reset()
+            {
+                mStats = new(mUnit.BoostedStats);
+            }
+            public void Evaluate(Ref<EvaluatedUnitStats> stats, Unit enemy)
+            {
+                {
+                    SkillBeforeStatEvaluationArgs eventArgs = new(enemy);
+                    eventArgs.Stats = new Ref<UnitStats>(ref mStats);
+                    mUnit.CallEvent(SkillTriggerEvent.BeforeStatEvaluation, eventArgs);
+                }
+                ref EvaluatedUnitStats evaluatedStats = ref stats.Value;
+                evaluatedStats.Atk = GetAtk();
+                evaluatedStats.Prt = GetPrt();
+                evaluatedStats.Rsl = GetRsl();
+                evaluatedStats.AS = GetAS();
+                evaluatedStats.Hit = GetHit();
+                evaluatedStats.Avo = GetAvo(enemy);
+                evaluatedStats.Crit = GetCrit();
+                evaluatedStats.CritAvo = GetCritAvo();
+                {
+                    SkillAfterStatEvaluationArgs eventArgs = new(enemy);
+                    eventArgs.EvaluatedStats = stats;
+                    mUnit.CallEvent(SkillTriggerEvent.AfterStatEvaluation, eventArgs);
+                }
+            }
+            private int GetAtk()
+            {
+                if (mUnit.mEquippedWeaponIndex == -1)
+                {
+                    return 0;
+                }
+                Item equippedWeapon = mUnit.EquippedWeapon;
+                WeaponStats weaponStats = equippedWeapon.WeaponStats;
+                bool isMagic = IsMagic(weaponStats.Type);
+                return weaponStats.Attack + (isMagic ? mStats.Mag : mStats.Str);
+            }
+            private int GetPrt()
+            {
+                int prt = mStats.Def;
+                // todo: add things like equipment protection and battalion protection
+                return prt;
+            }
+            private int GetRsl()
+            {
+                int rsl = mStats.Res;
+                // todo: add things like equipment resilience and battalion resilience
+                return rsl;
+            }
+            private int GetAS()
+            {
+                int burden = 0;
+                if (mUnit.mEquippedWeaponIndex != -1)
+                {
+                    Item weapon = mUnit.EquippedWeapon;
+                    burden += weapon.WeaponStats.Weight;
+                }
+                burden -= (mStats.Str / 5);
+                if (burden < 0)
+                {
+                    burden = 0;
+                }
+                return mStats.Spd - burden;
+            }
+            private int GetHit()
+            {
+                if (mUnit.mEquippedWeaponIndex == -1)
+                {
+                    return 0;
+                }
+                Item weapon = mUnit.EquippedWeapon;
+                bool isMagic = IsMagic(weapon.WeaponStats.Type);
+                int dex = mStats.Dex;
+                return (isMagic ? (dex + mStats.Lck) / 2 : dex) + weapon.WeaponStats.HitRate;
+            }
+            private int GetAvo(Unit enemy)
+            {
+                if (enemy == null)
+                {
+                    return 0;
+                }
+                // were just gonna assume the enemy has a weapon, or this wouldnt be called
+                Item enemyWeapon = enemy.EquippedWeapon;
+                if (enemyWeapon == null)
+                {
+                    throw new ArgumentNullException();
+                }
+                bool isMagic = IsMagic(enemyWeapon.WeaponStats.Type);
+                int factor = isMagic ? (mStats.Spd + mStats.Lck) / 2 : GetAS();
+                return factor; // todo: add more parameters
+            }
+            private int GetCrit()
+            {
+                if (mUnit.mEquippedWeaponIndex == -1)
+                {
+                    return 0;
+                }
+                Item weapon = mUnit.EquippedWeapon;
+                int crit = weapon.WeaponStats.CritRate;
+                crit += (mStats.Dex + mStats.Lck) / 2;
+                return crit;
+            }
+            private int GetCritAvo()
+            {
+                return mStats.Lck; // todo: add combat art crit avoid
+            }
+            private readonly Unit mUnit;
+            private UnitStats mStats;
+        }
+        /// <summary>
+        /// Get the effective stats of the current <see cref="Unit"/>
+        /// </summary>
+        /// <returns>The <see cref="EvaluatedUnitStats"/></returns>
+        public EvaluatedUnitStats GetEvaluatedStats(Unit enemy)
+        {
+            EvaluatedUnitStats evaluatedStats = new();
+            StatEvaluator evaluator = new(this);
+            evaluator.Evaluate(new Ref<EvaluatedUnitStats>(ref evaluatedStats), enemy);
+            return evaluatedStats;
         }
         /// <summary>
         /// The position of the <see cref="Unit"/> on the map
@@ -469,8 +611,8 @@ namespace FEEngine
         /// <returns>Whether the attack succeeded</returns>
         public bool Attack(Unit toAttack)
         {
-            UnitStats boostedStats = BoostedStats;
-            UnitStats otherBoostedStats = toAttack.BoostedStats;
+            EvaluatedUnitStats evaluatedStats = GetEvaluatedStats(toAttack);
+            EvaluatedUnitStats otherEvaluatedStats = toAttack.GetEvaluatedStats(this);
             // check if the attacker can move, and if the recipient is a valid target
             Item myWeapon = EquippedWeapon;
             if (!CanMove || IsAllied(toAttack) || myWeapon == null)
@@ -490,32 +632,30 @@ namespace FEEngine
                 IVec2<int> otherRange = otherWeapon.WeaponStats.Range;
                 iAmInRange = distance > otherRange.X && distance < otherRange.Y;
             }
-            int attackSpeed = boostedStats.Spd - myWeapon.WeaponStats.Weight;
-            int otherAttackSpeed = otherBoostedStats.Spd - otherWeapon?.WeaponStats.Weight ?? 0;
-            AttackImpl(toAttack, myWeapon);
+            AttackImpl(toAttack, myWeapon, evaluatedStats, otherEvaluatedStats);
             if (toAttack.CurrentHP <= 0)
             {
                 goto exit;
             }
             if (iAmInRange)
             {
-                toAttack.AttackImpl(this, otherWeapon);
+                toAttack.AttackImpl(this, otherWeapon, otherEvaluatedStats, evaluatedStats);
                 if (CurrentHP <= 0)
                 {
                     goto exit;
                 }
             }
-            if (attackSpeed - otherAttackSpeed >= 4)
+            if (evaluatedStats.AS - otherEvaluatedStats.AS >= 4)
             {
-                AttackImpl(toAttack, myWeapon);
+                AttackImpl(toAttack, myWeapon, evaluatedStats, otherEvaluatedStats);
                 if (toAttack.CurrentHP <= 0)
                 {
                     goto exit;
                 }
             }
-            else if (otherAttackSpeed - attackSpeed >= 4 && iAmInRange)
+            else if (otherEvaluatedStats.AS - evaluatedStats.AS >= 4 && iAmInRange)
             {
-                toAttack.AttackImpl(this, otherWeapon);
+                toAttack.AttackImpl(this, otherWeapon, otherEvaluatedStats, evaluatedStats);
             }
             exit:
             CanMove = false;
@@ -533,9 +673,9 @@ namespace FEEngine
             public bool DidHit { get; set; }
             public bool DidCrit { get; set; }
         }
-        private void AttackImpl(Unit toAttack, Item myWeapon)
+        private void AttackImpl(Unit toAttack, Item myWeapon, EvaluatedUnitStats myStats, EvaluatedUnitStats otherStats)
         {
-            AttackPacket packet = CreateAttackPacket(toAttack.BoostedStats, myWeapon);
+            AttackPacket packet = CreateAttackPacket(myStats, otherStats, myWeapon);
             SkillAttackArgs eventArgs = new(toAttack);
             eventArgs.Might = new Ref<int>(ref packet.Might);
             eventArgs.HitRate = new Ref<int>(ref packet.Hit);
@@ -545,9 +685,8 @@ namespace FEEngine
             toAttack.ReceiveAttackResult(result, this);
             myWeapon.WeaponStats.Durability--;
         }
-        private AttackPacket CreateAttackPacket(UnitStats otherStats, Item myWeapon)
+        private AttackPacket CreateAttackPacket(EvaluatedUnitStats myStats, EvaluatedUnitStats otherStats, Item myWeapon)
         {
-            UnitStats boostedStats = BoostedStats;
             AttackPacket packet = new();
             WeaponStats weaponStats = myWeapon.WeaponStats;
             var isMagic = weaponStats.Type switch
@@ -557,11 +696,10 @@ namespace FEEngine
                 WeaponType.DarkMagic => true,
                 _ => false,
             };
-            int strength = isMagic ? boostedStats.Mag : boostedStats.Str;
-            int defense = isMagic ? otherStats.Res : otherStats.Def;
-            packet.Might = weaponStats.Attack + strength - defense;
-            packet.Hit = weaponStats.HitRate + boostedStats.Dex - otherStats.Dex;
-            packet.Crit = weaponStats.CritRate + boostedStats.Lck - otherStats.Lck;
+            int defense = isMagic ? otherStats.Rsl : otherStats.Prt;
+            packet.Might = weaponStats.Attack + myStats.Atk - defense;
+            packet.Hit = myStats.Hit - otherStats.Avo;
+            packet.Crit = myStats.Crit - otherStats.Avo;
             return packet;
         }
         private static AttackResult ParseAttackPacket(AttackPacket packet)

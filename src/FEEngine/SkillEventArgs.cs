@@ -65,4 +65,40 @@ namespace FEEngine
         /// </summary>
         public Ref<int> CritRate { get; internal set; }
     }
+    /// <summary>
+    /// This event is triggered before a <see cref="Unit"/>'s stats are evaluated
+    /// </summary>
+    public class SkillBeforeStatEvaluationArgs : SkillEventArgs
+    {
+        internal SkillBeforeStatEvaluationArgs(Unit enemyUnit) : base(SkillTriggerEvent.BeforeStatEvaluation)
+        {
+            Enemy = enemyUnit;
+        }
+        /// <summary>
+        /// The enemy that the unit is targeting; can be null
+        /// </summary>
+        public Unit Enemy { get; private set; }
+        /// <summary>
+        /// The reference to the stats that will be evaluated; can be altered
+        /// </summary>
+        public Ref<Unit.UnitStats> Stats { get; internal set; }
+    }
+    /// <summary>
+    /// This event is triggered after a <see cref="Unit"/>'s stats are evaluated
+    /// </summary>
+    public class SkillAfterStatEvaluationArgs : SkillEventArgs
+    {
+        internal SkillAfterStatEvaluationArgs(Unit enemyUnit) : base(SkillTriggerEvent.AfterStatEvaluation)
+        {
+            Enemy = enemyUnit;
+        }
+        /// <summary>
+        /// The enemy that the unit is targeting; can be null
+        /// </summary>
+        public Unit Enemy { get; private set; }
+        /// <summary>
+        /// The reference to the evaluated stats; can be altered
+        /// </summary>
+        public Ref<Unit.EvaluatedUnitStats> EvaluatedStats { get; internal set; }
+    }
 }

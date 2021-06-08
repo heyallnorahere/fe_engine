@@ -20,12 +20,20 @@ namespace FEEngine
         /// After two <see cref="Unit"/>s attack each other (an "exchange")
         /// </summary>
         AfterExchange,
+        /// <summary>
+        /// Before stats are evaluated
+        /// </summary>
+        BeforeStatEvaluation,
+        /// <summary>
+        /// After stats are evaluated
+        /// </summary>
+        AfterStatEvaluation
     }
     /// <summary>
     /// Specifies when this <see cref="Skill"/> is to be called. Use multiple instances to call at multiple times
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public class SkillTriggerAttribute : Attribute
+    public sealed class SkillTriggerAttribute : Attribute
     {
         public SkillTriggerEvent TriggerEvent { get; set; }
         public SkillTriggerAttribute(SkillTriggerEvent triggerEvent)

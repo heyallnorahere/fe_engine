@@ -1,6 +1,6 @@
 ﻿namespace FEEngine.Skills
 {
-    [SkillTrigger(SkillTriggerEvent.OnAttack)]
+    [SkillTrigger(SkillTriggerEvent.AfterStatEvaluation)]
     public abstract class BreakerSkillBase : Skill
     {
         public BreakerSkillBase(WeaponType weaponType, WeaponType opponentWeaponType)
@@ -10,24 +10,27 @@
         }
         protected override void Invoke(Unit caller, SkillEventArgs eventArgs)
         {
-            if (eventArgs.Event == SkillTriggerEvent.OnAttack)
+            if (eventArgs.Event == SkillTriggerEvent.AfterStatEvaluation)
             {
-                SkillAttackArgs attackArgs = (SkillAttackArgs)eventArgs;
+                SkillAfterStatEvaluationArgs args = (SkillAfterStatEvaluationArgs)eventArgs;
                 Item myWeapon = caller.EquippedWeapon;
-                Item otherWeapon = attackArgs.Enemy.EquippedWeapon;
-                if (myWeapon.WeaponStats.Type == mWeaponType && otherWeapon != null)
+                if (args.Enemy != null)
                 {
-                    if (otherWeapon.WeaponStats.Type == mOpponentWeaponType)
+                    Item otherWeapon = args.Enemy.EquippedWeapon;
+                    if (myWeapon.WeaponStats.Type == mWeaponType && otherWeapon != null)
                     {
-                        attackArgs.HitRate.Value += 20;
-                        // todo: add 20 to avo stat, when it gets implemented
+                        if (otherWeapon.WeaponStats.Type == mOpponentWeaponType)
+                        {
+                            args.EvaluatedStats.Value.Hit += 20;
+                            args.EvaluatedStats.Value.Avo += 20;
+                        }
                     }
                 }
             }
         }
         private readonly WeaponType mWeaponType, mOpponentWeaponType;
     }
-    [SkillTrigger(SkillTriggerEvent.OnAttack)]
+    [SkillTrigger(SkillTriggerEvent.AfterStatEvaluation)]
     public abstract class CritPlus10Base : Skill
     {
         public CritPlus10Base(WeaponType weaponType)
@@ -36,19 +39,19 @@
         }
         protected override void Invoke(Unit caller, SkillEventArgs eventArgs)
         {
-            if (eventArgs.Event == SkillTriggerEvent.OnAttack)
+            if (eventArgs.Event == SkillTriggerEvent.AfterStatEvaluation)
             {
-                SkillAttackArgs attackArgs = (SkillAttackArgs)eventArgs;
+                SkillAfterStatEvaluationArgs args = (SkillAfterStatEvaluationArgs)eventArgs;
                 Item myWeapon = caller.EquippedWeapon;
                 if (myWeapon.WeaponStats.Type == mWeaponType)
                 {
-                    attackArgs.CritRate.Value += 10;
+                    args.EvaluatedStats.Value.Crit += 10;
                 }
             }
         }
         private readonly WeaponType mWeaponType;
     }
-    [SkillTrigger(SkillTriggerEvent.OnAttack)]
+    [SkillTrigger(SkillTriggerEvent.AfterStatEvaluation)]
     public abstract class FaireSkillBase : Skill
     {
         public FaireSkillBase(WeaponType weaponType)
@@ -57,13 +60,13 @@
         }
         protected override void Invoke(Unit caller, SkillEventArgs eventArgs)
         {
-            if (eventArgs.Event == SkillTriggerEvent.OnAttack)
+            if (eventArgs.Event == SkillTriggerEvent.AfterStatEvaluation)
             {
-                SkillAttackArgs attackArgs = (SkillAttackArgs)eventArgs;
+                SkillAfterStatEvaluationArgs args = (SkillAfterStatEvaluationArgs)eventArgs;
                 Item myWeapon = caller.EquippedWeapon;
                 if (myWeapon.WeaponStats.Type == mWeaponType)
                 {
-                    attackArgs.Might.Value += 5;
+                    args.EvaluatedStats.Value.Atk += 5;
                 }
             }
         }
