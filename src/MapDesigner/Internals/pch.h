@@ -9,6 +9,7 @@
 #include <mono/jit/jit.h>
 #include <malloc.h>
 #include <assert.h>
+#include <stdint.h>
 #ifndef __cplusplus
 #define bool int
 #endif

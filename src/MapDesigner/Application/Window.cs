@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace MapDesigner
 {
-    public class Window
+    public class Window : INativeObject
     {
         public Window(string title, int width, int height, bool mainWindow = false)
         {
@@ -13,6 +13,7 @@ namespace MapDesigner
                 initialized = true;
             }
             mWindow = CreateWindow_(title, width, height, mainWindow);
+            mWindowHandle = GetWindowHandle_(mWindow);
         }
         public void Loop()
         {
@@ -28,11 +29,14 @@ namespace MapDesigner
         {
             DestroyWindow_(mWindow);
         }
-        private readonly IntPtr mWindow;
+        public IntPtr NativeInterface => mWindowHandle;
+        private readonly IntPtr mWindow, mWindowHandle;
         [DllImport("MapDesigner-Internals.dll")]
         private static extern void InitWindow_();
         [DllImport("MapDesigner-Internals.dll")]
         private static extern IntPtr CreateWindow_(string title, int width, int height, bool mainWindow);
+        [DllImport("MapDesigner-Internals.dll")]
+        private static extern IntPtr GetWindowHandle_(IntPtr window);
         [DllImport("MapDesigner-Internals.dll")]
         private static extern bool PeekMessage_(IntPtr window);
         [DllImport("MapDesigner-Internals.dll")]

@@ -29,6 +29,9 @@ EXPORT window* CreateWindow_(const char* title, int32_t width, int32_t height, i
     w->main_window = main_window;
     return w;
 }
+EXPORT HWND GetWindowHandle_(window* w) {
+    return w->window;
+}
 EXPORT bool PeekMessage_(window* window) {
     return PeekMessage(&window->message, NULL, 0, 0, PM_REMOVE);
 }
