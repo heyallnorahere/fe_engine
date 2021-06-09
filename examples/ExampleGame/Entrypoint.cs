@@ -28,6 +28,22 @@ namespace ExampleGame
             attackArgs.CritRate.Value = 100; // then triple that again
         }
     }
+    [WeaponBehaviorTrigger(WeaponBehaviorEvent.OnCalculation), WeaponBehaviorTrigger(WeaponBehaviorEvent.AfterExchange)]
+    public class TestWeaponBehavior : WeaponBehavior
+    {
+        protected override void Invoke(WeaponBehaviorArgs args)
+        {
+            switch (args.Event)
+            {
+                case WeaponBehaviorEvent.OnCalculation:
+                    Logger.Print(Color.White, "on calculation");
+                    break;
+                case WeaponBehaviorEvent.AfterExchange:
+                    Logger.Print(Color.White, "after exchange");
+                    break;
+            }
+        }
+    }
     public class Entrypoint
     {
         public static void Main()

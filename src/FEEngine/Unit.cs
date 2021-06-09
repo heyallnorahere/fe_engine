@@ -632,14 +632,16 @@ namespace FEEngine
                 IVec2<int> otherRange = otherWeapon.WeaponStats.Range;
                 iAmInRange = distance > otherRange.X && distance < otherRange.Y;
             }
-            AttackImpl(toAttack, myWeapon, evaluatedStats, otherEvaluatedStats);
+            WeaponAfterExchangeArgs afterExchangeArgs = new(this, toAttack);
+            WeaponAfterExchangeArgs otherAfterExchangeArgs = new(toAttack, this);
+            AttackImpl(toAttack, myWeapon, evaluatedStats, otherEvaluatedStats, afterExchangeArgs);
             if (toAttack.CurrentHP <= 0)
             {
                 goto exit;
             }
             if (iAmInRange)
             {
-                toAttack.AttackImpl(this, otherWeapon, otherEvaluatedStats, evaluatedStats);
+                toAttack.AttackImpl(this, otherWeapon, otherEvaluatedStats, evaluatedStats, otherAfterExchangeArgs);
                 if (CurrentHP <= 0)
                 {
                     goto exit;
@@ -647,7 +649,7 @@ namespace FEEngine
             }
             if (evaluatedStats.AS - otherEvaluatedStats.AS >= 4)
             {
-                AttackImpl(toAttack, myWeapon, evaluatedStats, otherEvaluatedStats);
+                AttackImpl(toAttack, myWeapon, evaluatedStats, otherEvaluatedStats, afterExchangeArgs);
                 if (toAttack.CurrentHP <= 0)
                 {
                     goto exit;
@@ -655,13 +657,21 @@ namespace FEEngine
             }
             else if (otherEvaluatedStats.AS - evaluatedStats.AS >= 4 && iAmInRange)
             {
-                toAttack.AttackImpl(this, otherWeapon, otherEvaluatedStats, evaluatedStats);
+                toAttack.AttackImpl(this, otherWeapon, otherEvaluatedStats, evaluatedStats, otherAfterExchangeArgs);
             }
-            exit:
+        exit:
+            WeaponBehavior.Invoke(WeaponBehaviorEvent.AfterExchange, afterExchangeArgs, myWeapon.WeaponStats.Behavior);
+            if (otherWeapon != null)
+            {
+                WeaponBehavior.Invoke(WeaponBehaviorEvent.AfterExchange, otherAfterExchangeArgs, otherWeapon.WeaponStats.Behavior);
+            }
             CanMove = false;
             return true;
         }
-        private struct AttackPacket
+        /// <summary>
+        /// A structure containing the might, hit rate, and critical rate of an attack
+        /// </summary>
+        public struct AttackPacket
         {
             public int Might;
             public int Hit;
@@ -673,17 +683,24 @@ namespace FEEngine
             public bool DidHit { get; set; }
             public bool DidCrit { get; set; }
         }
-        private void AttackImpl(Unit toAttack, Item myWeapon, EvaluatedUnitStats myStats, EvaluatedUnitStats otherStats)
+        private unsafe void AttackImpl(Unit toAttack, Item myWeapon, EvaluatedUnitStats myStats, EvaluatedUnitStats otherStats, WeaponAfterExchangeArgs afterExchangeArgs)
         {
             AttackPacket packet = CreateAttackPacket(myStats, otherStats, myWeapon);
             SkillAttackArgs eventArgs = new(toAttack);
-            eventArgs.Might = new Ref<int>(ref packet.Might);
-            eventArgs.HitRate = new Ref<int>(ref packet.Hit);
-            eventArgs.CritRate = new Ref<int>(ref packet.Crit);
+            eventArgs.Might = &packet.Might;
+            eventArgs.HitRate = &packet.Hit;
+            eventArgs.CritRate = &packet.Crit;
             CallEvent(SkillTriggerEvent.OnAttack, eventArgs);
+            WeaponOnCalculationArgs weaponArgs = new(this, toAttack);
+            weaponArgs.Packet = &packet;
+            WeaponBehavior.Invoke(WeaponBehaviorEvent.OnCalculation, weaponArgs, myWeapon.WeaponStats.Behavior);
             AttackResult result = ParseAttackPacket(packet);
             toAttack.ReceiveAttackResult(result, this);
             myWeapon.WeaponStats.Durability--;
+            if (result.DidHit)
+            {
+                afterExchangeArgs.TimesAttacked++;
+            }
         }
         private AttackPacket CreateAttackPacket(EvaluatedUnitStats myStats, EvaluatedUnitStats otherStats, Item myWeapon)
         {

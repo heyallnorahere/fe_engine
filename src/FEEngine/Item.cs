@@ -20,6 +20,10 @@ namespace FEEngine
     [JsonObject]
     public class WeaponStats
     {
+        public WeaponStats()
+        {
+            mBehavior = null;
+        }
         /// <summary>
         /// Gets the <see cref="char"/> value associated with the passed weapon data
         /// </summary>
@@ -80,6 +84,38 @@ namespace FEEngine
         /// The current durability of the weapon
         /// </summary>
         public int Durability { get; set; }
+        /// <summary>
+        /// The class name of the currently attached <see cref="WeaponBehavior"/>
+        /// </summary>
+        public string BehaviorName
+        {
+            get
+            {
+                return mBehavior?.GetType().AssemblyQualifiedName ?? null;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    mBehavior = null;
+                }
+                else
+                {
+                    Type behaviorType = System.Type.GetType(value);
+                    mBehavior = (WeaponBehavior)behaviorType.GetConstructor(new Type[0]).Invoke(new object[0]);
+                }
+            }
+        }
+        /// <summary>
+        /// The current attached <see cref="WeaponBehavior"/>
+        /// </summary>
+        [JsonIgnore]
+        public WeaponBehavior Behavior
+        {
+            get => mBehavior;
+            set => mBehavior = value;
+        }
+        private WeaponBehavior mBehavior;
     }
     /// <summary>
     /// An object that represents an item in a <see cref="Unit"/>'s inventory
