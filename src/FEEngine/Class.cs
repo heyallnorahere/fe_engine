@@ -6,8 +6,17 @@ namespace FEEngine
 {
     public enum MovementType
     {
-        Foot,
-        Mounted,
+        /// <summary>
+        /// On foot
+        /// </summary>
+        Infantry,
+        /// <summary>
+        /// On a horse
+        /// </summary>
+        Cavalry,
+        /// <summary>
+        /// On a flying creature (pegasus, wyvern, etc.)
+        /// </summary>
         Flying
     }
     [JsonObject]

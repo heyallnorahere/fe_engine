@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using FEEngine.Classes;
@@ -28,19 +29,14 @@ namespace FEEngine
         /// <returns>The associated <see cref="Color"/></returns>
         public static Color GetColorForAffiliation(UnitAffiliation affiliation)
         {
-            switch (affiliation)
+            return affiliation switch
             {
-                case UnitAffiliation.Player:
-                    return Color.Blue;
-                case UnitAffiliation.Enemy:
-                    return Color.Red;
-                case UnitAffiliation.ThirdEnemy:
-                    return Color.Yellow;
-                case UnitAffiliation.Ally:
-                    return Color.Green;
-                default:
-                    return Color.White;
-            }
+                UnitAffiliation.Player => Color.Blue,
+                UnitAffiliation.Enemy => Color.Red,
+                UnitAffiliation.ThirdEnemy => Color.Yellow,
+                UnitAffiliation.Ally => Color.Green,
+                _ => Color.White,
+            };
         }
         public enum MovementType
         {
@@ -57,7 +53,7 @@ namespace FEEngine
             /// </summary>
             RefundMovement
         }
-        [JsonObject]
+        [JsonObject, StructLayout(LayoutKind.Sequential)]
         public struct UnitStats
         {
             public int HP, Str, Mag, Dex, Spd, Lck, Def, Res, Cha, Mv;
@@ -91,6 +87,7 @@ namespace FEEngine
                 };
             }
         }
+        [JsonObject, StructLayout(LayoutKind.Sequential)]
         public struct EvaluatedUnitStats
         {
             public int Atk, Prt, Rsl, AS, Hit, Avo, Crit, CritAvo;
@@ -109,6 +106,9 @@ namespace FEEngine
                 CallEvent(SkillTriggerEvent.OnReclass, eventArgs);
             }
         }
+        /// <summary>
+        /// Do not touch; this will be set by <see cref="JsonConverter"/>
+        /// </summary>
         public string ClassName
         {
             get
@@ -123,6 +123,34 @@ namespace FEEngine
                 {
                     Class = (Class)type.GetConstructor(new Type[0]).Invoke(new object[0]);
                 }
+            }
+        }
+        /// <summary>
+        /// The register index of the unit's equipped <see cref="Battalion"/>
+        /// </summary>
+        public int BattalionIndex
+        {
+            get => mBattalionIndex;
+            set => mBattalionIndex = value;
+        }
+        [JsonIgnore]
+        public Battalion Battalion
+        {
+            get
+            {
+                if (mBattalionIndex == -1)
+                {
+                    return null;
+                }
+                else
+                {
+                    Register<Battalion> battalionRegister = mRegister.Parent.GetRegister<Battalion>();
+                    return battalionRegister[mBattalionIndex];
+                }
+            }
+            set
+            {
+                mBattalionIndex = value?.RegisterIndex ?? -1;
             }
         }
         /// <summary>
@@ -766,6 +794,7 @@ namespace FEEngine
             ClassName = className; // doesnt matter if its null, ClassName will handle null values
             CurrentHP = BoostedStats.HP;
             RefreshMovement();
+            mBattalionIndex = -1;
             if (equippedWeapon == null)
             {
                 mEquippedWeaponIndex = -1;
@@ -802,6 +831,6 @@ namespace FEEngine
         private IUnitBehavior mBehavior;
         private Class mClass;
         private readonly List<Skill> mSkills;
-        private int mEquippedWeaponIndex;
+        private int mEquippedWeaponIndex, mBattalionIndex;
     }
 }

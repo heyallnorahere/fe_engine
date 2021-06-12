@@ -151,6 +151,7 @@ namespace FEEngine
             mRegistry.CreateRegister<Unit>();
             mRegistry.CreateRegister<Item>();
             mRegistry.CreateRegister<Tile>();
+            mRegistry.CreateRegister<Battalion>();
         }
         private readonly Registry mRegistry;
         private readonly string mKeyBindingsFile;

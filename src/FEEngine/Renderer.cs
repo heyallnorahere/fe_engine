@@ -69,7 +69,7 @@ namespace FEEngine
         public bool RenderChar(IVec2<int> position, char character, Color color = Color.White)
         {
             OffsetClipPair currentData = GetCurrentOffsetClipData();
-            if (MathUtil.IsVectorOutOfBounds(position, currentData.Clip))
+            if (MathUtil.IsVectorOutOfBounds(position, MathUtil.SubVectors(currentData.Clip, currentData.Offset)))
             {
                 return false;
             }
@@ -105,15 +105,18 @@ namespace FEEngine
                 Offset = new Vec2I(0),
                 Clip = new Vec2I(mBufferSize)
             };
-            foreach (OffsetClipPair pair in mStack)
+            OffsetClipPair[] array = new OffsetClipPair[mStack.Count];
+            mStack.CopyTo(array, 0);
+            for (int i = array.Length - 1; i >= 0; i--)
             {
+                OffsetClipPair pair = array[i];
                 MathUtil.AddVectors(ref data.Offset, pair.Offset);
                 IVec2<int> clipWithOffset = MathUtil.AddVectors(data.Offset, pair.Clip);
-                if (pair.Clip.X < clipWithOffset.X)
+                if (clipWithOffset.X < data.Clip.X)
                 {
                     data.Clip.X = clipWithOffset.X;
                 }
-                if (pair.Clip.Y < clipWithOffset.Y)
+                if (clipWithOffset.Y < data.Clip.Y)
                 {
                     data.Clip.Y = clipWithOffset.Y;
                 }

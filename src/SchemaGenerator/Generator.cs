@@ -15,12 +15,19 @@ namespace SchemaGenerator
         }
         private static void WriteSchema<T>(string name = null)
         {
-            string path = settings.SchemaDirectoryInfo.FullName + "/" + (name ?? typeof(T).Name) + ".json";
+            string title = name ?? typeof(T).Name;
+            string path = settings.SchemaDirectoryInfo.FullName + "/" + title + ".json";
             JSchema schema = generator.Generate(typeof(T));
             TextWriter textWriter = new StreamWriter(path);
             JsonWriter jsonWriter = new JsonTextWriter(textWriter);
+            schema.Title = title;
             schema.WriteTo(jsonWriter);
             jsonWriter.Close();
+        }
+        private static void WriteRegisterSchema<T>(string name = null) where T : class, IRegisteredObject<T>
+        {
+            string typeName = typeof(T).Name;
+            WriteSchema<Register<T>>(name ?? typeName + "s");
         }
         public static void Main(string[] args)
         {
@@ -41,10 +48,11 @@ namespace SchemaGenerator
             {
                 settings.SchemaDirectoryInfo = new(settings.SchemaDirectory);
             }
-            WriteSchema<Register<Map>>("Maps");
-            WriteSchema<Register<Unit>>("Units");
-            WriteSchema<Register<Item>>("Items");
-            WriteSchema<Register<Tile>>("Tiles");
+            WriteRegisterSchema<Map>();
+            WriteRegisterSchema<Unit>();
+            WriteRegisterSchema<Item>();
+            WriteRegisterSchema<Tile>();
+            WriteRegisterSchema<Battalion>();
             WriteSchema<InputManager.KeyBindings>();
         }
         private static JSchemaGenerator CreateGenerator()

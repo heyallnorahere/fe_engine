@@ -8,7 +8,7 @@
             {
                 return new MovementProperties
                 {
-                    MovementType = MovementType.Foot,
+                    MovementType = MovementType.Infantry,
                     IsArmored = false
                 };
             }

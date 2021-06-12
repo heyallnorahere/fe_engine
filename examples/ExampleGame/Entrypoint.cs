@@ -68,6 +68,7 @@ namespace ExampleGame
                 return true;
             });
             InitRegister<Tile>("data/tiles.json", game);
+            InitRegister<Battalion>("data/battalions.json", game);
             Player player = new(game);
             game.Renderer.Root.Center = new BorderedObject(new Map.MapRenderer(game));
             game.Renderer.Root.AddChild(new BorderedObject(new Logger.RenderAgent()), BorderLayout.Alignment.Bottom);
@@ -75,6 +76,7 @@ namespace ExampleGame
             game.Renderer.Root.AddChild(new BorderedMenu(UIController.FindMenu<TileInfoMenu>()), BorderLayout.Alignment.Left);
             Logger.Print(Color.Green, "Successfully initialized!");
             game.Loop(player);
+            game.Registry.SerializeRegister<Battalion>("data/battalions.json");
             game.Registry.SerializeRegister<Tile>("data/tiles.json");
             game.Registry.SerializeRegister<Map>("data/maps.json");
             game.Registry.SerializeRegister<Unit>("data/units.json");
