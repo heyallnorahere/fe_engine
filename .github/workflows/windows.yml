@@ -27,7 +27,7 @@ jobs:
         uses: yodasoda1219/create-package@v1.3
         id: artifact
         with:
-          config: artifact-description.json
+          config: ${{ github.workspace }}/artifact-description.json
       - name: upload artifact
         uses: actions/upload-artifact@v2
         with:
