@@ -1,0 +1,21 @@
+{
+    "outputPath": "FEEngine.zip",
+    "entries": [
+        {
+            "type": "directory",
+            "source": "bin/Release-%{platform}-x86_64/host",
+            "destination": "host"
+        },
+        {
+            "type": "directory",
+            "source": "bin/Release-%{platform}-x86_64/SchemaGenerator",
+            "destination": "SchemaGenerator"
+        },
+        {
+            "type": "glob",
+            "source": "bin/Release-%{platform}-x86_64/host/System*.dll",
+            "destination": "SchemaGenerator"
+        }
+    ],
+    "variables": []
+}
