@@ -24,7 +24,7 @@ jobs:
         run: |
           "%MSBUILD_PATH%\MSBuild.exe" fe_engine.sln -p:Configuration=Release -m
       - name: create artifact
-        uses: yodasoda1219/create-package@v2
+        uses: yodasoda1219/create-package@v2.2
         id: artifact
         with:
           config: ${{ github.workspace }}/artifact-description.json
