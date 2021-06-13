@@ -182,6 +182,8 @@ namespace FEEngine
                         stats += skill.StatBoosts;
                     }
                 }
+                BattalionStatBoosts battalionStatBoosts = Battalion?.StatBoosts;
+                stats.Cha += battalionStatBoosts?.CharmBoost ?? 0;
                 return stats;
             }
         }
@@ -207,7 +209,7 @@ namespace FEEngine
             {
                 mStats = new(mUnit.BoostedStats);
             }
-            public void Evaluate(Ref<EvaluatedUnitStats> stats, Unit enemy)
+            public void Evaluate(Ref<EvaluatedUnitStats> stats, Unit enemy, EvaluatedUnitStats? battalionStatBoosts)
             {
                 {
                     SkillBeforeStatEvaluationArgs eventArgs = new(enemy);
@@ -215,14 +217,14 @@ namespace FEEngine
                     mUnit.CallEvent(SkillTriggerEvent.BeforeStatEvaluation, eventArgs);
                 }
                 ref EvaluatedUnitStats evaluatedStats = ref stats.Value;
-                evaluatedStats.Atk = GetAtk();
-                evaluatedStats.Prt = GetPrt();
-                evaluatedStats.Rsl = GetRsl();
-                evaluatedStats.AS = GetAS();
-                evaluatedStats.Hit = GetHit();
-                evaluatedStats.Avo = GetAvo(enemy);
-                evaluatedStats.Crit = GetCrit();
-                evaluatedStats.CritAvo = GetCritAvo();
+                evaluatedStats.Atk = GetAtk() + (battalionStatBoosts?.Atk ?? 0);
+                evaluatedStats.Prt = GetPrt() + (battalionStatBoosts?.Prt ?? 0);
+                evaluatedStats.Rsl = GetRsl() + (battalionStatBoosts?.Rsl ?? 0);
+                evaluatedStats.AS = GetAS() + (battalionStatBoosts?.AS ?? 0);
+                evaluatedStats.Hit = GetHit() + (battalionStatBoosts?.Hit ?? 0);
+                evaluatedStats.Avo = GetAvo(enemy) + (battalionStatBoosts?.Avo ?? 0);
+                evaluatedStats.Crit = GetCrit() + (battalionStatBoosts?.Crit ?? 0);
+                evaluatedStats.CritAvo = GetCritAvo() + (battalionStatBoosts?.CritAvo ?? 0);
                 {
                     SkillAfterStatEvaluationArgs eventArgs = new(enemy);
                     eventArgs.EvaluatedStats = stats;
@@ -320,7 +322,10 @@ namespace FEEngine
         {
             EvaluatedUnitStats evaluatedStats = new();
             StatEvaluator evaluator = new(this);
-            evaluator.Evaluate(new Ref<EvaluatedUnitStats>(ref evaluatedStats), enemy);
+            Battalion battalion = Battalion;
+            BattalionStatBoosts battalionStatBoosts = battalion?.StatBoosts;
+            EvaluatedUnitStats? battalionBoosts = battalionStatBoosts?.EvaluatedStatBoosts;
+            evaluator.Evaluate(new Ref<EvaluatedUnitStats>(ref evaluatedStats), enemy, battalionBoosts);
             return evaluatedStats;
         }
         /// <summary>

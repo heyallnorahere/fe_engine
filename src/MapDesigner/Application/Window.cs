@@ -12,9 +12,9 @@ namespace MapDesigner
             {
                 if (!InitWindow())
                 {
+                    Console.WriteLine("Error: {0}", PlatformWindowUtils.GetLastError());
                     throw new Exception();
                 }
-                Console.WriteLine("Error: {0}", PlatformWindowUtils.GetLastError());
                 initialized = true;
             }
             uint style = 0x10000000 | 0x00000000 | 0x00C00000 | 0x00080000 | 0x00040000 | 0x00020000 | 0x00010000;
@@ -22,6 +22,7 @@ namespace MapDesigner
             if (mWindowHandle.ToInt32() == 0)
             {
                 Console.WriteLine("Error: {0}", PlatformWindowUtils.GetLastError());
+                throw new NullReferenceException();
             }
         }
         public unsafe void Loop()
@@ -36,6 +37,7 @@ namespace MapDesigner
                 }
             }
         }
+        [StructLayout(LayoutKind.Sequential)]
         private struct WNDCLASSA
         {
             public uint style;
@@ -62,10 +64,12 @@ namespace MapDesigner
                 lpszClassName = new(0);
             }
         }
+        [StructLayout(LayoutKind.Sequential)]
         private struct POINT
         {
             public int x, y;
         }
+        [StructLayout(LayoutKind.Sequential)]
         private struct MSG
         {
             public IntPtr hwnd;
