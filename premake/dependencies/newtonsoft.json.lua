@@ -12,15 +12,6 @@ project "Newtonsoft.Json"
     excludes {
         "../../vendor/submodules/%{prj.name}/Src/%{prj.name}/obj/**.cs"
     }
-    links {
-        "System",
-        "System.Core",
-        "System.Data",
-        "System.Numerics",
-        "System.Runtime.Serialization",
-        "System.Xml",
-        "System.Xml.Linq"
-    }
     defines {
         "HAVE_ADO_NET",
         "HAVE_APP_DOMAIN",
@@ -78,3 +69,13 @@ project "Newtonsoft.Json"
         "HAVE_XML_DOCUMENT_TYPE",
         "HAVE_CONCURRENT_DICTIONARY"
     }
+    filter "system:windows"
+        links {
+            "System",
+            "System.Core",
+            "System.Data",
+            "System.Numerics",
+            "System.Runtime.Serialization",
+            "System.Xml",
+            "System.Xml.Linq"
+        }

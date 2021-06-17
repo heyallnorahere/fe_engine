@@ -13,11 +13,7 @@ project "Newtonsoft.Json.Schema"
         "../../vendor/submodules/%{prj.name}/Src/%{prj.name}/obj/**.cs"
     }
     links {
-        "Newtonsoft.Json",
-        "System",
-        "System.Data",
-        "System.Numerics",
-        "System.Runtime.Serialization"
+        "Newtonsoft.Json"
     }
     defines {
         "HAVE_ADO_NET",
@@ -25,3 +21,10 @@ project "Newtonsoft.Json.Schema"
         "HAVE_DATE_TIME_OFFSET",
         "HAVE_FULL_REFLECTION"
     }
+    filter "system:windows"
+        links {
+            "System",
+            "System.Data",
+            "System.Numerics",
+            "System.Runtime.Serialization"
+        }

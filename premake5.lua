@@ -8,6 +8,23 @@ architecture_ = _OPTIONS["architecture"]
 include "premake/mono.lua"
 default_mono_includedir = determine_mono_include(architecture_)
 default_mono_libdir = determine_mono_libdir(architecture_)
+function scandir(directory, pattern)
+    local i, t, popen = 0, {}, io.popen
+    for filename in popen('find "' .. directory .. '" -maxdepth 1 -name "' .. pattern .. '"'):lines() do
+        i = i + 1
+        t[i] = filename
+    end
+    return t
+end
+function iterate_dlls()
+    local directory = os.getenv("DOTNET_ASSEMBLY_PATH")
+    local table = scandir(directory, "*.dll")
+    for key, value in pairs(table) do
+        links {
+            (value)
+        }
+    end
+end
 newoption {
     trigger = "mono-include",
     value = "PATH",
@@ -36,6 +53,12 @@ newoption {
         { "full-clear", "Clear every character on the screen (worse display)" }
     }
 }
+newoption {
+    trigger = "dotnet-sdk-version",
+    value = "VERSION",
+    description = "The .NET Core SDK version to target; only applicable to Unix systems",
+    default = "5.0.204"
+}
 includedirs_table = {}
 libdirs_table = {}
 includedirs_table["mono"] = _OPTIONS["mono-include"]
@@ -44,9 +67,6 @@ libdirs_table["mono"] = _OPTIONS["mono-libdir"]
 cs_version = _OPTIONS["cs-version"]
 dotnet_framework_version = "4.5" -- sorry, option removed
 dotnet_assembly_path = "%{libdirs_table.mono}/mono"
-version_table = {}
-version_table["System"] = "2.0.0.0"
-version_table["SystemCore"] = "3.5.0.0"
 workspace "fe_engine"
     architecture (architecture_)
     targetdir "bin"
@@ -71,6 +91,14 @@ workspace "fe_engine"
             "26451",
             "26812"
         }
+    filter { "system:not windows", "language:C#" }
+        libdirs {
+            (os.getenv("DOTNET_SDK_PATH"))
+        }
+        links {
+            "System.Security.Permissions.dll"
+        }
+        iterate_dlls()
     filter "system:windows"
         defines {
             "FEENGINE_WINDOWS"
@@ -114,9 +142,12 @@ project "FEEngine"
         _SCRIPT
     }
     links {
-        "Newtonsoft.Json",
-        "System"
+        "Newtonsoft.Json"
     }
+    filter "system:windows"
+        links {
+            "System"
+        }
 project "host"
     location "src/host"
     kind "ConsoleApp"
@@ -221,9 +252,12 @@ project "SchemaGenerator"
     links {
         "FEEngine",
         "Newtonsoft.Json",
-        "Newtonsoft.Json.Schema",
-        "System"
+        "Newtonsoft.Json.Schema"
     }
+    filter "system:windows"
+        links {
+            "System"
+        }
 project "MapDesigner"
     location "src/MapDesigner/Application"
     kind "ConsoleApp"
@@ -245,9 +279,12 @@ project "MapDesigner"
     links {
         "FEEngine",
         "Newtonsoft.Json",
-        "System",
         "MapDesigner-Internals"
     }
+    filter "system:windows"
+        links {
+            "System"
+        }
 project "MapDesigner-Internals"
     location "src/MapDesigner/Internals"
     kind "SharedLib"
@@ -308,7 +345,10 @@ project "ExampleGame"
         "examples/%{prj.name}/**.cs"
     }
     links {
-        "FEEngine",
-        "System"
+        "FEEngine"
     }
+    filter "system:windows"
+        links {
+            "System"
+        }
 group ""
