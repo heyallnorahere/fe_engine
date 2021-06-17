@@ -9,6 +9,9 @@ include "premake/mono.lua"
 default_mono_includedir = determine_mono_include(architecture_)
 default_mono_libdir = determine_mono_libdir(architecture_)
 function scandir(directory, pattern)
+    if not directory then
+        return {}
+    end
     local i, t, popen = 0, {}, io.popen
     for filename in popen('find "' .. directory .. '" -maxdepth 1 -name "' .. pattern .. '"'):lines() do
         i = i + 1
