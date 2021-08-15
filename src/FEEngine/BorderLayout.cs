@@ -135,7 +135,7 @@ namespace FEEngine
                 Alignment = alignment
             });
         }
-        public IRenderable Center { get; set; }
+        public IRenderable? Center { get; set; }
         private IVec2<int> mSize;
         private readonly List<ChildAlignmentPair> mChildren;
     }

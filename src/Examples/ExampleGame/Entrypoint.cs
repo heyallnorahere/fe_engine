@@ -46,14 +46,9 @@ namespace ExampleGame
     }
     public class Entrypoint
     {
-        public static void Main()
+        public static void Main(string[] args) // todo: add args parameter
         {
-            Game.HasNativeImplementation = false;
-            Main(true);
-        }
-        public static void Main(bool debug) // todo: add args parameter
-        {
-            Game.Debug = debug;
+            Game.Debug = false;
             if (!Directory.Exists("data"))
             {
                 Directory.CreateDirectory("data");

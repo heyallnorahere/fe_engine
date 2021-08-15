@@ -24,7 +24,7 @@ namespace FEEngine
                 }
                 int lineSegmentWidth = (lineWidth - titleLength) / 2;
                 int currentX;
-                char borderChar = (char)205;
+                char borderChar = '\u2550';
                 for (currentX = 0; currentX < lineSegmentWidth; currentX++)
                 {
                     context.RenderChar(new Vec2I(currentX + 1, y), borderChar);

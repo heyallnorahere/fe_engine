@@ -10,6 +10,7 @@ namespace FEEngine
         public BorderedObject(IRenderable child)
         {
             mChild = child;
+            mRenderSize = new Vec2I(0);
         }
         public IVec2<int> MinSize => MathUtil.AddVectors(mChild.MinSize, new Vec2I(2));
         public void Render(RenderContext context)
@@ -29,22 +30,22 @@ namespace FEEngine
         {
             for (int x = 0; x < mRenderSize.X - 2; x++)
             {
-                context.RenderChar(new Vec2I(x + 1, y), (char)205);
+                context.RenderChar(new Vec2I(x + 1, y), '\u2550');
             }
         }
         private void DrawVerticalLine(int x, RenderContext context)
         {
             for (int y = 0; y < mRenderSize.Y - 2; y++)
             {
-                context.RenderChar(new Vec2I(x, y + 1), (char)186);
+                context.RenderChar(new Vec2I(x, y + 1), '\u2551');
             }
         }
         private void DrawCorners(RenderContext context)
         {
-            context.RenderChar(new Vec2I(0), (char)200);
-            context.RenderChar(new Vec2I(mRenderSize.X - 1, 0), (char)188);
-            context.RenderChar(new Vec2I(0, mRenderSize.Y - 1), (char)201);
-            context.RenderChar(new Vec2I(mRenderSize.X - 1, mRenderSize.Y - 1), (char)187);
+            context.RenderChar(new Vec2I(0), '\u255A');
+            context.RenderChar(new Vec2I(mRenderSize.X - 1, 0), '\u255D');
+            context.RenderChar(new Vec2I(0, mRenderSize.Y - 1), '\u2554');
+            context.RenderChar(new Vec2I(mRenderSize.X - 1, mRenderSize.Y - 1), '\u2557');
         }
         private void DrawBorder(RenderContext context)
         {

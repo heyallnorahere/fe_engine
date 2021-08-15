@@ -17,7 +17,7 @@ jobs:
       - name: build
         shell: cmd
         run: |
-          dotnet build src/FEEngine.sln
+          dotnet build
       #- name: create artifact
       #  uses: yodasoda1219/create-package@v2.1
       #  id: artifact

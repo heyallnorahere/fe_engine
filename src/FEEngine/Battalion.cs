@@ -39,11 +39,11 @@ namespace FEEngine
             Name = "Generic Battalion";
             RemainingUses = 0;
         }
-        public string GambitName
+        public string? GambitName
         {
             get
             {
-                return mGambit?.GetType().AssemblyQualifiedName;
+                return mGambit?.GetType()?.AssemblyQualifiedName;
             }
             set
             {
@@ -53,12 +53,12 @@ namespace FEEngine
                 }
                 else
                 {
-                    Type type = Type.GetType(value);
+                    Type? type = Type.GetType(value);
                     bool isDerived;
-                    Type currentType = type;
+                    Type? currentType = type;
                     while (true)
                     {
-                        Type baseType = currentType.BaseType;
+                        Type? baseType = currentType?.BaseType;
                         if (baseType == typeof(Gambit) || baseType == typeof(object))
                         {
                             isDerived = baseType == typeof(Gambit);
@@ -71,16 +71,16 @@ namespace FEEngine
                         mGambit = null;
                         return;
                     }
-                    mGambit = (Gambit)type.GetConstructor(new Type[0]).Invoke(new object[0]);
-                    RemainingUses = mGambit.MaxUses;
+                    mGambit = (Gambit?)type?.GetConstructor(new Type[0])?.Invoke(new object[0]);
+                    RemainingUses = mGambit?.MaxUses ?? throw new NullReferenceException();
                 }
             }
         }
         public int Durability { get; set; }
-        public BattalionStatBoosts StatBoosts { get; set; }
+        public BattalionStatBoosts? StatBoosts { get; set; }
         public string Name { get; set; }
         [JsonIgnore]
-        public Unit Parent { get; set; }
+        public Unit? Parent { get; set; }
         [JsonIgnore]
         public int RemainingUses { get; private set; }
         /// <summary>
@@ -109,6 +109,6 @@ namespace FEEngine
         {
             return mGambit?.GambitType ?? GambitType.Null;
         }
-        private Gambit mGambit;
+        private Gambit? mGambit;
     }
 }

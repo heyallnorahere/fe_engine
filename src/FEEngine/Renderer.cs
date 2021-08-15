@@ -146,49 +146,38 @@ namespace FEEngine
         }
         private void Present()
         {
-            if (Game.HasNativeImplementation)
+            var buffer = new List<KeyValuePair<char, Color>>();
+            for (int y = mBufferSize.Y - 1; y >= 0; y--)
             {
-                ClearNativeBuffer_Native();
-                for (int y = mBufferSize.Y - 1; y >= 0; y--)
+                for (int x = 0; x < mBufferSize.X; x++)
                 {
-                    for (int x = 0; x < mBufferSize.X; x++)
-                    {
-                        int bufferIndex = GetBufferIndex(new Vec2I(x, y), mBufferSize);
-                        char character = mCharacterBuffer[bufferIndex];
-                        Color color = mColorBuffer[bufferIndex];
-                        WriteColoredChar_Native(character, color);
-                    }
-                    if (y > 0)
-                    {
-                        WriteColoredChar_Native('\n', Color.White);
-                    }
+                    int bufferIndex = GetBufferIndex(new Vec2I(x, y), mBufferSize);
+                    char character = mCharacterBuffer[bufferIndex];
+                    Color color = mColorBuffer[bufferIndex];
+                    buffer.Add(new KeyValuePair<char, Color>(character, color));
                 }
-                Present_Native();
+                if (y > 0)
+                {
+                    buffer.Add(new KeyValuePair<char, Color>('\n', Color.White));
+                }
             }
-            else
+            Console.CursorTop = 0;
+            Console.CursorLeft = 0;
+            foreach (var pair in buffer)
             {
-#if CLEAR_MODE_FULL_CLEAR
-                Console.Clear();
-#endif
-                Console.SetCursorPosition(0, 0);
-                string text = "";
-                for (int y = mBufferSize.Y - 1; y >= 0; y--)
+                Console.ForegroundColor = pair.Value switch
                 {
-                    for (int x = 0; x < mBufferSize.X; x++)
-                    {
-                        int bufferIndex = GetBufferIndex(new Vec2I(x, y), mBufferSize);
-                        char character = mCharacterBuffer[bufferIndex];
-                        text += character;
-                    }
-                    if (y > 0)
-                    {
-                        text += '\n';
-                    }
-                }
-                foreach (char character in text)
-                {
-                    Console.Write(character);
-                }
+                    Color.White => ConsoleColor.White,
+                    Color.Black => ConsoleColor.Black,
+                    Color.Red => ConsoleColor.Red,
+                    Color.Green => ConsoleColor.Green,
+                    Color.Blue => ConsoleColor.Blue,
+                    Color.Yellow => ConsoleColor.Yellow,
+                    Color.LightBlue => ConsoleColor.Cyan,
+                    Color.Purple => ConsoleColor.Magenta,
+                    _ => throw new ArgumentException("Invalid color!")
+                };
+                Console.Write(pair.Key);
             }
         }
         /// <summary>
@@ -247,14 +236,7 @@ namespace FEEngine
         }
         static Renderer()
         {
-            if (Game.HasNativeImplementation)
-            {
-                DisableCursor_Native();
-            }
-            else
-            {
-                Console.CursorVisible = false;
-            }
+            Console.CursorVisible = false;
         }
         private readonly List<char> mCharacterBuffer = new();
         private readonly List<Color> mColorBuffer = new();
