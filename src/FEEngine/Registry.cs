@@ -73,7 +73,7 @@ namespace FEEngine
                     return (Register<T>)register;
                 }
             }
-            return null;
+            throw new RegisterDoesNotExistException();
         }
         /// <summary>
         /// Creates a register of the specified type

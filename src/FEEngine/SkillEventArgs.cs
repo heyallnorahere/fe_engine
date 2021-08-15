@@ -55,15 +55,15 @@ namespace FEEngine
         /// <summary>
         /// A reference to the attack's might
         /// </summary>
-        public Ref<int> Might { get; internal set; }
+        public Ref<int>? Might { get; internal set; }
         /// <summary>
         /// A reference to the attack's hit rate
         /// </summary>
-        public Ref<int> HitRate { get; internal set; }
+        public Ref<int>? HitRate { get; internal set; }
         /// <summary>
         /// A reference to the attack's critical rate
         /// </summary>
-        public Ref<int> CritRate { get; internal set; }
+        public Ref<int>? CritRate { get; internal set; }
     }
     /// <summary>
     /// This event is triggered before a <see cref="Unit"/>'s stats are evaluated
@@ -81,7 +81,7 @@ namespace FEEngine
         /// <summary>
         /// The reference to the stats that will be evaluated; can be altered
         /// </summary>
-        public Ref<Unit.UnitStats> Stats { get; internal set; }
+        public Ref<Unit.UnitStats>? Stats { get; internal set; }
     }
     /// <summary>
     /// This event is triggered after a <see cref="Unit"/>'s stats are evaluated
@@ -99,6 +99,6 @@ namespace FEEngine
         /// <summary>
         /// The reference to the evaluated stats; can be altered
         /// </summary>
-        public Ref<Unit.EvaluatedUnitStats> EvaluatedStats { get; internal set; }
+        public Ref<Unit.EvaluatedUnitStats>? EvaluatedStats { get; internal set; }
     }
 }

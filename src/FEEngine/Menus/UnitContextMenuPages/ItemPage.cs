@@ -18,7 +18,7 @@ namespace FEEngine.Menus.UnitContextMenuPages
             protected override void OnSelect()
             {
                 mItem.Use();
-                Parent.GoBack();
+                Parent?.GoBack();
                 GoBack();
                 UIController.ResetSelectedUnit();
                 UIController.IsUnitContextMenuOpen = false;
@@ -38,7 +38,7 @@ namespace FEEngine.Menus.UnitContextMenuPages
             protected override void OnSelect()
             {
                 UIController.SelectedUnit.EquippedWeapon = mItem;
-                Parent.GoBack();
+                Parent?.GoBack();
                 GoBack();
             }
             private readonly Item mItem;
@@ -52,10 +52,12 @@ namespace FEEngine.Menus.UnitContextMenuPages
             protected override void OnSelect()
             {
                 Unit unit = UIController.SelectedUnit;
-                Item item = unit.EquippedWeapon;
+                Item? item = unit.EquippedWeapon;
                 unit.EquippedWeapon = null;
-                unit.Inventory.Add(item.RegisterIndex);
-                Parent.GoBack();
+                if (item != null) {
+                    unit.Inventory.Add(item.RegisterIndex);
+                }
+                Parent?.GoBack();
                 GoBack();
             }
         }
@@ -67,7 +69,7 @@ namespace FEEngine.Menus.UnitContextMenuPages
             }
             protected override void OnSelect()
             {
-                Parent.GoBack();
+                Parent?.GoBack();
                 GoBack();
             }
         }

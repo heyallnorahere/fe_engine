@@ -91,7 +91,7 @@ namespace FEEngine
         {
             get
             {
-                return mBehavior?.GetType().AssemblyQualifiedName ?? null;
+                return this.VerifyValue(mBehavior?.GetType().AssemblyQualifiedName);
             }
             set
             {
@@ -150,11 +150,11 @@ namespace FEEngine
         /// The holder of this item
         /// </summary>
         [JsonIgnore]
-        public Unit Parent { get; set; }
+        public Unit? Parent { get; set; }
         /// <summary>
         /// The <see cref="Type.AssemblyQualifiedName"/> of this item's behavior type
         /// </summary>
-        public string BehaviorName { get; set; }
+        public string? BehaviorName { get; set; }
         /// <summary>
         /// Attaches a <see cref="IItemBehavior"/> onto the item
         /// </summary>
@@ -196,7 +196,7 @@ namespace FEEngine
             return true;
         }
         [JsonConstructor]
-        public Item(bool usable, string behaviorName = null, WeaponStats weaponStats = null, string name = "RESERVE")
+        public Item(bool usable, string? behaviorName = null, WeaponStats? weaponStats = null, string name = "RESERVE")
         {
             Usable = usable;
             Name = name;
@@ -210,17 +210,17 @@ namespace FEEngine
             }
             else
             {
-                Type behaviorType = Type.GetType(BehaviorName);
+                Type? behaviorType = Type.GetType(BehaviorName);
                 if (behaviorType == null)
                 {
                     mBehavior = null;
                     return;
                 }
-                var constructor = behaviorType.GetConstructor(new Type[0]);
-                mBehavior = (IItemBehavior)constructor.Invoke(new object[0]);
+                var constructor = behaviorType?.GetConstructor(Array.Empty<Type>());
+                mBehavior = (IItemBehavior)this.VerifyValue(constructor?.Invoke(new object[0]));
                 mBehavior.Parent = this;
             }
         }
-        private IItemBehavior mBehavior;
+        private IItemBehavior? mBehavior;
     }
 }

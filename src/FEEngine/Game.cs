@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using FEEngine.Menus;
 
 namespace FEEngine
@@ -11,30 +11,12 @@ namespace FEEngine
     public class Game
     {
         /// <summary>
-        /// Whether the game is in debug mode; enables functions such as <see cref="BreakDebugger"/>
-        /// </summary>
-        public static bool Debug
-        {
-            get => debug;
-            set => debug = value;
-        }
-        /// <summary>
         /// Whether the game is being run from the C++ host application
         /// </summary>
         public static bool HasNativeImplementation
         {
             get => hasNativeImplementation;
             set => hasNativeImplementation = value;
-        }
-        /// <summary>
-        /// Breaks the debugger; only available when both <see cref="Debug"/> and <see cref="HasNativeImplementation"/> are set to "true"
-        /// </summary>
-        public static void BreakDebugger()
-        {
-            if (Debug && HasNativeImplementation)
-            {
-                BreakDebugger_Native();
-            }
         }
         /// <summary>
         /// The game's <see cref="FEEngine.PhaseManager"/>
@@ -44,7 +26,7 @@ namespace FEEngine
         /// The index of the current <see cref="Map"/> that is being played
         /// </summary>
         public int CurrentMapIndex { get; set; }
-        public Game(string bindingsFile = null)
+        public Game(string? bindingsFile = null)
         {
             UIController.Init(this);
             PhaseManager = new(Unit.UnitAffiliation.Ally);
@@ -154,11 +136,8 @@ namespace FEEngine
             mRegistry.CreateRegister<Battalion>();
         }
         private readonly Registry mRegistry;
-        private readonly string mKeyBindingsFile;
+        private readonly string? mKeyBindingsFile;
         private readonly Renderer mRenderer;
-        private static bool debug = false;
         private static bool hasNativeImplementation = true;
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void BreakDebugger_Native();
     }
 }

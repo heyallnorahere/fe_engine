@@ -52,7 +52,7 @@ namespace FEEngine.Scripting
         /// <summary>
         /// The <see cref="Unit.AttackPacket"/> that will be processed; can be altered
         /// </summary>
-        public Ref<Unit.AttackPacket> Packet { get; internal set; }
+        public Ref<Unit.AttackPacket>? Packet { get; internal set; }
     }
     /// <summary>
     /// A derived object of <see cref="WeaponBehaviorArgs"/> that is passed when the <see cref="WeaponBehaviorEvent.AfterExchange"/> event is triggered

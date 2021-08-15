@@ -48,7 +48,6 @@ namespace ExampleGame
     {
         public static void Main(string[] args) // todo: add args parameter
         {
-            Game.Debug = false;
             if (!Directory.Exists("data"))
             {
                 Directory.CreateDirectory("data");

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace FEEngine
 {
@@ -12,7 +13,7 @@ namespace FEEngine
         public int RegisterIndex { get { return mRegisterIndex; } }
         public Register<T> GetRegister()
         {
-            return mRegister;
+            return this.VerifyValue(mRegister);
         }
         public void SetRegister(int index, Register<T> register)
         {
@@ -20,7 +21,7 @@ namespace FEEngine
             mRegister = register;
         }
         public virtual void OnDeserialized() { }
-        protected int mRegisterIndex;
-        protected Register<T> mRegister;
+        protected int mRegisterIndex = -1;
+        protected Register<T>? mRegister;
     }
 }

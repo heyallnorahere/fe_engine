@@ -82,7 +82,7 @@ namespace FEEngine.Math
         {
             return v1.X.Equals(v2.X) && v1.Y.Equals(v2.Y);
         }
-        public static bool IsVectorOutOfBounds<T>(IVec2<T> vector, IVec2<T> boundsMax, IVec2<T> boundsMin = null) where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
+        public static bool IsVectorOutOfBounds<T>(IVec2<T> vector, IVec2<T> boundsMax, IVec2<T>? boundsMin = null) where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
         {
             if (vector.X.CompareTo(boundsMax.X) >= 0)
             {

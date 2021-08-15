@@ -93,10 +93,13 @@ namespace FEEngine.Menus
             {
                 if (CanGoBack)
                 {
+                    if (Parent == null) {
+                        throw new NullReferenceException();
+                    }
                     Parent.mCurrentChildIndex = -1;
                 }
             }
-            public Page Parent { get; private set; }
+            public Page? Parent { get; private set; }
             protected virtual void OnSelect() { }
             protected virtual void UpdatePage() { }
             protected abstract string GetTitle();
@@ -114,7 +117,7 @@ namespace FEEngine.Menus
             }
             protected override void OnSelect()
             {
-                UIController.SelectedUnit.Wait();
+                UIController.SelectedUnit?.Wait();
                 GoBack();
                 UIController.ResetSelectedUnit();
                 UIController.IsUnitContextMenuOpen = false;
@@ -134,7 +137,7 @@ namespace FEEngine.Menus
                 InputManager.State state = InputManager.GetState();
                 if (state.Back)
                 {
-                    UIController.SelectedUnit.Move(mParent.OriginalUnitPosition, Unit.MovementType.RefundMovement);
+                    UIController.SelectedUnit?.Move(this.VerifyValue(mParent.OriginalUnitPosition), Unit.MovementType.RefundMovement);
                     mParent.OriginalUnitPosition = null;
                     UIController.IsUnitContextMenuOpen = false;
                 }
@@ -174,6 +177,7 @@ namespace FEEngine.Menus
         public IVec2<int> MinSize { get { return new Vec2I(25, 26 - Logger.MaxLogSize); } }
         internal UnitContextMenu()
         {
+            mRenderSize = new Vec2I(0);
             OriginalUnitPosition = null;
             mBasePage = new BasePage(this);
         }
@@ -216,7 +220,7 @@ namespace FEEngine.Menus
         {
             return "Unit Context Menu";
         }
-        public IVec2<int> OriginalUnitPosition { private get; set; }
+        public IVec2<int>? OriginalUnitPosition { private get; set; }
         private IVec2<int> mRenderSize;
         private readonly Page mBasePage;
     }

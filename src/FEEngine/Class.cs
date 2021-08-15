@@ -34,7 +34,7 @@ namespace FEEngine
     {
         public Class()
         {
-            ClassSkills = new Skill[3] { null, null, null };
+            ClassSkills = new Skill?[3] { null, null, null };
         }
         /// <summary>
         /// Whether the <see cref="Unit"/> is mounted or not
@@ -51,6 +51,6 @@ namespace FEEngine
         /// <summary>
         /// An array of 3 <see cref="Skill"/>s that will have effect on the user of this class
         /// </summary>
-        public Skill[] ClassSkills { get; private set; }
+        public Skill?[] ClassSkills { get; private set; }
     }
 }

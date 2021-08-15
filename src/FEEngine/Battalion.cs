@@ -72,7 +72,7 @@ namespace FEEngine
                         return;
                     }
                     mGambit = (Gambit?)type?.GetConstructor(new Type[0])?.Invoke(new object[0]);
-                    RemainingUses = mGambit?.MaxUses ?? throw new NullReferenceException();
+                    RemainingUses = this.VerifyValue(mGambit).MaxUses;
                 }
             }
         }
@@ -98,7 +98,7 @@ namespace FEEngine
             {
                 return;
             }
-            mGambit?.Use(null, target, this);
+            mGambit?.Use(this.VerifyValue(Parent), target, this);
             RemainingUses--;
         }
         /// <summary>

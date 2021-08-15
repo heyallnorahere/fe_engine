@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FEEngine.Menus;
 
 namespace FEEngine
@@ -41,9 +42,9 @@ namespace FEEngine
         /// </summary>
         /// <typeparam name="T">The type of menu to find</typeparam>
         /// <returns>A menu of the specified type, or null if none was found</returns>
-        public static T FindMenu<T>() where T : class, IMenu
+        public static T? FindMenu<T>() where T : class, IMenu
         {
-            T menu = null;
+            T? menu = null;
             if (initialized)
             {
                 foreach (IMenu element in menus)
@@ -60,11 +61,11 @@ namespace FEEngine
         /// <summary>
         /// The unit selected by the <see cref="Player"/> instance, to be used by the <see cref="UnitContextMenu"/>
         /// </summary>
-        public static Unit SelectedUnit
+        public static Unit? SelectedUnit
         {
             get
             {
-                Register<Unit> unitRegister = gameInstance.Registry.GetRegister<Unit>();
+                Register<Unit> unitRegister = Extensions.VerifyValue(null, gameInstance?.Registry?.GetRegister<Unit>());
                 if (selectedUnitIndex == -1)
                 {
                     return null;
@@ -73,7 +74,7 @@ namespace FEEngine
             }
             set
             {
-                selectedUnitIndex = value.RegisterIndex;
+                selectedUnitIndex = value?.RegisterIndex ?? -1;
             }
         }
         /// <summary>
@@ -99,8 +100,8 @@ namespace FEEngine
             AddMenu(new UnitContextMenu());
             AddMenu(new TileInfoMenu());
         }
-        internal static Game GameInstance { get => gameInstance; }
-        private static Game gameInstance;
+        internal static Game? GameInstance => gameInstance;
+        private static Game? gameInstance;
         private static bool initialized = false;
         private static readonly List<IMenu> menus = new();
         private static int selectedUnitIndex = -1;

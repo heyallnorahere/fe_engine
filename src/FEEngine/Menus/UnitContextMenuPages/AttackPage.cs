@@ -18,7 +18,7 @@ namespace FEEngine.Menus.UnitContextMenuPages
             protected override void OnSelect()
             {
                 UIController.SelectedUnit.Attack(mUnit);
-                Parent.GoBack();
+                Parent?.GoBack();
                 GoBack();
                 UIController.ResetSelectedUnit();
                 UIController.IsUnitContextMenuOpen = false;

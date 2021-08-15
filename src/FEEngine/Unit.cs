@@ -113,15 +113,14 @@ namespace FEEngine
         {
             get
             {
-                return Class.GetType().AssemblyQualifiedName;
+                return this.VerifyValue(Class.GetType().AssemblyQualifiedName);
             }
             set
             {
-                string typeName = value ?? typeof(DefaultClass).AssemblyQualifiedName;
-                Type type = Type.GetType(typeName);
+                Type? type = Type.GetType(value);
                 if (type != null)
                 {
-                    Class = (Class)type.GetConstructor(new Type[0]).Invoke(new object[0]);
+                    Class = (Class)this.VerifyValue(type.GetConstructor(new Type[0])?.Invoke(new object[0]));
                 }
             }
         }
@@ -134,7 +133,7 @@ namespace FEEngine
             set => mBattalionIndex = value;
         }
         [JsonIgnore]
-        public Battalion Battalion
+        public Battalion? Battalion
         {
             get
             {
@@ -144,7 +143,7 @@ namespace FEEngine
                 }
                 else
                 {
-                    Register<Battalion> battalionRegister = mRegister.Parent.GetRegister<Battalion>();
+                    Register<Battalion> battalionRegister = this.VerifyValue(mRegister).Parent.GetRegister<Battalion>();
                     return battalionRegister[mBattalionIndex];
                 }
             }
@@ -175,14 +174,14 @@ namespace FEEngine
                 {
                     stats += skill.StatBoosts;
                 }
-                foreach (Skill skill in mClass.ClassSkills)
+                foreach (Skill? skill in mClass.ClassSkills)
                 {
                     if (skill != null)
                     {
                         stats += skill.StatBoosts;
                     }
                 }
-                BattalionStatBoosts battalionStatBoosts = Battalion?.StatBoosts;
+                BattalionStatBoosts? battalionStatBoosts = Battalion?.StatBoosts;
                 stats.Cha += battalionStatBoosts?.CharmBoost ?? 0;
                 return stats;
             }
@@ -237,10 +236,10 @@ namespace FEEngine
                 {
                     return 0;
                 }
-                Item equippedWeapon = mUnit.EquippedWeapon;
-                WeaponStats weaponStats = equippedWeapon.WeaponStats;
-                bool isMagic = IsMagic(weaponStats.Type);
-                return weaponStats.Attack + (isMagic ? mStats.Mag : mStats.Str);
+                Item? equippedWeapon = mUnit.EquippedWeapon;
+                WeaponStats? weaponStats = equippedWeapon?.WeaponStats;
+                bool isMagic = IsMagic(this.VerifyValue(weaponStats).Type);
+                return this.VerifyValue(weaponStats).Attack + (isMagic ? mStats.Mag : mStats.Str);
             }
             private int GetPrt()
             {
@@ -259,8 +258,8 @@ namespace FEEngine
                 int burden = 0;
                 if (mUnit.mEquippedWeaponIndex != -1)
                 {
-                    Item weapon = mUnit.EquippedWeapon;
-                    burden += weapon.WeaponStats.Weight;
+                    Item? weapon = mUnit.EquippedWeapon;
+                    burden += this.VerifyValue(weapon).WeaponStats.Weight;
                 }
                 burden -= (mStats.Str / 5);
                 if (burden < 0)
@@ -275,7 +274,7 @@ namespace FEEngine
                 {
                     return 0;
                 }
-                Item weapon = mUnit.EquippedWeapon;
+                Item weapon = this.VerifyValue(mUnit.EquippedWeapon);
                 bool isMagic = IsMagic(weapon.WeaponStats.Type);
                 int dex = mStats.Dex;
                 return (isMagic ? (dex + mStats.Lck) / 2 : dex) + weapon.WeaponStats.HitRate;
@@ -287,7 +286,7 @@ namespace FEEngine
                     return 0;
                 }
                 // were just gonna assume the enemy has a weapon, or this wouldnt be called
-                Item enemyWeapon = enemy.EquippedWeapon;
+                Item? enemyWeapon = enemy.EquippedWeapon;
                 if (enemyWeapon == null)
                 {
                     throw new ArgumentNullException();
@@ -302,7 +301,11 @@ namespace FEEngine
                 {
                     return 0;
                 }
-                Item weapon = mUnit.EquippedWeapon;
+                Item? weapon = mUnit.EquippedWeapon;
+                if (weapon == null)
+                {
+                    throw new NullReferenceException();
+                }
                 int crit = weapon.WeaponStats.CritRate;
                 crit += (mStats.Dex + mStats.Lck) / 2;
                 return crit;
@@ -322,8 +325,8 @@ namespace FEEngine
         {
             EvaluatedUnitStats evaluatedStats = new();
             StatEvaluator evaluator = new(this);
-            Battalion battalion = Battalion;
-            BattalionStatBoosts battalionStatBoosts = battalion?.StatBoosts;
+            Battalion? battalion = Battalion;
+            BattalionStatBoosts? battalionStatBoosts = battalion?.StatBoosts;
             EvaluatedUnitStats? battalionBoosts = battalionStatBoosts?.EvaluatedStatBoosts;
             evaluator.Evaluate(new Ref<EvaluatedUnitStats>(ref evaluatedStats), enemy, battalionBoosts);
             return evaluatedStats;
@@ -346,7 +349,7 @@ namespace FEEngine
                 List<string> typeNames = new();
                 foreach (Skill skill in mSkills)
                 {
-                    typeNames.Add(skill.GetType().AssemblyQualifiedName);
+                    typeNames.Add(this.VerifyValue(skill.GetType().AssemblyQualifiedName));
                 }
                 return typeNames;
             }
@@ -355,8 +358,9 @@ namespace FEEngine
                 mSkills.Clear();
                 foreach (string skillName in value)
                 {
-                    Type skillType = Type.GetType(skillName);
-                    mSkills.Add((Skill)skillType.GetConstructor(new Type[0]).Invoke(new object[0]));
+                    Type? skillType = Type.GetType(skillName);
+                    Skill skill = (Skill)this.VerifyValue(skillType?.GetConstructor(new Type[0])?.Invoke(new object[0]));
+                    mSkills.Add(skill);
                 }
             }
         }
@@ -384,7 +388,7 @@ namespace FEEngine
         /// The object of the equipped weapon. Use this to equip/unequip weapons.
         /// </summary>
         [JsonIgnore]
-        public Item EquippedWeapon
+        public Item? EquippedWeapon
         {
             get
             {
@@ -394,7 +398,7 @@ namespace FEEngine
                 }
                 else
                 {
-                    Register<Item> itemRegister = mRegister.Parent.GetRegister<Item>();
+                    Register<Item> itemRegister = this.VerifyValue(mRegister).Parent.GetRegister<Item>();
                     return itemRegister[mEquippedWeaponIndex];
                 }
             }
@@ -402,9 +406,12 @@ namespace FEEngine
             {
                 if (value == null)
                 {
-                    Item previouslyEquipped = EquippedWeapon;
+                    Item? previouslyEquipped = EquippedWeapon;
                     mEquippedWeaponIndex = -1;
-                    previouslyEquipped.Parent = null;
+                    if (previouslyEquipped != null)
+                    {
+                        previouslyEquipped.Parent = null;
+                    }
                 }
                 else
                 {
@@ -433,7 +440,7 @@ namespace FEEngine
         /// The <see cref="Map"/> the <see cref="Unit"/> was placed on
         /// </summary>
         [JsonIgnore]
-        public Map Parent { get; set; }
+        public Map? Parent { get; set; }
         /// <summary>
         /// Attaches a <see cref="IUnitBehavior"/> onto the unit
         /// </summary>
@@ -457,9 +464,9 @@ namespace FEEngine
         /// </summary>
         /// <typeparam name="B">The type of <see cref="IUnitBehavior"/> to cast to</typeparam>
         /// <returns>The <see cref="Unit"/>'s behavior instance</returns>
-        public B GetBehavior<B>() where B : IUnitBehavior, new()
+        public B? GetBehavior<B>() where B : IUnitBehavior, new()
         {
-            return (B)mBehavior;
+            return (B?)mBehavior;
         }
         /// <summary>
         /// Resets the <see cref="Unit"/>'s current movement
@@ -497,7 +504,7 @@ namespace FEEngine
         }
         public override void OnDeserialized()
         {
-            Register<Item> itemRegister = mRegister.Parent.GetRegister<Item>();
+            Register<Item> itemRegister = this.VerifyValue(mRegister?.Parent?.GetRegister<Item>());
             foreach (int index in Inventory)
             {
                 itemRegister[index].Parent = this;
@@ -516,7 +523,7 @@ namespace FEEngine
                 return false;
             }
             IVec2<int> delta = MathUtil.SubVectors(newPos, Position);
-            if (MathUtil.IsVectorOutOfBounds(newPos, Parent.Dimensions))
+            if (MathUtil.IsVectorOutOfBounds(newPos, this.VerifyValue(Parent?.Dimensions)))
             {
                 return false;
             }
@@ -553,16 +560,16 @@ namespace FEEngine
         }
         internal void UpdateWeapon()
         {
-            Item equippedWeapon = EquippedWeapon;
+            Item? equippedWeapon = EquippedWeapon;
             if ((equippedWeapon?.WeaponStats.Durability ?? 1) <= 0)
             {
                 mEquippedWeaponIndex = -1; // just stop referencing it
-                Logger.Print(Color.Yellow, "{0} broke...", equippedWeapon.Name);
+                Logger.Print(Color.Yellow, "{0} broke...", this.VerifyValue(equippedWeapon?.Name));
             }
         }
         internal void Update()
         {
-            Register<Item> itemRegister = mRegister.Parent.GetRegister<Item>();
+            Register<Item> itemRegister = this.VerifyValue(mRegister?.Parent?.GetRegister<Item>());
             foreach (int index in Inventory)
             {
                 Item item = itemRegister[index];
@@ -580,7 +587,7 @@ namespace FEEngine
         {
             List<Skill> skills = new();
             skills.AddRange(mSkills);
-            foreach (Skill skill in mClass.ClassSkills)
+            foreach (Skill? skill in mClass.ClassSkills)
             {
                 if (skill != null)
                 {
@@ -647,19 +654,19 @@ namespace FEEngine
             EvaluatedUnitStats evaluatedStats = GetEvaluatedStats(toAttack);
             EvaluatedUnitStats otherEvaluatedStats = toAttack.GetEvaluatedStats(this);
             // check if the attacker can move, and if the recipient is a valid target
-            Item myWeapon = EquippedWeapon;
+            Item? myWeapon = EquippedWeapon;
             if (!CanMove || IsAllied(toAttack) || myWeapon == null)
             {
                 return false;
             }
             int distance = MathUtil.SubVectors(Position, toAttack.Position).TaxicabLength();
-            WeaponStats stats = EquippedWeapon.WeaponStats;
+            WeaponStats stats = myWeapon.WeaponStats;
             IVec2<int> range = stats.Range;
             if (distance < range.X || distance > range.Y)
             {
                 return false;
             }
-            Item otherWeapon = toAttack.EquippedWeapon;
+            Item? otherWeapon = toAttack.EquippedWeapon;
             bool iAmInRange = false;
             if (otherWeapon != null) {
                 IVec2<int> otherRange = otherWeapon.WeaponStats.Range;
@@ -672,7 +679,7 @@ namespace FEEngine
             {
                 goto exit;
             }
-            if (iAmInRange)
+            if (iAmInRange && otherWeapon != null)
             {
                 toAttack.AttackImpl(this, otherWeapon, otherEvaluatedStats, evaluatedStats, otherAfterExchangeArgs);
                 if (CurrentHP <= 0)
@@ -688,7 +695,7 @@ namespace FEEngine
                     goto exit;
                 }
             }
-            else if (otherEvaluatedStats.AS - evaluatedStats.AS >= 4 && iAmInRange)
+            else if (otherEvaluatedStats.AS - evaluatedStats.AS >= 4 && iAmInRange && otherWeapon != null)
             {
                 toAttack.AttackImpl(this, otherWeapon, otherEvaluatedStats, evaluatedStats, otherAfterExchangeArgs);
             }
@@ -785,9 +792,9 @@ namespace FEEngine
         /// <summary>
         /// The <see cref="Type.AssemblyQualifiedName"/> of the <see cref="Unit"/>'s behavior type
         /// </summary>
-        public string BehaviorName { get; set; }
+        public string? BehaviorName { get; set; }
         [JsonConstructor]
-        public Unit(IVec2<int> position, UnitAffiliation affiliation, UnitStats stats, string behaviorName = null, Item equippedWeapon = null, string className = null, string name = "Soldier")
+        public Unit(IVec2<int> position, UnitAffiliation affiliation, UnitStats stats, string? behaviorName = null, Item? equippedWeapon = null, string? className = null, string name = "Soldier")
         {
             Inventory = new();
             Name = name;
@@ -796,7 +803,11 @@ namespace FEEngine
             Stats = stats;
             BehaviorName = behaviorName;
             mSkills = new();
-            ClassName = className; // doesnt matter if its null, ClassName will handle null values
+            ClassName = className ?? this.VerifyValue(typeof(DefaultClass).AssemblyQualifiedName);
+            if (mClass == null)
+            {
+                throw new NullReferenceException();
+            }
             CurrentHP = BoostedStats.HP;
             RefreshMovement();
             mBattalionIndex = -1;
@@ -822,18 +833,18 @@ namespace FEEngine
             else
             {
                 // i couldnt think of any other way lmaoooo
-                Type behaviorType = Type.GetType(BehaviorName);
+                Type? behaviorType = Type.GetType(BehaviorName);
                 if (behaviorType == null)
                 {
                     mBehavior = null;
                     return;
                 }
                 var constructor = behaviorType.GetConstructor(new Type[0]);
-                mBehavior = (IUnitBehavior)constructor.Invoke(new object[0]);
+                mBehavior = (IUnitBehavior)this.VerifyValue(constructor?.Invoke(new object[0]));
                 mBehavior.Parent = this;
             }
         }
-        private IUnitBehavior mBehavior;
+        private IUnitBehavior? mBehavior;
         private Class mClass;
         private readonly List<Skill> mSkills;
         private int mEquippedWeaponIndex, mBattalionIndex;

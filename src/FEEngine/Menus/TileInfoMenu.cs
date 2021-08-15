@@ -6,6 +6,7 @@ namespace FEEngine.Menus
     {
         internal TileInfoMenu()
         {
+            mRenderSize = new Vec2I(0);
             SelectedTile = new Vec2I();
         }
         public IVec2<int> MinSize { get => new Vec2I(20, 26 - Logger.MaxLogSize); }
