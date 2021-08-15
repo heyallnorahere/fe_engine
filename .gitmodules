@@ -1,9 +1,0 @@
-[submodule "vendor/submodules/cxxopts"]
-	path = vendor/submodules/cxxopts
-	url = https://github.com/jarro2783/cxxopts.git
-[submodule "vendor/submodules/Newtonsoft.Json"]
-	path = vendor/submodules/Newtonsoft.Json
-	url = https://github.com/JamesNK/Newtonsoft.Json.git
-[submodule "vendor/submodules/Newtonsoft.Json.Schema"]
-	path = vendor/submodules/Newtonsoft.Json.Schema
-	url = https://github.com/JamesNK/Newtonsoft.Json.Schema
