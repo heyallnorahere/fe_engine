@@ -91,7 +91,7 @@ namespace FEEngine
             InputManager.Update();
             if (UIController.IsUnitContextMenuOpen)
             {
-                UIController.FindMenu<UnitContextMenu>().Update();
+                UIController.FindMenu<UnitContextMenu>()?.Update();
             }
             else
             {

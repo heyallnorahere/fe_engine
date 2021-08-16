@@ -37,7 +37,7 @@ namespace FEEngine.Menus.UnitContextMenuPages
             }
             protected override void OnSelect()
             {
-                UIController.SelectedUnit.EquippedWeapon = mItem;
+                this.VerifyValue(UIController.SelectedUnit).EquippedWeapon = mItem;
                 Parent?.GoBack();
                 GoBack();
             }
@@ -51,7 +51,7 @@ namespace FEEngine.Menus.UnitContextMenuPages
             }
             protected override void OnSelect()
             {
-                Unit unit = UIController.SelectedUnit;
+                Unit unit = this.VerifyValue(UIController.SelectedUnit);
                 Item? item = unit.EquippedWeapon;
                 unit.EquippedWeapon = null;
                 if (item != null) {
@@ -85,15 +85,16 @@ namespace FEEngine.Menus.UnitContextMenuPages
             }
             protected override void OnSelect()
             {
+                Unit selectedUnit = this.VerifyValue(UIController.SelectedUnit);
                 if (mItem.Usable)
                 {
                     AddChild(new ItemUsePage(mItem));
                 }
-                if (mItem.IsWeapon && mItem.RegisterIndex != UIController.SelectedUnit.EquippedWeaponIndex)
+                if (mItem.IsWeapon && mItem.RegisterIndex != selectedUnit.EquippedWeaponIndex)
                 {
                     AddChild(new ItemEquipPage(mItem));
                 }
-                else if (mItem.RegisterIndex == UIController.SelectedUnit.EquippedWeaponIndex)
+                else if (mItem.RegisterIndex == selectedUnit.EquippedWeaponIndex)
                 {
                     AddChild(new ItemUnequipPage());
                 }
@@ -108,12 +109,12 @@ namespace FEEngine.Menus.UnitContextMenuPages
         protected override void UpdatePage()
         {
             Children.Clear();
-            Unit unit = UIController.SelectedUnit;
+            Unit? unit = UIController.SelectedUnit;
             if (unit == null)
             {
                 throw new ArgumentNullException();
             }
-            Register<Item> itemRegister = UIController.GameInstance.Registry.GetRegister<Item>();
+            Register<Item> itemRegister = this.VerifyValue(UIController.GameInstance).Registry.GetRegister<Item>();
             List<int> items = new();
             items.AddRange(unit.Inventory);
             if (unit.EquippedWeaponIndex != -1)

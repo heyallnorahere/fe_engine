@@ -63,7 +63,7 @@ namespace FEEngine
                     // check if the currently selected unit can pass the next tile
                     if (canMoveCursor && mSelectedIndex != -1)
                     {
-                        Tile nextTile = Map.GetTileAt(MathUtil.AddVectors(delta, CursorPosition));
+                        Tile? nextTile = Map.GetTileAt(MathUtil.AddVectors(delta, CursorPosition));
                         if (nextTile != null)
                         {
                             Unit unit = unitRegister[mSelectedIndex];
@@ -73,7 +73,7 @@ namespace FEEngine
                     // check if there is an enemy unit at the cursor's new position
                     if (canMoveCursor && mSelectedIndex != -1)
                     {
-                        Unit candidateUnit = Map.GetUnitAt(MathUtil.AddVectors(delta, CursorPosition));
+                        Unit? candidateUnit = Map.GetUnitAt(MathUtil.AddVectors(delta, CursorPosition));
                         if (candidateUnit != null)
                         {
                             Unit unit = unitRegister[mSelectedIndex];
@@ -86,14 +86,14 @@ namespace FEEngine
                         IVec2<int> temp = CursorPosition;
                         MathUtil.AddVectors(ref temp, delta);
                         CursorPosition = temp;
-                        UIController.FindMenu<TileInfoMenu>().SelectedTile = new Vec2I(CursorPosition);
+                        this.VerifyValue(UIController.FindMenu<TileInfoMenu>()).SelectedTile = new Vec2I(CursorPosition);
                     }
                 }
                 if (state.OK)
                 {
                     if (mSelectedIndex == -1)
                     {
-                        Unit unit = Map.GetUnitAt(CursorPosition);
+                        Unit? unit = Map.GetUnitAt(CursorPosition);
                         if (unit != null)
                         {
                             if (unit.CanMove)
@@ -106,7 +106,7 @@ namespace FEEngine
                     {
                         Register<Unit> unitRegister = mGame.Registry.GetRegister<Unit>();
                         Unit unit = unitRegister[mSelectedIndex];
-                        UIController.FindMenu<UnitContextMenu>().OriginalUnitPosition = unit.Position;
+                        this.VerifyValue(UIController.FindMenu<UnitContextMenu>()).OriginalUnitPosition = unit.Position;
                         unit.Move(CursorPosition);
                         mSelectedIndex = -1;
                         UIController.SelectedUnit = unit;

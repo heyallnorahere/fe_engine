@@ -26,7 +26,7 @@ namespace FEEngine
         /// <param name="path">The path of the file to read</param>
         /// <param name="plugin">Runs after the see <see cref="Newtonsoft.Json.JsonSerializer"/> is created</param>
         /// <returns>The deserialized object</returns>
-        public static T Deserialize<T>(string path, SerializationPlugin plugin = null)
+        public static T? Deserialize<T>(string path, SerializationPlugin? plugin = null)
         {
             TextReader textReader = new StreamReader(path);
             JsonReader reader = new JsonTextReader(textReader);
@@ -34,7 +34,7 @@ namespace FEEngine
             plugin?.Invoke(serializer);
             // ill add more vec2 converters later
             serializer.Converters.Add(new Vec2Converter<int>());
-            T value =  serializer.Deserialize<T>(reader);
+            T? value = serializer.Deserialize<T>(reader);
             reader.Close();
             return value;
         }
@@ -44,7 +44,7 @@ namespace FEEngine
         /// <param name="path">The path of the file to write</param>
         /// <param name="value">The object to serialize</param>
         /// <param name="plugin">Runs after the see <see cref="Newtonsoft.Json.JsonSerializer"/> is created</param>
-        public static void Serialize(string path, object value, SerializationPlugin plugin = null)
+        public static void Serialize(string path, object value, SerializationPlugin? plugin = null)
         {
             TextWriter textWriter = new StreamWriter(path);
             JsonWriter writer = new JsonTextWriter(textWriter);

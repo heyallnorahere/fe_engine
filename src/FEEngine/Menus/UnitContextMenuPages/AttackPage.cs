@@ -17,7 +17,7 @@ namespace FEEngine.Menus.UnitContextMenuPages
             }
             protected override void OnSelect()
             {
-                UIController.SelectedUnit.Attack(mUnit);
+                UIController.SelectedUnit?.Attack(mUnit);
                 Parent?.GoBack();
                 GoBack();
                 UIController.ResetSelectedUnit();
@@ -28,12 +28,12 @@ namespace FEEngine.Menus.UnitContextMenuPages
         private static List<Unit> GetAttackableUnits()
         {
             List<Unit> units = new();
-            Unit currentUnit = UIController.SelectedUnit;
-            Item weapon = currentUnit.EquippedWeapon;
-            Map map = currentUnit.Parent;
+            Unit currentUnit = Extensions.VerifyValue(null, UIController.SelectedUnit);
+            Item? weapon = currentUnit.EquippedWeapon;
+            Map map = Extensions.VerifyValue(null, currentUnit.Parent);
             if (weapon != null)
             {
-                IVec2<int> range = weapon.WeaponStats.Range;
+                IVec2<int> range = Extensions.VerifyValue(null, weapon.WeaponStats).Range;
                 foreach (Unit unit in map)
                 {
                     int distance = MathUtil.SubVectors(currentUnit.Position, unit.Position).TaxicabLength();

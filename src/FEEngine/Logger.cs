@@ -38,7 +38,7 @@ namespace FEEngine
             {
                 mRenderSize = size;
             }
-            private IVec2<int> mRenderSize;
+            private IVec2<int> mRenderSize = new Vec2I(0);
         }
         public static void Print(Color color, string format, params object[] args)
         {

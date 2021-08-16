@@ -57,7 +57,7 @@ namespace FEEngine
             {
                 get
                 {
-                    Registry registry = mParent.mRegister.Parent;
+                    Registry registry = this.VerifyValue(mParent.mRegister).Parent;
                     Register<Unit> unitRegister = registry.GetRegister<Unit>();
                     return unitRegister[mParent.Units[mPosition]];
                 }
@@ -110,14 +110,14 @@ namespace FEEngine
         /// </summary>
         public List<int> SpecialTiles { get; set; }
         [JsonIgnore]
-        internal Player Player { get; set; }
+        internal Player? Player { get; set; }
         public IVec2<int> MinSize { get => Dimensions; }
         /// <summary>
         /// Finds a <see cref="Unit"/> at the specified position
         /// </summary>
         /// <param name="position">The position to search at</param>
         /// <returns>A <see cref="Unit"/> object if found; otherwise, null</returns>
-        public Unit GetUnitAt(IVec2<int> position)
+        public Unit? GetUnitAt(IVec2<int> position)
         {
             foreach (Unit unit in this)
             {
@@ -133,9 +133,9 @@ namespace FEEngine
         /// </summary>
         /// <param name="position">The position to search at</param>
         /// <returns>A <see cref="Tile"/> object if found; otherwise, null</returns>
-        public Tile GetTileAt(IVec2<int> position)
+        public Tile? GetTileAt(IVec2<int> position)
         {
-            Register<Tile> tileRegister = mRegister.Parent.GetRegister<Tile>();
+            Register<Tile> tileRegister = this.VerifyValue(mRegister).Parent.GetRegister<Tile>();
             foreach (int index in SpecialTiles)
             {
                 Tile tile = tileRegister[index];
@@ -227,10 +227,10 @@ namespace FEEngine
             foreach (Unit unit in this)
             {
                 // todo: replace 'U' with character corresponding to the units weapon type
-                Item equippedWeapon = unit.EquippedWeapon;
-                context.RenderChar(unit.Position, WeaponStats.GetCharacterForWeapon(equippedWeapon?.WeaponStats ?? null), Unit.GetColorForAffiliation(unit.Affiliation));
+                Item? equippedWeapon = unit.EquippedWeapon;
+                context.RenderChar(unit.Position, WeaponStats.GetCharacterForWeapon(equippedWeapon?.WeaponStats), Unit.GetColorForAffiliation(unit.Affiliation));
             }
-            Player.Render(context);
+            Player?.Render(context);
         }
         /// <summary>
         /// Adds a <see cref="Unit"/> to the list of units
@@ -254,8 +254,9 @@ namespace FEEngine
             mRenderSize = size;
         }
         [JsonConstructor]
-        public Map(int width, int height, List<int> units = null, List<int> specialTiles = null)
+        public Map(int width, int height, List<int>? units = null, List<int>? specialTiles = null)
         {
+            mRenderSize = new Vec2I(0);
             Width = width;
             Height = height;
             Units = units ?? new List<int>();

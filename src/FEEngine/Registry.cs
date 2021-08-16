@@ -136,10 +136,10 @@ namespace FEEngine
             {
                 if (mRegisters[i].IsOfType<T>())
                 {
-                    mRegisters[i] = JsonSerializer.Deserialize<Register<T>>(jsonFilePath, (Newtonsoft.Json.JsonSerializer serializer) =>
+                    mRegisters[i] = this.VerifyValue(JsonSerializer.Deserialize<Register<T>>(jsonFilePath, (Newtonsoft.Json.JsonSerializer serializer) =>
                     {
                         serializer.Converters.Add(new Converter<T>(this));
-                    });
+                    }));
                 }
             }
         }

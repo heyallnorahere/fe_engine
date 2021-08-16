@@ -23,13 +23,14 @@ namespace FEEngine
         public WeaponStats()
         {
             mBehavior = null;
+            Range = new Vec2I(1);
         }
         /// <summary>
         /// Gets the <see cref="char"/> value associated with the passed weapon data
         /// </summary>
         /// <param name="stats">An object of type <see cref="WeaponStats"/>, containing the weapon's type. Can be null</param>
         /// <returns>The associated <see cref="char"/></returns>
-        public static char GetCharacterForWeapon(WeaponStats stats)
+        public static char GetCharacterForWeapon(WeaponStats? stats)
         {
             if (stats != null)
             {
@@ -101,8 +102,8 @@ namespace FEEngine
                 }
                 else
                 {
-                    Type behaviorType = System.Type.GetType(value);
-                    mBehavior = (WeaponBehavior)behaviorType.GetConstructor(new Type[0]).Invoke(new object[0]);
+                    Type behaviorType = this.VerifyValue(System.Type.GetType(value));
+                    mBehavior = (WeaponBehavior)this.VerifyValue(behaviorType.GetConstructor(new Type[0])?.Invoke(new object[0]));
                 }
             }
         }
@@ -110,12 +111,12 @@ namespace FEEngine
         /// The current attached <see cref="WeaponBehavior"/>
         /// </summary>
         [JsonIgnore]
-        public WeaponBehavior Behavior
+        public WeaponBehavior? Behavior
         {
             get => mBehavior;
             set => mBehavior = value;
         }
-        private WeaponBehavior mBehavior;
+        private WeaponBehavior? mBehavior;
     }
     /// <summary>
     /// An object that represents an item in a <see cref="Unit"/>'s inventory
@@ -141,7 +142,8 @@ namespace FEEngine
         /// <summary>
         /// The stats of the weapon; is null if the <see cref="Item"/> is not a weapon
         /// </summary>
-        public WeaponStats WeaponStats { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Include)]
+        public WeaponStats? WeaponStats { get; set; }
         /// <summary>
         /// The name of this item
         /// </summary>
@@ -178,9 +180,9 @@ namespace FEEngine
         /// </summary>
         /// <typeparam name="B">The type of <see cref="IItemBehavior"/> to cast to</typeparam>
         /// <returns>The <see cref="Item"/>'s behavior instance</returns>
-        public B GetBehavior<B>() where B : IItemBehavior
+        public B? GetBehavior<B>() where B : IItemBehavior
         {
-            return (B)mBehavior;
+            return (B?)mBehavior;
         }
         /// <summary>
         /// Uses the item

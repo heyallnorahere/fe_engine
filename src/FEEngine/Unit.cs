@@ -259,7 +259,7 @@ namespace FEEngine
                 if (mUnit.mEquippedWeaponIndex != -1)
                 {
                     Item? weapon = mUnit.EquippedWeapon;
-                    burden += this.VerifyValue(weapon).WeaponStats.Weight;
+                    burden += this.VerifyValue(weapon?.WeaponStats).Weight;
                 }
                 burden -= (mStats.Str / 5);
                 if (burden < 0)
@@ -275,9 +275,9 @@ namespace FEEngine
                     return 0;
                 }
                 Item weapon = this.VerifyValue(mUnit.EquippedWeapon);
-                bool isMagic = IsMagic(weapon.WeaponStats.Type);
+                bool isMagic = IsMagic(this.VerifyValue(weapon.WeaponStats).Type);
                 int dex = mStats.Dex;
-                return (isMagic ? (dex + mStats.Lck) / 2 : dex) + weapon.WeaponStats.HitRate;
+                return (isMagic ? (dex + mStats.Lck) / 2 : dex) + this.VerifyValue(weapon.WeaponStats).HitRate;
             }
             private int GetAvo(Unit enemy)
             {
@@ -286,12 +286,8 @@ namespace FEEngine
                     return 0;
                 }
                 // were just gonna assume the enemy has a weapon, or this wouldnt be called
-                Item? enemyWeapon = enemy.EquippedWeapon;
-                if (enemyWeapon == null)
-                {
-                    throw new ArgumentNullException();
-                }
-                bool isMagic = IsMagic(enemyWeapon.WeaponStats.Type);
+                Item enemyWeapon = this.VerifyValue(enemy.EquippedWeapon);
+                bool isMagic = IsMagic(this.VerifyValue(enemyWeapon.WeaponStats).Type);
                 int factor = isMagic ? (mStats.Spd + mStats.Lck) / 2 : GetAS();
                 return factor; // todo: add more parameters
             }
@@ -301,12 +297,8 @@ namespace FEEngine
                 {
                     return 0;
                 }
-                Item? weapon = mUnit.EquippedWeapon;
-                if (weapon == null)
-                {
-                    throw new NullReferenceException();
-                }
-                int crit = weapon.WeaponStats.CritRate;
+                Item weapon = this.VerifyValue(mUnit.EquippedWeapon);
+                int crit = this.VerifyValue(weapon.WeaponStats).CritRate;
                 crit += (mStats.Dex + mStats.Lck) / 2;
                 return crit;
             }
@@ -561,10 +553,10 @@ namespace FEEngine
         internal void UpdateWeapon()
         {
             Item? equippedWeapon = EquippedWeapon;
-            if ((equippedWeapon?.WeaponStats.Durability ?? 1) <= 0)
+            if ((equippedWeapon?.WeaponStats?.Durability ?? 1) <= 0)
             {
                 mEquippedWeaponIndex = -1; // just stop referencing it
-                Logger.Print(Color.Yellow, "{0} broke...", this.VerifyValue(equippedWeapon?.Name));
+                Logger.Print(Color.Yellow, "{0} broke...", this.VerifyValue(equippedWeapon).Name);
             }
         }
         internal void Update()
@@ -660,7 +652,7 @@ namespace FEEngine
                 return false;
             }
             int distance = MathUtil.SubVectors(Position, toAttack.Position).TaxicabLength();
-            WeaponStats stats = myWeapon.WeaponStats;
+            WeaponStats stats = this.VerifyValue(myWeapon.WeaponStats);
             IVec2<int> range = stats.Range;
             if (distance < range.X || distance > range.Y)
             {
@@ -669,7 +661,7 @@ namespace FEEngine
             Item? otherWeapon = toAttack.EquippedWeapon;
             bool iAmInRange = false;
             if (otherWeapon != null) {
-                IVec2<int> otherRange = otherWeapon.WeaponStats.Range;
+                IVec2<int> otherRange = this.VerifyValue(otherWeapon.WeaponStats).Range;
                 iAmInRange = distance > otherRange.X && distance < otherRange.Y;
             }
             WeaponAfterExchangeArgs afterExchangeArgs = new(this, toAttack);
@@ -700,10 +692,10 @@ namespace FEEngine
                 toAttack.AttackImpl(this, otherWeapon, otherEvaluatedStats, evaluatedStats, otherAfterExchangeArgs);
             }
         exit:
-            WeaponBehavior.Invoke(WeaponBehaviorEvent.AfterExchange, afterExchangeArgs, myWeapon.WeaponStats.Behavior);
+            WeaponBehavior.Invoke(WeaponBehaviorEvent.AfterExchange, afterExchangeArgs, this.VerifyValue(myWeapon.WeaponStats?.Behavior));
             if (otherWeapon != null)
             {
-                WeaponBehavior.Invoke(WeaponBehaviorEvent.AfterExchange, otherAfterExchangeArgs, otherWeapon.WeaponStats.Behavior);
+                WeaponBehavior.Invoke(WeaponBehaviorEvent.AfterExchange, otherAfterExchangeArgs, this.VerifyValue(otherWeapon.WeaponStats?.Behavior));
             }
             CanMove = false;
             return true;
@@ -733,10 +725,10 @@ namespace FEEngine
             CallEvent(SkillTriggerEvent.OnAttack, eventArgs);
             WeaponOnCalculationArgs weaponArgs = new(this, toAttack);
             weaponArgs.Packet = &packet;
-            WeaponBehavior.Invoke(WeaponBehaviorEvent.OnCalculation, weaponArgs, myWeapon.WeaponStats.Behavior);
+            WeaponBehavior.Invoke(WeaponBehaviorEvent.OnCalculation, weaponArgs, this.VerifyValue(myWeapon.WeaponStats?.Behavior));
             AttackResult result = ParseAttackPacket(packet);
             toAttack.ReceiveAttackResult(result, this);
-            myWeapon.WeaponStats.Durability--;
+            this.VerifyValue(myWeapon.WeaponStats).Durability--;
             if (result.DidHit)
             {
                 afterExchangeArgs.TimesAttacked++;
@@ -745,7 +737,7 @@ namespace FEEngine
         private AttackPacket CreateAttackPacket(EvaluatedUnitStats myStats, EvaluatedUnitStats otherStats, Item myWeapon)
         {
             AttackPacket packet = new();
-            WeaponStats weaponStats = myWeapon.WeaponStats;
+            WeaponStats weaponStats = this.VerifyValue(myWeapon.WeaponStats);
             var isMagic = weaponStats.Type switch
             {
                 WeaponType.WhiteMagic => true,

@@ -13,16 +13,16 @@
             if (eventArgs.Event == SkillTriggerEvent.AfterStatEvaluation)
             {
                 SkillAfterStatEvaluationArgs args = (SkillAfterStatEvaluationArgs)eventArgs;
-                Item myWeapon = caller.EquippedWeapon;
+                Item myWeapon = this.VerifyValue(caller.EquippedWeapon);
                 if (args.Enemy != null)
                 {
-                    Item otherWeapon = args.Enemy.EquippedWeapon;
-                    if (myWeapon.WeaponStats.Type == mWeaponType && otherWeapon != null)
+                    Item? otherWeapon = args.Enemy.EquippedWeapon;
+                    if (this.VerifyValue(myWeapon.WeaponStats).Type == mWeaponType && otherWeapon != null)
                     {
-                        if (otherWeapon.WeaponStats.Type == mOpponentWeaponType)
+                        if (this.VerifyValue(otherWeapon.WeaponStats).Type == mOpponentWeaponType)
                         {
-                            args.EvaluatedStats.Value.Hit += 20;
-                            args.EvaluatedStats.Value.Avo += 20;
+                            this.VerifyValue(args.EvaluatedStats).Value.Hit += 20;
+                            this.VerifyValue(args.EvaluatedStats).Value.Avo += 20;
                         }
                     }
                 }
@@ -42,10 +42,10 @@
             if (eventArgs.Event == SkillTriggerEvent.AfterStatEvaluation)
             {
                 SkillAfterStatEvaluationArgs args = (SkillAfterStatEvaluationArgs)eventArgs;
-                Item myWeapon = caller.EquippedWeapon;
-                if (myWeapon.WeaponStats.Type == mWeaponType)
+                Item myWeapon = this.VerifyValue(caller.EquippedWeapon);
+                if (this.VerifyValue(myWeapon.WeaponStats).Type == mWeaponType)
                 {
-                    args.EvaluatedStats.Value.Crit += 10;
+                    this.VerifyValue(args.EvaluatedStats).Value.Crit += 10;
                 }
             }
         }
@@ -63,10 +63,10 @@
             if (eventArgs.Event == SkillTriggerEvent.AfterStatEvaluation)
             {
                 SkillAfterStatEvaluationArgs args = (SkillAfterStatEvaluationArgs)eventArgs;
-                Item myWeapon = caller.EquippedWeapon;
-                if (myWeapon.WeaponStats.Type == mWeaponType)
+                Item myWeapon = this.VerifyValue(caller.EquippedWeapon);
+                if (this.VerifyValue(myWeapon.WeaponStats).Type == mWeaponType)
                 {
-                    args.EvaluatedStats.Value.Atk += 5;
+                    this.VerifyValue(args.EvaluatedStats).Value.Atk += 5;
                 }
             }
         }

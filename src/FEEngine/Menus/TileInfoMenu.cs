@@ -27,10 +27,10 @@ namespace FEEngine.Menus
         public void Render(RenderContext context)
         {
             IVec2<int> origin = new Vec2I(0, mRenderSize.Y - 1);
-            Registry registry = UIController.GameInstance.Registry;
+            Registry registry = this.VerifyValue(UIController.GameInstance).Registry;
             Register<Map> mapRegister = registry.GetRegister<Map>();
-            Map map = mapRegister[UIController.GameInstance.CurrentMapIndex];
-            Unit unit = map.GetUnitAt(SelectedTile);
+            Map map = mapRegister[this.VerifyValue(UIController.GameInstance).CurrentMapIndex];
+            Unit? unit = map.GetUnitAt(SelectedTile);
             string unitDescText = "None";
             string affiliationName = "NA";
             string className = "NA";
@@ -53,7 +53,7 @@ namespace FEEngine.Menus
             IVec2<int> classTextPos = MathUtil.AddVectors(origin, new Vec2I(1, -6));
             context.RenderString(classTextPos, "Class:");
             context.RenderString(MathUtil.AddVectors(classTextPos, new Vec2I(2, -1)), className);
-            Tile tile = map.GetTileAt(SelectedTile);
+            Tile? tile = map.GetTileAt(SelectedTile);
             string tileContentText = "Plain";
             string whoCanPassTile = GetStringForMovementLimit(Tile.MovementLimitEnum.All);
             if (tile != null)

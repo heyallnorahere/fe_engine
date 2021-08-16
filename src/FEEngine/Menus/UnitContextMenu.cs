@@ -162,7 +162,8 @@ namespace FEEngine.Menus
                 {
                     AddChild(new AttackPage());
                 }
-                if (UIController.SelectedUnit.Inventory.Count > 0 || UIController.SelectedUnit.EquippedWeapon != null)
+                Unit selectedUnit = this.VerifyValue(UIController.SelectedUnit);
+                if (selectedUnit.Inventory.Count > 0 || selectedUnit.EquippedWeapon != null)
                 {
                     AddChild(new ItemPage());
                 }
