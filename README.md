@@ -1,4 +1,4 @@
-# fe_engine [![build](https://img.shields.io/github/workflow/status/yodasoda1219/fe_engine/build)](https://github.com/yodasoda1219/fe_engine/actions/workflows/build.yml) [![build](https://img.shields.io/github/workflow/status/yodasoda1219/fe_engine/build-native/native)](https://github.com/yodasoda1219/fe_engine/actions/workflows/build-native.yml)
+# fe_engine [![build](https://img.shields.io/github/workflow/status/yodasoda1219/fe_engine/build)](https://github.com/yodasoda1219/fe_engine/actions/workflows/build.yml) [![build-native](https://img.shields.io/github/workflow/status/yodasoda1219/fe_engine/build-native/native?label=build%20%28native%29)](https://github.com/yodasoda1219/fe_engine/actions/workflows/build-native.yml)
 ## About
 This project aims to recreate the Fire Emblem: Three Houses game engine in a terminal. The gameplay side, I mean.
 ## What's this Fire Emblem?
