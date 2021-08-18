@@ -244,22 +244,53 @@ namespace FEEngine
             private int GetPrt()
             {
                 int prt = mStats.Def;
-                // todo: add things like equipment protection and battalion protection
+                Item? equippedItem = mUnit.EquippedItem;
+                if (equippedItem != null)
+                {
+                    prt += this.VerifyValue(equippedItem.EquipmentStats).Protection;
+                }
+                Battalion? battalion = mUnit.Battalion;
+                if (battalion != null)
+                {
+                    BattalionStatBoosts? statBoosts = battalion.StatBoosts;
+                    if (statBoosts != null)
+                    {
+                        prt += statBoosts.EvaluatedStatBoosts.Prt;
+                    }
+                }
                 return prt;
             }
             private int GetRsl()
             {
                 int rsl = mStats.Res;
-                // todo: add things like equipment resilience and battalion resilience
+                Item? equippedItem = mUnit.EquippedItem;
+                if (equippedItem != null)
+                {
+                    rsl += this.VerifyValue(equippedItem.EquipmentStats).Resilience;
+                }
+                Battalion? battalion = mUnit.Battalion;
+                if (battalion != null)
+                {
+                    BattalionStatBoosts? statBoosts = battalion.StatBoosts;
+                    if (statBoosts != null)
+                    {
+                        rsl += statBoosts.EvaluatedStatBoosts.Rsl;
+                    }
+                }
                 return rsl;
             }
             private int GetAS()
             {
                 int burden = 0;
-                if (mUnit.mEquippedWeaponIndex != -1)
+                Item? weapon = mUnit.EquippedWeapon;
+                if (weapon != null)
                 {
-                    Item? weapon = mUnit.EquippedWeapon;
-                    burden += this.VerifyValue(weapon?.WeaponStats).Weight;
+                    burden += this.VerifyValue(weapon.WeaponStats).Weight;
+                }
+                Item? equippedItem = mUnit.EquippedItem;
+                if (equippedItem != null)
+                {
+                    burden += this.VerifyValue(equippedItem.EquipmentStats).Weight;
                 }
                 burden -= (mStats.Str / 5);
                 if (burden < 0)
