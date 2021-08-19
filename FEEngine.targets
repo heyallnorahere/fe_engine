@@ -3,9 +3,10 @@
         <FEEngineGamesDirectory>$(MSBuildThisFileDirectory)Games</FEEngineGamesDirectory>
     </PropertyGroup>
     <ItemGroup>
-        <GameOutputFiles Include="$(OutputPath)$(TargetName).dll" />
+        <GameOutputFiles Include="$(BaseOutputPath)\$(Configuration)\$(TargetFramework)\$(TargetName).dll" />
     </ItemGroup>
     <Target Name="CopyBinary" AfterTargets="Build">
         <Copy SourceFiles="@(GameOutputFiles)" DestinationFolder="$(FEEngineGamesDirectory)" />
+        <Exec Command="echo Copied $(MSBuildProjectName) into $(FEEngineGamesDirectory)" />
     </Target>
 </Project>
