@@ -587,8 +587,12 @@ obj/
 
 # End of https://www.toptal.com/developers/gitignore/api/csharp,dotnetcore,visualstudiocode,visualstudio
 
-# map data
+# data used by FEEngine
 data/
+bindings.json
 
 # generated schemas
 schemas/
+
+# copied game binaries
+Games/
