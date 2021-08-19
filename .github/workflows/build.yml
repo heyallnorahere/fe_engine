@@ -27,7 +27,7 @@ jobs:
       - name: upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: release-windows
+          name: release-${{ matrix.os-name }}
           path: ${{ steps.artifact.outputs.path }}
       - name: create release
         uses: softprops/action-gh-release@v1
