@@ -120,7 +120,7 @@ namespace FEEngine
                 Type? type = Type.GetType(value);
                 if (type != null)
                 {
-                    Class = (Class)this.VerifyValue(type.GetConstructor(new Type[0])?.Invoke(new object[0]));
+                    Class = Class.GetClass(type);
                 }
             }
         }
@@ -350,8 +350,7 @@ namespace FEEngine
                 mSkills.Clear();
                 foreach (string skillName in value)
                 {
-                    Type? skillType = Type.GetType(skillName);
-                    Skill skill = (Skill)this.VerifyValue(skillType?.GetConstructor(new Type[0])?.Invoke(new object[0]));
+                    Skill skill = Skill.GetSkill(skillName);
                     mSkills.Add(skill);
                 }
             }
@@ -427,6 +426,58 @@ namespace FEEngine
         {
             get => mEquippedWeaponIndex;
             set => mEquippedWeaponIndex = value;
+        }
+        /// <summary>
+        /// The equipped <see cref="Item"/>. Prefer this over <see cref="EquippedItemIndex"/>.
+        /// </summary>
+        [JsonIgnore]
+        public Item? EquippedItem
+        {
+            get
+            {
+                if (mEquippedItemIndex == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    int inventoryIndex = mEquippedItemIndex ?? throw new NullReferenceException();
+                    int registerIndex = Inventory[inventoryIndex];
+                    Register<Item> itemRegister = this.VerifyValue(mRegister).Parent.GetRegister<Item>();
+                    return itemRegister[registerIndex];
+                }
+            }
+            set
+            {
+                if (value == null)
+                {
+                    mEquippedItemIndex = null;
+                }
+                else
+                {
+                    int registerIndex = value.RegisterIndex;
+                    if (!Inventory.Contains(registerIndex))
+                    {
+                        throw new ArgumentException("The equipped item must be in the unit's inventory!");
+                    }
+                    int inventoryIndex = Inventory.IndexOf(registerIndex);
+                    Register<Item> itemRegister = this.VerifyValue(mRegister).Parent.GetRegister<Item>();
+                    Item item = itemRegister[inventoryIndex];
+                    if (item.EquipmentStats == null)
+                    {
+                        throw new ArgumentException("The equipped item must have valid equipment stats!");
+                    }
+                    mEquippedItemIndex = inventoryIndex;
+                }
+            }
+        }
+        /// <summary>
+        /// The inventory index of the equipped <see cref="Item"/>
+        /// </summary>
+        public int? EquippedItemIndex
+        {
+            get => mEquippedItemIndex;
+            set => mEquippedItemIndex = value;
         }
         /// <summary>
         /// The <see cref="Map"/> the <see cref="Unit"/> was placed on
@@ -786,7 +837,7 @@ namespace FEEngine
         /// </summary>
         public string? BehaviorName { get; set; }
         [JsonConstructor]
-        public Unit(IVec2<int> position, UnitAffiliation affiliation, UnitStats stats, string? behaviorName = null, Item? equippedWeapon = null, string? className = null, string name = "Soldier")
+        public Unit(IVec2<int> position, UnitAffiliation affiliation, UnitStats stats, string? behaviorName = null, Item? equippedWeapon = null, string? className = null, int? equippedItemIndex = null, string name = "Soldier")
         {
             Inventory = new();
             Name = name;
@@ -803,6 +854,7 @@ namespace FEEngine
             CurrentHP = BoostedStats.HP;
             RefreshMovement();
             mBattalionIndex = -1;
+            mEquippedItemIndex = equippedItemIndex;
             if (equippedWeapon == null)
             {
                 mEquippedWeaponIndex = -1;
@@ -840,5 +892,6 @@ namespace FEEngine
         private Class mClass;
         private readonly List<Skill> mSkills;
         private int mEquippedWeaponIndex, mBattalionIndex;
+        private int? mEquippedItemIndex;
     }
 }

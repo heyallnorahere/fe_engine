@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace FEEngine
 {
@@ -46,6 +47,25 @@ namespace FEEngine
     /// </summary>
     public abstract class Skill
     {
+        public static Skill GetSkill(string name)
+        {
+            Type? skillType = Type.GetType(name);
+            ConstructorInfo? constructor = skillType?.GetConstructor(Array.Empty<Type>());
+            object createdObject = Extensions.VerifyValue(null, constructor?.Invoke(Array.Empty<object>()));
+            if (createdObject is not Skill)
+            {
+                throw new ArgumentException("The given type does not derive from Skill!");
+            }
+            return (Skill)createdObject;
+        }
+        public static Skill GetSkill(Type type)
+        {
+            return GetSkill(Extensions.VerifyValue(null, type.AssemblyQualifiedName));
+        }
+        public static Skill GetSkill<T>() where T : Skill, new()
+        {
+            return GetSkill(typeof(T));
+        }
         internal static void Invoke(Skill skill, SkillTriggerEvent @event, Unit caller, SkillEventArgs eventArgs)
         {
             Type type = skill.GetType();

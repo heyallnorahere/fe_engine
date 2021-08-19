@@ -1,30 +1,39 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using FEEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema;
 using Newtonsoft.Json.Schema.Generation;
+using CommandLine;
 
 namespace SchemaGenerator
 {
-    public class Generator
+    public static class Generator
     {
+        public class Options
+        {
+            [Option('d', "directory", HelpText = "The directory to write schemas to")]
+            public string? SchemaDirectory { get; set; }
+        }
         private struct Settings
         {
             public string SchemaDirectory { get; set; }
             public DirectoryInfo SchemaDirectoryInfo { get; set; }
         }
-        private static void WriteSchema<T>(string name = null)
+        private static void WriteSchema<T>(string? name = null)
         {
             string title = name ?? typeof(T).Name;
-            string path = settings.SchemaDirectoryInfo.FullName + "/" + title + ".json";
+            string path = Path.Join(settings.SchemaDirectoryInfo.FullName, title + ".json");
+            Console.WriteLine("Writing schema: {0}", path);
             JSchema schema = generator.Generate(typeof(T));
             TextWriter textWriter = new StreamWriter(path);
             JsonWriter jsonWriter = new JsonTextWriter(textWriter);
             schema.Title = title;
             schema.WriteTo(jsonWriter);
             jsonWriter.Close();
+            Console.WriteLine("Wrote schema: {0}", path);
         }
-        private static void WriteRegisterSchema<T>(string name = null) where T : class, IRegisteredObject<T>
+        private static void WriteRegisterSchema<T>(string? name = null) where T : class, IRegisteredObject<T>
         {
             string typeName = typeof(T).Name;
             WriteSchema<Register<T>>(name ?? typeName + "s");
@@ -32,9 +41,11 @@ namespace SchemaGenerator
         public static void Main(string[] args)
         {
             settings = new Settings();
-            if (args.Length >= 1)
+            Options? options = null;
+            new Parser().ParseArguments<Options>(args).WithParsed(opt => options = opt);
+            if (options?.SchemaDirectory != null)
             {
-                settings.SchemaDirectory = args[0];
+                settings.SchemaDirectory = options.SchemaDirectory;
             }
             else
             {

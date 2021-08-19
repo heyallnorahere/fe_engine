@@ -118,6 +118,14 @@ namespace FEEngine
         }
         private WeaponBehavior? mBehavior;
     }
+    [JsonObject]
+    public class EquipmentStats
+    {
+        public Skill? Effect { get; set; }
+        public int Protection { get; set; }
+        public int Resilience { get; set; }
+        public int Weight { get; set; }
+    }
     /// <summary>
     /// An object that represents an item in a <see cref="Unit"/>'s inventory
     /// </summary>
@@ -144,6 +152,11 @@ namespace FEEngine
         /// </summary>
         [JsonProperty(NullValueHandling = NullValueHandling.Include)]
         public WeaponStats? WeaponStats { get; set; }
+        /// <summary>
+        /// The stats equipment stats of the <see cref="Item"/>; is null if the item cannot be equipped as equipment
+        /// </summary>
+        [JsonProperty(NullValueHandling = NullValueHandling.Include)]
+        public EquipmentStats? EquipmentStats { get; set; }
         /// <summary>
         /// The name of this item
         /// </summary>

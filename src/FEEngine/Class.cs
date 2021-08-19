@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -32,6 +33,25 @@ namespace FEEngine
     [JsonObject]
     public abstract class Class
     {
+        public static Class GetClass(string name)
+        {
+            Type? classType = Type.GetType(name);
+            ConstructorInfo? constructor = classType?.GetConstructor(Array.Empty<Type>());
+            object createdObject = Extensions.VerifyValue(null, constructor?.Invoke(Array.Empty<object>()));
+            if (createdObject is not Class)
+            {
+                throw new ArgumentException("The given type does not derive from Class!");
+            }
+            return (Class)createdObject;
+        }
+        public static Class GetClass(Type type)
+        {
+            return GetClass(Extensions.VerifyValue(null, type.AssemblyQualifiedName));
+        }
+        public static Class GetClass<T>() where T : Class, new()
+        {
+            return GetClass(typeof(T));
+        }
         public Class()
         {
             ClassSkills = new Skill?[3] { null, null, null };

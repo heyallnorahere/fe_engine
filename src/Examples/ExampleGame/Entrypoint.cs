@@ -9,11 +9,16 @@ namespace ExampleGame
 {
     public class TestItemBehavior : IItemBehavior
     {
-        public Item Parent { get; set; }
+        public Item Parent
+        {
+            get => this.VerifyValue(mParent);
+            set => mParent = value;
+        }
         public void OnUse()
         {
-            Parent.Parent.Move(new Vec2I(0, 1), Unit.MovementType.IgnoreMovement);
+            mParent?.Parent?.Move(new Vec2I(0, 1), Unit.MovementType.IgnoreMovement);
         }
+        private Item? mParent;
     }
     [SkillTrigger(SkillTriggerEvent.OnAttack)]
     public class TestSkill : Skill
@@ -24,8 +29,8 @@ namespace ExampleGame
         {
             SkillAttackArgs attackArgs = (SkillAttackArgs)eventArgs;
             Logger.Print(Color.White, "{0} activated!", nameof(TestSkill));
-            attackArgs.Might.Value *= 3; // essentially a crit
-            attackArgs.CritRate.Value = 100; // then triple that again
+            this.VerifyValue(attackArgs.Might).Value *= 3; // essentially a crit
+            this.VerifyValue(attackArgs.CritRate).Value = 100; // then triple that again
         }
     }
     [WeaponBehaviorTrigger(WeaponBehaviorEvent.OnCalculation), WeaponBehaviorTrigger(WeaponBehaviorEvent.AfterExchange)]
@@ -44,7 +49,7 @@ namespace ExampleGame
             }
         }
     }
-    public class Entrypoint
+    public static class Entrypoint
     {
         public static void Main(string[] args) // todo: add args parameter
         {
@@ -66,8 +71,8 @@ namespace ExampleGame
             Player player = new(game);
             game.Renderer.Root.Center = new BorderedObject(new Map.MapRenderer(game));
             game.Renderer.Root.AddChild(new BorderedObject(new Logger.RenderAgent()), BorderLayout.Alignment.Bottom);
-            game.Renderer.Root.AddChild(new BorderedMenu(UIController.FindMenu<UnitContextMenu>()), BorderLayout.Alignment.Right);
-            game.Renderer.Root.AddChild(new BorderedMenu(UIController.FindMenu<TileInfoMenu>()), BorderLayout.Alignment.Left);
+            game.Renderer.Root.AddChild(new BorderedMenu(player.VerifyValue(UIController.FindMenu<UnitContextMenu>())), BorderLayout.Alignment.Right);
+            game.Renderer.Root.AddChild(new BorderedMenu(player.VerifyValue(UIController.FindMenu<TileInfoMenu>())), BorderLayout.Alignment.Left);
             Logger.Print(Color.Green, "Successfully initialized!");
             game.Loop(player);
             game.Registry.SerializeRegister<Battalion>("data/battalions.json");
@@ -76,7 +81,7 @@ namespace ExampleGame
             game.Registry.SerializeRegister<Unit>("data/units.json");
             game.Registry.SerializeRegister<Item>("data/items.json");
         }
-        private static void InitRegister<T>(string filename, Game game, Func<bool> beforeSerializationCallback = null, Func<bool> afterDeserializationCallback = null) where T : class, IRegisteredObject<T>
+        private static void InitRegister<T>(string filename, Game game, Func<bool>? beforeSerializationCallback = null, Func<bool>? afterDeserializationCallback = null) where T : class, IRegisteredObject<T>
         {
             if (File.Exists(filename))
             {
