@@ -17,15 +17,13 @@ namespace ExampleGame
             var units = new List<int>();
             units.AddRange(AddUnits(Unit.UnitAffiliation.Player, 0, size.X, game));
             units.AddRange(AddUnits(Unit.UnitAffiliation.Enemy, size.Y - 2, size.X, game));
-            var map = new Map(size.X, size.Y, units);
-            game.Registry.GetRegister<Map>().Add(map);
-            // todo: figure out a better way to do all of this
+            var map = new Map(size.X, size.Y);
             var unitRegister = game.Registry.GetRegister<Unit>();
             foreach (int index in units)
             {
-                Unit unit = unitRegister[index];
-                unit.Parent = map;
+                map.AddUnit(unitRegister[index]);
             }
+            game.Registry.GetRegister<Map>().Add(map);
         }
         private static List<int> AddUnits(Unit.UnitAffiliation affiliation, int y, int mapWidth, Game game)
         {
@@ -44,6 +42,7 @@ namespace ExampleGame
                 unitRegister.Add(unit);
                 unit.AddSkill<HawkeyePlus>();
                 int lanceIndex = CreateLance(itemRegister);
+                unit.Inventory.Add(lanceIndex);
                 unit.EquippedWeapon = itemRegister[lanceIndex];
             }
             return indices;
@@ -55,8 +54,10 @@ namespace ExampleGame
                 Attack = 5,
                 HitRate = 80,
                 CritRate = 0,
+                Type = WeaponType.Lance,
+                Range = new Vec2I(1),
                 Weight = 1,
-                Type = WeaponType.Lance
+                Durability = 25
             };
             var lance = new Item(false, weaponStats: stats, name: "C#ium Lance");
             int index = itemRegister.Count;

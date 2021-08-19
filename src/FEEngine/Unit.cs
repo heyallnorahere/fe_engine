@@ -793,10 +793,13 @@ namespace FEEngine
                 toAttack.AttackImpl(this, otherWeapon, otherEvaluatedStats, evaluatedStats, otherAfterExchangeArgs);
             }
         exit:
-            WeaponBehavior.Invoke(WeaponBehaviorEvent.AfterExchange, afterExchangeArgs, this.VerifyValue(myWeapon.WeaponStats?.Behavior));
-            if (otherWeapon != null)
+            if (myWeapon.WeaponStats?.Behavior != null)
             {
-                WeaponBehavior.Invoke(WeaponBehaviorEvent.AfterExchange, otherAfterExchangeArgs, this.VerifyValue(otherWeapon.WeaponStats?.Behavior));
+                WeaponBehavior.Invoke(WeaponBehaviorEvent.AfterExchange, afterExchangeArgs, myWeapon.WeaponStats.Behavior);
+            }
+            if (otherWeapon?.WeaponStats?.Behavior != null)
+            {
+                WeaponBehavior.Invoke(WeaponBehaviorEvent.AfterExchange, otherAfterExchangeArgs, otherWeapon.WeaponStats.Behavior);
             }
             CanMove = false;
             return true;
@@ -826,7 +829,10 @@ namespace FEEngine
             CallEvent(SkillTriggerEvent.OnAttack, eventArgs);
             WeaponOnCalculationArgs weaponArgs = new(this, toAttack);
             weaponArgs.Packet = &packet;
-            WeaponBehavior.Invoke(WeaponBehaviorEvent.OnCalculation, weaponArgs, this.VerifyValue(myWeapon.WeaponStats?.Behavior));
+            if (myWeapon.WeaponStats?.Behavior != null)
+            {
+                WeaponBehavior.Invoke(WeaponBehaviorEvent.OnCalculation, weaponArgs, this.VerifyValue(myWeapon.WeaponStats?.Behavior));
+            }
             AttackResult result = ParseAttackPacket(packet);
             toAttack.ReceiveAttackResult(result, this);
             this.VerifyValue(myWeapon.WeaponStats).Durability--;
