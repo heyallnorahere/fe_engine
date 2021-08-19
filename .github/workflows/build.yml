@@ -18,21 +18,21 @@ jobs:
       - name: build
         shell: bash
         run: |
-          dotnet build -c Release
-      #- name: create artifact
-      #  uses: yodasoda1219/create-package@v2.1
-      #  id: artifact
-      #  with:
-      #    config: ${{ github.workspace }}/artifact-description.json
-      #- name: upload artifact
-      #  uses: actions/upload-artifact@v2
-      #  with:
-      #    name: release-windows
-      #    path: ${{ steps.artifact.outputs.path }}
-      #- name: create release
-      #  uses: softprops/action-gh-release@v1
-      #  if: startsWith(github.ref, 'refs/tags/')
-      #  with:
-      #    files: ${{ steps.artifact.outputs.path }}
-      #  env:
-      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          dotnet build -c Release -o bin
+      - name: create artifact
+        uses: yodasoda1219/create-package@v2.1
+        id: artifact
+        with:
+          config: ${{ github.workspace }}/artifact-description.json
+      - name: upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: release-windows
+          path: ${{ steps.artifact.outputs.path }}
+      - name: create release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ${{ steps.artifact.outputs.path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
