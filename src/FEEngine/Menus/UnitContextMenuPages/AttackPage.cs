@@ -25,10 +25,10 @@ namespace FEEngine.Menus.UnitContextMenuPages
             }
             private readonly Unit mUnit;
         }
-        private static List<Unit> GetAttackableUnits()
+        private List<Unit> GetAttackableUnits()
         {
             List<Unit> units = new();
-            Unit currentUnit = Extensions.VerifyValue(null, UIController.SelectedUnit);
+            Unit currentUnit = this.VerifyValue(UIController.SelectedUnit);
             Item? weapon = currentUnit.EquippedWeapon;
             Map map = Extensions.VerifyValue(null, currentUnit.Parent);
             if (weapon != null)
@@ -46,7 +46,7 @@ namespace FEEngine.Menus.UnitContextMenuPages
             }
             return units;
         }
-        public static bool AreUnitsInRange()
+        public bool AreUnitsInRange()
         {
             return GetAttackableUnits().Count > 0;
         }
@@ -62,6 +62,5 @@ namespace FEEngine.Menus.UnitContextMenuPages
                 AddChild(new AttackUnitPage(unit));
             }
         }
-        internal override bool IsInternal { get { return true; } }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using FEEngine.Math;
 
 namespace FEEngine
 {
@@ -17,45 +17,23 @@ namespace FEEngine
         /// </summary>
         Support,
         /// <summary>
-        /// Represents a null <see cref="Gambit"/>; should not be passed to <see cref="GambitActionAttribute"/>
+        /// Represents a null <see cref="Gambit"/>; should not be passed to <see cref="Gambit(GambitType)"/>
         /// </summary>
         Null
-    }
-    /// <summary>
-    /// Determines what type of <see cref="Gambit"/> the assigned class is
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public sealed class GambitActionAttribute : Attribute
-    {
-        public GambitActionAttribute(GambitType gambitType)
-        {
-            GambitType = gambitType;
-        }
-        public GambitType GambitType { get; private set; }
     }
     /// <summary>
     /// An action to be attached to a <see cref="Battalion"/>
     /// </summary>
     public abstract class Gambit
     {
+        public Gambit(GambitType gambitType)
+        {
+            mGambitType = gambitType;
+        }
         /// <summary>
         /// The type of this gambit
         /// </summary>
-        public GambitType GambitType
-        {
-            get
-            {
-                Attribute[] attributes = Attribute.GetCustomAttributes(GetType());
-                foreach (Attribute attr in attributes)
-                {
-                    if (attr is GambitActionAttribute attribute)
-                    {
-                        return attribute.GambitType;
-                    }
-                }
-                return GambitType.Null;
-            }
-        }
+        public GambitType GambitType => mGambitType;
         internal void Use(Unit thisUnit, Unit targetUnit, Battalion battalion)
         {
             GambitArgs args = new()
@@ -74,5 +52,7 @@ namespace FEEngine
             public Battalion Battalion { get; internal set; }
         }
         public abstract int MaxUses { get; }
+        public abstract IVec2<int> Range { get; }
+        private readonly GambitType mGambitType;
     }
 }

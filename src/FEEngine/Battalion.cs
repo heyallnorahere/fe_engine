@@ -102,12 +102,20 @@ namespace FEEngine
             RemainingUses--;
         }
         /// <summary>
-        /// Gets the child <see cref="Gambit"/>'s type
+        /// Gets the assigned <see cref="Gambit"/>
         /// </summary>
         /// <returns>See summary</returns>
-        public GambitType GetGambitType()
+        public Gambit GetGambit()
         {
-            return mGambit?.GambitType ?? GambitType.Null;
+            return this.VerifyValue(mGambit);
+        }
+        /// <summary>
+        /// Checks if the given battalion has a <see cref="Gambit"/>
+        /// </summary>
+        /// <returns>See summary</returns>
+        public bool HasGambit()
+        {
+            return mGambit != null;
         }
         private Gambit? mGambit;
     }

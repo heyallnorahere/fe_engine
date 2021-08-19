@@ -127,6 +127,5 @@ namespace FEEngine.Menus.UnitContextMenuPages
                 AddChild(new ItemSubPage(item));
             }
         }
-        internal override bool IsInternal { get { return true; } }
     }
 }

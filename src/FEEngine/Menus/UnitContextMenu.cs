@@ -107,7 +107,6 @@ namespace FEEngine.Menus
             private readonly List<Page> mChildren;
             protected List<Page> Children { get => mChildren; }
             protected bool CanGoBack { get; set; }
-            internal virtual bool IsInternal { get { return false; } }
         }
         private class WaitPage : Page
         {
@@ -122,7 +121,6 @@ namespace FEEngine.Menus
                 UIController.ResetSelectedUnit();
                 UIController.IsUnitContextMenuOpen = false;
             }
-            internal override bool IsInternal { get { return true; } }
         }
         private class BasePage : Page
         {
@@ -150,7 +148,7 @@ namespace FEEngine.Menus
                     goAgain = false;
                     foreach (Page page in Children)
                     {
-                        if (page.IsInternal)
+                        if (page.GetType().Assembly == GetType().Assembly)
                         {
                             goAgain = true;
                             Children.Remove(page);
@@ -158,9 +156,15 @@ namespace FEEngine.Menus
                         }
                     }
                 }
-                if (AttackPage.AreUnitsInRange())
+                var attackPage = new AttackPage();
+                if (attackPage.AreUnitsInRange())
                 {
-                    AddChild(new AttackPage());
+                    AddChild(attackPage);
+                }
+                var gambitPage = new GambitPage();
+                if (gambitPage.IsAvailable())
+                {
+                    AddChild(gambitPage);
                 }
                 Unit selectedUnit = this.VerifyValue(UIController.SelectedUnit);
                 if (selectedUnit.Inventory.Count > 0 || selectedUnit.EquippedWeapon != null)
@@ -172,7 +176,7 @@ namespace FEEngine.Menus
             private readonly UnitContextMenu mParent;
             protected override string GetTitle()
             {
-                throw new NotImplementedException(); // noones gonna call this anyway
+                throw new NotImplementedException(); // no ones gonna call this anyway
             }
         }
         public IVec2<int> MinSize { get { return new Vec2I(25, 26 - Logger.MaxLogSize); } }

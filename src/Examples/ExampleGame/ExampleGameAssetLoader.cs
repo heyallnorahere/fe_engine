@@ -13,9 +13,9 @@ namespace ExampleGame
     {
         public override void Load(Game game)
         {
-            IVec2<int> size = new Vec2I(20, 10);
+            IVec2<int> size = new Vec2I(25, 15);
             var units = new List<int>();
-            units.AddRange(AddUnits(Unit.UnitAffiliation.Player, 0, size.X, game));
+            units.AddRange(AddUnits(Unit.UnitAffiliation.Player, size.Y - 5, size.X, game));
             units.AddRange(AddUnits(Unit.UnitAffiliation.Enemy, size.Y - 2, size.X, game));
             var map = new Map(size.X, size.Y);
             var unitRegister = game.Registry.GetRegister<Unit>();
@@ -31,6 +31,7 @@ namespace ExampleGame
             var indices = new List<int>();
             Register<Unit> unitRegister = game.Registry.GetRegister<Unit>();
             Register<Item> itemRegister = game.Registry.GetRegister<Item>();
+            Register<Battalion> battalionRegister = game.Registry.GetRegister<Battalion>();
             for (int x = 0; x < mapWidth; x++)
             {
                 int unitY = y + (x % 2);
@@ -44,6 +45,7 @@ namespace ExampleGame
                 int lanceIndex = CreateLance(itemRegister);
                 unit.Inventory.Add(lanceIndex);
                 unit.EquippedWeapon = itemRegister[lanceIndex];
+                unit.Battalion = CreateBattalion(battalionRegister, unit);
             }
             return indices;
         }
@@ -63,6 +65,21 @@ namespace ExampleGame
             int index = itemRegister.Count;
             itemRegister.Add(lance);
             return index;
+        }
+        private static Battalion CreateBattalion(Register<Battalion> battalionRegister, Unit unit)
+        {
+            var battalion = new Battalion
+            {
+                Name = "Test Battalion",
+                Parent = unit,
+                StatBoosts = new BattalionStatBoosts
+                {
+                    CharmBoost = 5
+                }
+            };
+            battalion.SetGambit<TestGambit>();
+            battalionRegister.Add(battalion);
+            return battalion;
         }
     }
 }
