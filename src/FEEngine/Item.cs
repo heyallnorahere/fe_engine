@@ -88,11 +88,18 @@ namespace FEEngine
         /// <summary>
         /// The class name of the currently attached <see cref="WeaponBehavior"/>
         /// </summary>
-        public string BehaviorName
+        public string? BehaviorName
         {
             get
             {
-                return this.VerifyValue(mBehavior?.GetType().AssemblyQualifiedName);
+                if (mBehavior != null)
+                {
+                    return this.VerifyValue(mBehavior.GetType().AssemblyQualifiedName);
+                }
+                else
+                {
+                    return null;
+                }
             }
             set
             {

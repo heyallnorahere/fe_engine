@@ -2,10 +2,6 @@
 
   <Import Project="..\..\..\FEEngine.targets" />
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\FEEngine\FEEngine.csproj" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>

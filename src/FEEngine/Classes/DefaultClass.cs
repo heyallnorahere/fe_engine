@@ -5,7 +5,7 @@
         public DefaultClass()
         {
             mMovementProperties = ClassUtil.DefaultBeginnerFootProperties;
-            mStats = ClassUtil.CreateStatBoosts();
+            mStats = Unit.CreateStats();
         }
         public override MovementProperties MovementProperties => mMovementProperties;
         public override string Name => "None";

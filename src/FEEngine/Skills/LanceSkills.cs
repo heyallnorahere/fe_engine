@@ -1,6 +1,4 @@
-﻿using FEEngine.Classes;
-
-// descriptions taken from https://fireemblem.fandom.com/wiki/List_of_Skills_in_Fire_Emblem:_Three_Houses
+﻿// descriptions taken from https://fireemblem.fandom.com/wiki/List_of_Skills_in_Fire_Emblem:_Three_Houses
 namespace FEEngine.Skills
 {
     /// <summary>
@@ -9,7 +7,7 @@ namespace FEEngine.Skills
     public class Swordbreaker : BreakerSkillBase
     {
         public Swordbreaker() : base(WeaponType.Lance, WeaponType.Sword) { }
-        public override Unit.UnitStats StatBoosts => ClassUtil.CreateStatBoosts();
+        public override Unit.UnitStats StatBoosts => Unit.CreateStats();
         public override string FriendlyName => nameof(Swordbreaker);
     }
     /// <summary>
@@ -18,7 +16,7 @@ namespace FEEngine.Skills
     public class LanceCritPlus10 : CritPlus10Base
     {
         public LanceCritPlus10() : base(WeaponType.Lance) { }
-        public override Unit.UnitStats StatBoosts => ClassUtil.CreateStatBoosts();
+        public override Unit.UnitStats StatBoosts => Unit.CreateStats();
         public override string FriendlyName => "Lance Critical +10";
     }
     /// <summary>
@@ -27,7 +25,7 @@ namespace FEEngine.Skills
     public class Lancefaire : FaireSkillBase
     {
         public Lancefaire() : base(WeaponType.Lance) { }
-        public override Unit.UnitStats StatBoosts => ClassUtil.CreateStatBoosts();
+        public override Unit.UnitStats StatBoosts => Unit.CreateStats();
         public override string FriendlyName => nameof(Lancefaire);
     }
 }

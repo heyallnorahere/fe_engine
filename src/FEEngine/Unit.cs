@@ -15,6 +15,22 @@ namespace FEEngine
     [JsonObject]
     public class Unit : RegisteredObjectBase<Unit>
     {
+        public static UnitStats CreateStats(int hp = 0, int str = 0, int mag = 0, int dex = 0, int spd = 0, int lck = 0, int def = 0, int res = 0, int cha = 0, int mv = 0)
+        {
+            return new()
+            {
+                HP = hp,
+                Str = str,
+                Mag = mag,
+                Dex = dex,
+                Spd = spd,
+                Lck = lck,
+                Def = def,
+                Res = res,
+                Cha = cha,
+                Mv = mv
+            };
+        }
         public enum UnitAffiliation
         {
             Player,
@@ -181,8 +197,11 @@ namespace FEEngine
                         stats += skill.StatBoosts;
                     }
                 }
-                BattalionStatBoosts? battalionStatBoosts = Battalion?.StatBoosts;
-                stats.Cha += battalionStatBoosts?.CharmBoost ?? 0;
+                if (mRegister != null)
+                {
+                    BattalionStatBoosts? battalionStatBoosts = Battalion?.StatBoosts;
+                    stats.Cha += battalionStatBoosts?.CharmBoost ?? 0;
+                }
                 return stats;
             }
         }

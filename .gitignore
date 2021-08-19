@@ -587,8 +587,7 @@ obj/
 
 # End of https://www.toptal.com/developers/gitignore/api/csharp,dotnetcore,visualstudiocode,visualstudio
 
-# data used by FEEngine
-data/
+# key bindings
 bindings.json
 
 # generated schemas

@@ -13,22 +13,6 @@
                 };
             }
         }
-        public static Unit.UnitStats CreateStatBoosts(int hp = 0, int str = 0, int mag = 0, int dex = 0, int spd = 0, int lck = 0, int def = 0, int res = 0, int cha = 0, int mv = 0)
-        {
-            return new()
-            {
-                HP = hp,
-                Str = str,
-                Mag = mag,
-                Dex = dex,
-                Spd = spd,
-                Lck = lck,
-                Def = def,
-                Res = res,
-                Cha = cha,
-                Mv = mv
-            };
-        }
     }
     /// <summary>
     /// Beginner sword class
@@ -38,7 +22,7 @@
         public Myrmidon()
         {
             mMovementProperties = ClassUtil.DefaultBeginnerFootProperties;
-            mStats = ClassUtil.CreateStatBoosts(spd: 2);
+            mStats = Unit.CreateStats(spd: 2);
         }
         public override MovementProperties MovementProperties => mMovementProperties;
         public override string Name => nameof(Myrmidon);
@@ -54,7 +38,7 @@
         public Soldier()
         {
             mMovementProperties = ClassUtil.DefaultBeginnerFootProperties;
-            mStats = ClassUtil.CreateStatBoosts(def: 2);
+            mStats = Unit.CreateStats(def: 2);
         }
         public override MovementProperties MovementProperties => mMovementProperties;
         public override string Name => nameof(Soldier);
@@ -70,7 +54,7 @@
         public Fighter()
         {
             mMovementProperties = ClassUtil.DefaultBeginnerFootProperties;
-            mStats = ClassUtil.CreateStatBoosts(str: 2);
+            mStats = Unit.CreateStats(str: 2);
         }
         public override MovementProperties MovementProperties => mMovementProperties;
         public override string Name => nameof(Fighter);
@@ -86,7 +70,7 @@
         public Monk()
         {
             mMovementProperties = ClassUtil.DefaultBeginnerFootProperties;
-            mStats = ClassUtil.CreateStatBoosts(mag: 2);
+            mStats = Unit.CreateStats(mag: 2);
         }
         public override MovementProperties MovementProperties => mMovementProperties;
         public override string Name => nameof(Monk);

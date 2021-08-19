@@ -15,6 +15,7 @@ namespace FEEngine.Launcher
             mGame = game;
             mAssemblies = assemblies;
             mLayout = new BorderLayout();
+            SetupBorderLayout();
             mLoadedAssembly = false;
             mOptions = new List<string>();
             if (filename != null)
@@ -30,7 +31,6 @@ namespace FEEngine.Launcher
                     mOptions.Add(pair.Key);
                 }
             }
-            SetupBorderLayout();
         }
         public IVec2<int> MinSize => mLayout.MinSize;
         public void Render(RenderContext context)

@@ -1,103 +1,67 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
 using FEEngine;
 using FEEngine.Math;
-using FEEngine.Scripting;
+using FEEngine.Classes;
 using ExampleGame;
 
 [assembly: AssemblyAssetLoader(typeof(ExampleGameAssetLoader))]
 
 namespace ExampleGame
 {
-    public class TestItemBehavior : IItemBehavior
-    {
-        public Item Parent
-        {
-            get => this.VerifyValue(mParent);
-            set => mParent = value;
-        }
-        public void OnUse()
-        {
-            mParent?.Parent?.Move(new Vec2I(0, 1), Unit.MovementType.IgnoreMovement);
-        }
-        private Item? mParent;
-    }
-    [SkillTrigger(SkillTriggerEvent.OnAttack)]
-    public class TestSkill : Skill
-    {
-        public override Unit.UnitStats StatBoosts => new();
-        public override string FriendlyName => "Test skill";
-        protected override void Invoke(Unit caller, SkillEventArgs eventArgs)
-        {
-            SkillAttackArgs attackArgs = (SkillAttackArgs)eventArgs;
-            Logger.Print(Color.White, "{0} activated!", nameof(TestSkill));
-            this.VerifyValue(attackArgs.Might).Value *= 3; // essentially a crit
-            this.VerifyValue(attackArgs.CritRate).Value = 100; // then triple that again
-        }
-    }
-    [WeaponBehaviorTrigger(WeaponBehaviorEvent.OnCalculation), WeaponBehaviorTrigger(WeaponBehaviorEvent.AfterExchange)]
-    public class TestWeaponBehavior : WeaponBehavior
-    {
-        protected override void Invoke(WeaponBehaviorArgs args)
-        {
-            switch (args.Event)
-            {
-                case WeaponBehaviorEvent.OnCalculation:
-                    Logger.Print(Color.White, "on calculation");
-                    break;
-                case WeaponBehaviorEvent.AfterExchange:
-                    Logger.Print(Color.White, "after exchange");
-                    break;
-            }
-        }
-    }
     public class ExampleGameAssetLoader : AssetLoader 
     {
-        private static void InitRegister<T>(string filename, Game game, Func<bool>? beforeSerializationCallback = null, Func<bool>? afterDeserializationCallback = null) where T : class, IRegisteredObject<T>
-        {
-            if (File.Exists(filename))
-            {
-                game.Registry.DeserializeRegister<T>(File.ReadAllText(filename));
-                if (!(afterDeserializationCallback?.Invoke() ?? true))
-                {
-                    throw new Exception();
-                }
-            }
-            else
-            {
-                if (!(beforeSerializationCallback?.Invoke() ?? true))
-                {
-                    throw new Exception();
-                }
-                game.Registry.SerializeRegister<T>(filename);
-            }
-        }
         public override void Load(Game game)
         {
-            mGame = game;
-            if (!Directory.Exists("data"))
+            IVec2<int> size = new Vec2I(20, 10);
+            var units = new List<int>();
+            units.AddRange(AddUnits(Unit.UnitAffiliation.Player, 0, size.X, game));
+            units.AddRange(AddUnits(Unit.UnitAffiliation.Enemy, size.Y - 2, size.X, game));
+            var map = new Map(size.X, size.Y, units);
+            game.Registry.GetRegister<Map>().Add(map);
+            // todo: figure out a better way to do all of this
+            var unitRegister = game.Registry.GetRegister<Unit>();
+            foreach (int index in units)
             {
-                Directory.CreateDirectory("data");
+                Unit unit = unitRegister[index];
+                unit.Parent = map;
             }
-            InitRegister<Item>("data/items.json", mGame);
-            InitRegister<Unit>("data/units.json", mGame);
-            InitRegister<Map>("data/maps.json", mGame, () =>
-            {
-                game.Registry.GetRegister<Map>().Add(new(20, 10));
-                return true;
-            });
-            InitRegister<Tile>("data/tiles.json", mGame);
-            InitRegister<Battalion>("data/battalions.json", mGame);
         }
-        public override void Unload()
+        private static List<int> AddUnits(Unit.UnitAffiliation affiliation, int y, int mapWidth, Game game)
         {
-            Registry registry = this.VerifyValue(mGame).Registry;
-            registry.SerializeRegister<Battalion>("data/battalions.json");
-            registry.SerializeRegister<Tile>("data/tiles.json");
-            registry.SerializeRegister<Map>("data/maps.json");
-            registry.SerializeRegister<Unit>("data/units.json");
-            registry.SerializeRegister<Item>("data/items.json");
+            var stats = Unit.CreateStats(hp: 15, str: 9, mag: 1, dex: 7, spd: 5, lck: 8, def: 7, res: 5, cha: 10, mv: 5);
+            var indices = new List<int>();
+            Register<Unit> unitRegister = game.Registry.GetRegister<Unit>();
+            Register<Item> itemRegister = game.Registry.GetRegister<Item>();
+            for (int x = 0; x < mapWidth; x++)
+            {
+                int unitY = y + (x % 2);
+                var unit = new Unit(new Vec2I(x, unitY), affiliation, stats)
+                {
+                    Class = new Soldier(),
+                };
+                indices.Add(unitRegister.Count);
+                unitRegister.Add(unit);
+                unit.AddSkill<HawkeyePlus>();
+                int lanceIndex = CreateLance(itemRegister);
+                unit.EquippedWeapon = itemRegister[lanceIndex];
+            }
+            return indices;
         }
-        private Game? mGame;
+        private static int CreateLance(Register<Item> itemRegister)
+        {
+            var stats = new WeaponStats
+            {
+                Attack = 5,
+                HitRate = 80,
+                CritRate = 0,
+                Weight = 1,
+                Type = WeaponType.Lance
+            };
+            var lance = new Item(false, weaponStats: stats, name: "C#ium Lance");
+            int index = itemRegister.Count;
+            itemRegister.Add(lance);
+            return index;
+        }
     }
 }
