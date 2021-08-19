@@ -16,7 +16,7 @@ jobs:
         with:
           dotnet-version: 5.0.x
       - name: build
-        shell: cmd
+        shell: bash
         run: |
           dotnet build
       #- name: create artifact
