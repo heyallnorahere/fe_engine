@@ -2,8 +2,10 @@
 using System.IO;
 using FEEngine;
 using FEEngine.Math;
-using FEEngine.Menus;
 using FEEngine.Scripting;
+using ExampleGame;
+
+[assembly: AssemblyAssetLoader(typeof(ExampleGameAssetLoader))]
 
 namespace ExampleGame
 {
@@ -49,40 +51,8 @@ namespace ExampleGame
             }
         }
     }
-    public static class Entrypoint
+    public class ExampleGameAssetLoader : AssetLoader 
     {
-        public static void Main(string[] args)
-        {
-            if (!Directory.Exists("data"))
-            {
-                Directory.CreateDirectory("data");
-            }
-            Game game = new("data/bindings.json");
-            InitRegister<Item>("data/items.json", game);
-            InitRegister<Unit>("data/units.json", game);
-            InitRegister<Map>("data/maps.json", game, () =>
-            {
-                game.Registry.GetRegister<Map>().Add(new(20, 10));
-                return true;
-            });
-            InitRegister<Tile>("data/tiles.json", game);
-            InitRegister<Battalion>("data/battalions.json", game);
-            Player player = new(game);
-            BorderLayout root = new BorderLayout();
-            root.SetSize(game.Renderer.BufferSize);
-            root.Center = new BorderedObject(new Map.MapRenderer(game));
-            root.AddChild(new BorderedObject(new Logger.RenderAgent()), BorderLayout.Alignment.Bottom);
-            root.AddChild(new BorderedMenu(player.VerifyValue(UIController.FindMenu<UnitContextMenu>())), BorderLayout.Alignment.Right);
-            root.AddChild(new BorderedMenu(player.VerifyValue(UIController.FindMenu<TileInfoMenu>())), BorderLayout.Alignment.Left);
-            game.Renderer.Root = root;
-            Logger.Print(Color.Green, "Successfully initialized!");
-            game.Loop(player);
-            game.Registry.SerializeRegister<Battalion>("data/battalions.json");
-            game.Registry.SerializeRegister<Tile>("data/tiles.json");
-            game.Registry.SerializeRegister<Map>("data/maps.json");
-            game.Registry.SerializeRegister<Unit>("data/units.json");
-            game.Registry.SerializeRegister<Item>("data/items.json");
-        }
         private static void InitRegister<T>(string filename, Game game, Func<bool>? beforeSerializationCallback = null, Func<bool>? afterDeserializationCallback = null) where T : class, IRegisteredObject<T>
         {
             if (File.Exists(filename))
@@ -102,5 +72,32 @@ namespace ExampleGame
                 game.Registry.SerializeRegister<T>(filename);
             }
         }
+        public override void Load(Game game)
+        {
+            mGame = game;
+            if (!Directory.Exists("data"))
+            {
+                Directory.CreateDirectory("data");
+            }
+            InitRegister<Item>("data/items.json", mGame);
+            InitRegister<Unit>("data/units.json", mGame);
+            InitRegister<Map>("data/maps.json", mGame, () =>
+            {
+                game.Registry.GetRegister<Map>().Add(new(20, 10));
+                return true;
+            });
+            InitRegister<Tile>("data/tiles.json", mGame);
+            InitRegister<Battalion>("data/battalions.json", mGame);
+        }
+        public override void Unload()
+        {
+            Registry registry = this.VerifyValue(mGame).Registry;
+            registry.SerializeRegister<Battalion>("data/battalions.json");
+            registry.SerializeRegister<Tile>("data/tiles.json");
+            registry.SerializeRegister<Map>("data/maps.json");
+            registry.SerializeRegister<Unit>("data/units.json");
+            registry.SerializeRegister<Item>("data/items.json");
+        }
+        private Game? mGame;
     }
 }

@@ -8,26 +8,31 @@ namespace FEEngine.Launcher
 {
     public class GameFrame : IRenderable
     {
-        public GameFrame(Dictionary<string, Assembly> assemblies, Game game, string? filename)
+        public GameFrame(Dictionary<string, Assembly> assemblies, Game game, Player player, string? filename)
         {
+            mAssemblyIndex = 0;
             mSize = new Vec2I(0);
             mGame = game;
             mAssemblies = assemblies;
             mLayout = new BorderLayout();
             mLoadedAssembly = false;
-            SetupBorderLayout();
+            mOptions = new List<string>();
             if (filename != null)
             {
                 LoadAssembly(filename);
             }
+            else
+            {
+                mPlayer = player;
+                mPlayer.AddUpdateHook(Update);
+                foreach (var pair in mAssemblies)
+                {
+                    mOptions.Add(pair.Key);
+                }
+            }
+            SetupBorderLayout();
         }
         public IVec2<int> MinSize => mLayout.MinSize;
-        private struct SelectableOption
-        {
-            public string GameFilename { get; set; }
-            public string Text { get; set; }
-            public IVec2<int> Position { get; set; }
-        }
         public void Render(RenderContext context)
         {
             if (mLoadedAssembly)
@@ -36,8 +41,34 @@ namespace FEEngine.Launcher
             }
             else
             {
-                var options = new List<SelectableOption>();
-                // todo: render menu
+                if (mAssemblies.Count <= 0)
+                {
+                    context.RenderString(new Vec2I(0, mSize.Y - 1), "No assemblies were loaded!");
+                }
+                else
+                {
+                    for (int i = 0; i < mOptions.Count; i++)
+                    {
+                        int x;
+                        string text;
+                        Color color;
+                        if (i == mAssemblyIndex)
+                        {
+                            text = "> " + mOptions[i];
+                            x = 0;
+                            color = Color.Red;
+                        }
+                        else
+                        {
+                            text = mOptions[i];
+                            x = 2;
+                            color = Color.White;
+                        }
+                        int y = mSize.Y - ((i + 1) * 2);
+                        IVec2<int> position = new Vec2I(x, y);
+                        context.RenderString(position, text, color);
+                    }
+                }
             }
         }
         public void SetSize(IVec2<int> size)
@@ -55,15 +86,49 @@ namespace FEEngine.Launcher
         private void LoadAssembly(string name)
         {
             Assembly assembly = mAssemblies[name];
-            // todo: load content
+            var attribute = assembly.GetCustomAttribute<AssemblyAssetLoaderAttribute>();
+            if (attribute != null)
+            {
+                Loader = attribute.Loader;
+                Loader.Load(mGame);
+            }
+            else
+            {
+                throw new ArgumentException("The loaded assembly did not specify an AssetLoader class!");
+            }
             mLoadedAssembly = true;
             Register<Map> mapRegister = mGame.Registry.GetRegister<Map>();
             mGame.PhaseManager.CyclePhase(mapRegister[mGame.CurrentMapIndex]);
+            if (mPlayer != null)
+            {
+                mPlayer.RemoveUpdateHook(Update);
+                mPlayer = null;
+            }
         }
+        private void Update()
+        {
+            var state = InputManager.GetState();
+            if (mAssemblyIndex > 0 && state.Up)
+            {
+                mAssemblyIndex--;
+            }
+            if (mAssemblyIndex < mOptions.Count - 1 && state.Down)
+            {
+                mAssemblyIndex++;
+            }
+            if (state.OK)
+            {
+                LoadAssembly(mOptions[mAssemblyIndex]);
+            }
+        }
+        public AssetLoader? Loader { get; set; }
         private readonly BorderLayout mLayout;
         private readonly Game mGame;
         private readonly Dictionary<string, Assembly> mAssemblies;
         private bool mLoadedAssembly;
         private IVec2<int> mSize;
+        private int mAssemblyIndex;
+        private Player? mPlayer;
+        private readonly List<string> mOptions;
     }
 }

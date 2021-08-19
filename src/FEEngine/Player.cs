@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using FEEngine.Math;
 using FEEngine.Menus;
 
 namespace FEEngine
 {
+    public delegate void UpdateMethod();
     /// <summary>
     /// An object that controls the <see cref="Game"/>
     /// </summary>
@@ -11,6 +13,7 @@ namespace FEEngine
     {
         public Player(Game game)
         {
+            mUpdateHooks = new HashSet<UpdateMethod>();
             mLastColorFlip = 0.0;
             mRed = false;
             mSelectedIndex = -1;
@@ -23,6 +26,10 @@ namespace FEEngine
         public IVec2<int> CursorPosition { get; private set; }
         internal void Update()
         {
+            foreach (UpdateMethod updateMethod in mUpdateHooks)
+            {
+                updateMethod();
+            }
             Registry registry = mGame.Registry;
             if (registry.GetRegister<Map>().Count <= 0)
             {
@@ -151,9 +158,18 @@ namespace FEEngine
                 return mapRegister[mGame.CurrentMapIndex];
             }
         }
+        public bool AddUpdateHook(UpdateMethod update)
+        {
+            return mUpdateHooks.Add(update);
+        }
+        public bool RemoveUpdateHook(UpdateMethod update)
+        {
+            return mUpdateHooks.Remove(update);
+        }
         private double mLastColorFlip;
         private bool mRed;
         private int mSelectedIndex;
         private readonly Game mGame;
+        private readonly HashSet<UpdateMethod> mUpdateHooks;
     }
 }
