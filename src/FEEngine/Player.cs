@@ -23,6 +23,11 @@ namespace FEEngine
         public IVec2<int> CursorPosition { get; private set; }
         internal void Update()
         {
+            Registry registry = mGame.Registry;
+            if (registry.GetRegister<Map>().Count <= 0)
+            {
+                return;
+            }
             if (Map.Player == null)
             {
                 Map.Player = this;

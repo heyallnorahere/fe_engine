@@ -36,12 +36,12 @@ namespace FEEngine
         public static Class GetClass(string name)
         {
             Type? classType = Type.GetType(name);
-            ConstructorInfo? constructor = classType?.GetConstructor(Array.Empty<Type>());
-            object createdObject = Extensions.VerifyValue(null, constructor?.Invoke(Array.Empty<object>()));
-            if (createdObject is not Class)
+            if (!(classType?.DerivesFrom(typeof(Class)) ?? false))
             {
                 throw new ArgumentException("The given type does not derive from Class!");
             }
+            ConstructorInfo? constructor = classType?.GetConstructor(Array.Empty<Type>());
+            object createdObject = Extensions.VerifyValue(null, constructor?.Invoke(Array.Empty<object>()));
             return (Class)createdObject;
         }
         public static Class GetClass(Type type)

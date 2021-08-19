@@ -133,15 +133,18 @@ namespace FEEngine
         /// <summary>
         /// The root renderable object
         /// </summary>
-        public BorderLayout Root { get; set; }
+        public IRenderable? Root { get; set; }
         /// <summary>
         /// Renders the root object (<see cref="Root"/>) and all of its children.
         /// </summary>
         public void Render()
         {
             RenderContext context = new(mCharacterBuffer, mColorBuffer, mBufferSize);
-            Root.SetSize(BufferSize);
-            Root.Render(context);
+            if (Root != null)
+            {
+                Root.SetSize(BufferSize);
+                Root.Render(context);
+            }
             Present();
         }
         private void Present()
@@ -232,7 +235,6 @@ namespace FEEngine
         {
             // 119 x 30 is the default win32 console size, if i recall
             BufferSize = new Vec2I(100, 30);
-            Root = new BorderLayout();
         }
         static Renderer()
         {

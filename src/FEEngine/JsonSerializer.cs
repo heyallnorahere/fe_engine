@@ -26,13 +26,21 @@ namespace FEEngine
         /// <param name="path">The path of the file to read</param>
         /// <param name="plugin">Runs after the see <see cref="Newtonsoft.Json.JsonSerializer"/> is created</param>
         /// <returns>The deserialized object</returns>
-        public static T? Deserialize<T>(string path, SerializationPlugin? plugin = null)
+        public static T? DeserializeFile<T>(string path, SerializationPlugin? plugin = null)
         {
             TextReader textReader = new StreamReader(path);
+            return DeserializeImpl<T>(textReader, plugin);
+        }
+        public static T? DeserializeString<T>(string data, SerializationPlugin? plugin = null)
+        {
+            TextReader textReader = new StringReader(data);
+            return DeserializeImpl<T>(textReader, plugin);
+        }
+        private static T? DeserializeImpl<T>(TextReader textReader, SerializationPlugin? plugin)
+        {
             JsonReader reader = new JsonTextReader(textReader);
             Newtonsoft.Json.JsonSerializer serializer = new();
             plugin?.Invoke(serializer);
-            // ill add more vec2 converters later
             serializer.Converters.Add(new Vec2Converter<int>());
             T? value = serializer.Deserialize<T>(reader);
             reader.Close();

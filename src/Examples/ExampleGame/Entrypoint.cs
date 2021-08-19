@@ -51,14 +51,13 @@ namespace ExampleGame
     }
     public static class Entrypoint
     {
-        public static void Main(string[] args) // todo: add args parameter
+        public static void Main(string[] args)
         {
             if (!Directory.Exists("data"))
             {
                 Directory.CreateDirectory("data");
             }
             Game game = new("data/bindings.json");
-            game.SetupRegisters();
             InitRegister<Item>("data/items.json", game);
             InitRegister<Unit>("data/units.json", game);
             InitRegister<Map>("data/maps.json", game, () =>
@@ -69,10 +68,13 @@ namespace ExampleGame
             InitRegister<Tile>("data/tiles.json", game);
             InitRegister<Battalion>("data/battalions.json", game);
             Player player = new(game);
-            game.Renderer.Root.Center = new BorderedObject(new Map.MapRenderer(game));
-            game.Renderer.Root.AddChild(new BorderedObject(new Logger.RenderAgent()), BorderLayout.Alignment.Bottom);
-            game.Renderer.Root.AddChild(new BorderedMenu(player.VerifyValue(UIController.FindMenu<UnitContextMenu>())), BorderLayout.Alignment.Right);
-            game.Renderer.Root.AddChild(new BorderedMenu(player.VerifyValue(UIController.FindMenu<TileInfoMenu>())), BorderLayout.Alignment.Left);
+            BorderLayout root = new BorderLayout();
+            root.SetSize(game.Renderer.BufferSize);
+            root.Center = new BorderedObject(new Map.MapRenderer(game));
+            root.AddChild(new BorderedObject(new Logger.RenderAgent()), BorderLayout.Alignment.Bottom);
+            root.AddChild(new BorderedMenu(player.VerifyValue(UIController.FindMenu<UnitContextMenu>())), BorderLayout.Alignment.Right);
+            root.AddChild(new BorderedMenu(player.VerifyValue(UIController.FindMenu<TileInfoMenu>())), BorderLayout.Alignment.Left);
+            game.Renderer.Root = root;
             Logger.Print(Color.Green, "Successfully initialized!");
             game.Loop(player);
             game.Registry.SerializeRegister<Battalion>("data/battalions.json");
@@ -85,7 +87,7 @@ namespace ExampleGame
         {
             if (File.Exists(filename))
             {
-                game.Registry.DeserializeRegister<T>(filename);
+                game.Registry.DeserializeRegister<T>(File.ReadAllText(filename));
                 if (!(afterDeserializationCallback?.Invoke() ?? true))
                 {
                     throw new Exception();

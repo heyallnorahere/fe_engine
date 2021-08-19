@@ -8,5 +8,18 @@ namespace FEEngine
         {
             return value ?? throw new NullReferenceException();
         }
+        public static bool DerivesFrom(this Type type, Type baseType)
+        {
+            Type? currentType = type;
+            while (currentType != null)
+            {
+                currentType = currentType.BaseType;
+                if (currentType == baseType)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

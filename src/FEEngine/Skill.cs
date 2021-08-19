@@ -50,13 +50,12 @@ namespace FEEngine
         public static Skill GetSkill(string name)
         {
             Type? skillType = Type.GetType(name);
-            ConstructorInfo? constructor = skillType?.GetConstructor(Array.Empty<Type>());
-            object createdObject = Extensions.VerifyValue(null, constructor?.Invoke(Array.Empty<object>()));
-            if (createdObject is not Skill)
+            if (!(skillType?.DerivesFrom(typeof(Skill)) ?? false))
             {
                 throw new ArgumentException("The given type does not derive from Skill!");
             }
-            return (Skill)createdObject;
+            ConstructorInfo? constructor = skillType?.GetConstructor(Array.Empty<Type>());
+            return (Skill)Extensions.VerifyValue(null, constructor?.Invoke(Array.Empty<object>()));
         }
         public static Skill GetSkill(Type type)
         {

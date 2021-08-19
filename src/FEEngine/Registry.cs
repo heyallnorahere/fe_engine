@@ -125,8 +125,8 @@ namespace FEEngine
         /// Deserializes a register from a JSON file
         /// </summary>
         /// <typeparam name="T">The type of object the deserialized register will hold</typeparam>
-        /// <param name="jsonFilePath">The input file's path</param>
-        public void DeserializeRegister<T>(string jsonFilePath) where T : class, IRegisteredObject<T>
+        /// <param name="jsonData">The input file's path</param>
+        public void DeserializeRegister<T>(string jsonData) where T : class, IRegisteredObject<T>
         {
             if (!RegisterExists<T>())
             {
@@ -136,7 +136,7 @@ namespace FEEngine
             {
                 if (mRegisters[i].IsOfType<T>())
                 {
-                    mRegisters[i] = this.VerifyValue(JsonSerializer.Deserialize<Register<T>>(jsonFilePath, (Newtonsoft.Json.JsonSerializer serializer) =>
+                    mRegisters[i] = this.VerifyValue(JsonSerializer.DeserializeString<Register<T>>(jsonData, (Newtonsoft.Json.JsonSerializer serializer) =>
                     {
                         serializer.Converters.Add(new Converter<T>(this));
                     }));

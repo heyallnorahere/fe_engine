@@ -306,7 +306,7 @@ namespace FEEngine
         /// <param name="path">The path of the file to read from</param>
         public static void ReadBindings(string path)
         {
-            Bindings = JsonSerializer.Deserialize<KeyBindings>(path);
+            Bindings = JsonSerializer.DeserializeFile<KeyBindings>(path);
         }
         /// <summary>
         /// Writes the bindings to the specified JSON file

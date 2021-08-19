@@ -8,16 +8,8 @@ namespace FEEngine
     /// <summary>
     /// An object that oversees the entire game's state
     /// </summary>
-    public class Game
+    public sealed class Game
     {
-        /// <summary>
-        /// Whether the game is being run from the C++ host application
-        /// </summary>
-        public static bool HasNativeImplementation
-        {
-            get => hasNativeImplementation;
-            set => hasNativeImplementation = value;
-        }
         /// <summary>
         /// The game's <see cref="FEEngine.PhaseManager"/>
         /// </summary>
@@ -41,6 +33,7 @@ namespace FEEngine
                     InputManager.ReadBindings(mKeyBindingsFile);
                 }
             }
+            SetupRegisters();
         }
         ~Game()
         {
@@ -75,7 +68,11 @@ namespace FEEngine
         /// <param name="player">The <see cref="Player"/> object</param>
         public void Loop(Player player)
         {
-            PhaseManager.CyclePhase(Registry.GetRegister<Map>()[CurrentMapIndex]);
+            Register<Map> mapRegister = Registry.GetRegister<Map>();
+            if (mapRegister.Count > 0)
+            {
+                PhaseManager.CyclePhase(mapRegister[CurrentMapIndex]);
+            }
             while (true)
             {
                 Update(player);
@@ -97,11 +94,15 @@ namespace FEEngine
             {
                 player.Update();
             }
-            Map map = mRegistry.GetRegister<Map>()[CurrentMapIndex];
-            map.Update(PhaseManager.CurrentPhase);
-            if (ShouldCyclePhase(map))
+            Register<Map> mapRegister = mRegistry.GetRegister<Map>();
+            if (mapRegister.Count > 0)
             {
-                PhaseManager.CyclePhase(map);
+                Map map = mapRegister[CurrentMapIndex];
+                map.Update(PhaseManager.CurrentPhase);
+                if (ShouldCyclePhase(map))
+                {
+                    PhaseManager.CyclePhase(map);
+                }
             }
         }
         private bool ShouldCyclePhase(Map map)
@@ -124,10 +125,7 @@ namespace FEEngine
             Renderer.ClearBuffer();
             Renderer.Render();
         }
-        /// <summary>
-        /// Initializes the standard registers
-        /// </summary>
-        public void SetupRegisters()
+        private void SetupRegisters()
         {
             mRegistry.CreateRegister<Map>();
             mRegistry.CreateRegister<Unit>();
@@ -138,6 +136,5 @@ namespace FEEngine
         private readonly Registry mRegistry;
         private readonly string? mKeyBindingsFile;
         private readonly Renderer mRenderer;
-        private static bool hasNativeImplementation = true;
     }
 }
