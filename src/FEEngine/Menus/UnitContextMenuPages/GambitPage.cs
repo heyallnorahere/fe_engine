@@ -38,11 +38,10 @@ namespace FEEngine.Menus.UnitContextMenuPages
                 {
                     continue;
                 }
-                if (selectedUnit.IsAllied(unit))
+                if (selectedUnit.IsAllied(unit) != gambit.IsGambitOffensive)
                 {
-                    continue;
+                    units.Add(unit);
                 }
-                units.Add(unit);
             }
             return units;
         }
@@ -61,15 +60,11 @@ namespace FEEngine.Menus.UnitContextMenuPages
                     return false;
                 }
                 Gambit gambit = battalion.GetGambit();
-                if (gambit.GambitType != GambitType.PhysicalAttack && gambit.GambitType != GambitType.MagicAttack)
-                {
-                    return false;
-                }
                 return GetUnitsInRange(gambit).Count > 0;
             }
         }
         protected override string GetTitle() => "Gambit";
-        protected override void UpdatePage()
+        protected override void OnSelect()
         {
             Gambit gambit = this.VerifyValue(UIController.SelectedUnit?.Battalion?.GetGambit());
             List<Unit> unitsInRange = GetUnitsInRange(gambit);

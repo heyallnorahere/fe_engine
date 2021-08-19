@@ -34,6 +34,7 @@ namespace FEEngine
         /// The type of this gambit
         /// </summary>
         public GambitType GambitType => mGambitType;
+        public bool IsGambitOffensive => mGambitType == GambitType.PhysicalAttack || mGambitType == GambitType.MagicAttack;
         internal void Use(Unit thisUnit, Unit targetUnit, Battalion battalion)
         {
             GambitArgs args = new()
@@ -43,6 +44,7 @@ namespace FEEngine
                 Battalion = battalion
             };
             Use(args);
+            thisUnit.CanMove = false;
         }
         protected abstract void Use(GambitArgs args);
         protected struct GambitArgs

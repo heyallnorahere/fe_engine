@@ -414,7 +414,7 @@ namespace FEEngine
         /// Whether or not the <see cref="Unit"/> can move
         /// </summary>
         [JsonIgnore]
-        public bool CanMove { get; private set; }
+        public bool CanMove { get; internal set; }
         /// <summary>
         /// The <see cref="Unit"/>'s current HP (hit points)
         /// </summary>
