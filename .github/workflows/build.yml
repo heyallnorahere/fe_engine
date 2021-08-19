@@ -2,9 +2,10 @@ name: build
 on: [ push ]
 jobs:
   build:
-    runs-on: windows-latest
-    env:
-      MSBUILD_PATH: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\
+    runs-on: ${{ matrix.os-name }}-latest
+    strategy:
+      matrix:
+        os-name: [ windows, macos, ubuntu ]
     steps:
       - name: checkout repository
         uses: actions/checkout@v2
