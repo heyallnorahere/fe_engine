@@ -18,6 +18,10 @@ namespace FEEngine
         /// </summary>
         OnAttack,
         /// <summary>
+        /// When a <see cref="Unit"/> waits
+        /// </summary>
+        OnWait,
+        /// <summary>
         /// After two <see cref="Unit"/>s attack each other (an "exchange")
         /// </summary>
         AfterExchange,
@@ -87,6 +91,10 @@ namespace FEEngine
             }
         }
         protected virtual void Invoke(Unit caller, SkillEventArgs eventArgs) { }
+        protected ref object? GetData(Unit unit)
+        {
+            return ref unit.GetAttachedData(GetType()).Data;
+        }
         /// <summary>
         /// Stats granted by this <see cref="Skill"/> (for example, Str +2)
         /// </summary>
@@ -95,5 +103,9 @@ namespace FEEngine
         /// The friendly name of this <see cref="Skill"/>
         /// </summary>
         public abstract string FriendlyName { get; }
+        /// <summary>
+        /// Whether the <see cref="Unit"/> this skill is attached to can attack or not
+        /// </summary>
+        public virtual bool CanAttack(Unit unit) => true;
     }
 }

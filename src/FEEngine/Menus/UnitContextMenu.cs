@@ -157,7 +157,8 @@ namespace FEEngine.Menus
                     }
                 }
                 var attackPage = new AttackPage();
-                if (attackPage.AreUnitsInRange())
+                Unit selectedUnit = this.VerifyValue(UIController.SelectedUnit);
+                if (attackPage.AreUnitsInRange() && selectedUnit.CanAttack)
                 {
                     AddChild(attackPage);
                 }
@@ -166,7 +167,6 @@ namespace FEEngine.Menus
                 {
                     AddChild(gambitPage);
                 }
-                Unit selectedUnit = this.VerifyValue(UIController.SelectedUnit);
                 if (selectedUnit.Inventory.Count > 0 || selectedUnit.EquippedWeapon != null)
                 {
                     AddChild(new ItemPage());

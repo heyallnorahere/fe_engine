@@ -15,6 +15,11 @@ namespace FEEngine
     [JsonObject]
     public class Unit : RegisteredObjectBase<Unit>
     {
+        internal class AttachedData
+        {
+            public ref object? Data => ref mData;
+            private object? mData;
+        }
         public static UnitStats CreateStats(int hp = 0, int str = 0, int mag = 0, int dex = 0, int spd = 0, int lck = 0, int def = 0, int res = 0, int cha = 0, int mv = 0)
         {
             return new()
@@ -416,6 +421,29 @@ namespace FEEngine
         [JsonIgnore]
         public bool CanMove { get; internal set; }
         /// <summary>
+        /// Whether or not the <see cref="Unit"/> can attack
+        /// </summary>
+        [JsonIgnore]
+        public bool CanAttack
+        {
+            get
+            {
+                bool canAttack = CanMove;
+                foreach (Skill skill in mSkills)
+                {
+                    if (!canAttack)
+                    {
+                        break;
+                    }
+                    if (!skill.CanAttack(this))
+                    {
+                        canAttack = false;
+                    }
+                }
+                return canAttack;
+            }
+        }
+        /// <summary>
         /// The <see cref="Unit"/>'s current HP (hit points)
         /// </summary>
         [JsonIgnore]
@@ -625,6 +653,7 @@ namespace FEEngine
             {
                 return false;
             }
+            bool retreated = false;
             // todo: use pathfinding algorithm to figure out how much movement to consume/refund
             switch (movementType)
             {
@@ -632,6 +661,7 @@ namespace FEEngine
                     CurrentMovement -= deltaLength;
                     break;
                 case MovementType.RefundMovement:
+                    retreated = true;
                     CurrentMovement += deltaLength;
                     if (CurrentMovement > BoostedStats.Mv)
                     {
@@ -640,16 +670,17 @@ namespace FEEngine
                     break;
             }
             Position = newPos;
-            SkillEventArgs eventArgs = new SkillMoveArgs(Position);
+            SkillEventArgs eventArgs = new SkillMoveArgs(Position, retreated);
             CallEvent(SkillTriggerEvent.OnMove, eventArgs);
             return true;
         }
         /// <summary>
-        /// Does nothing; just disables any further action for this turn
+        /// Does nothing; just disables any further action for this turn. Call this function instead of simply returning in behavior.
         /// </summary>
         public void Wait()
         {
             CanMove = false;
+            CallEvent(SkillTriggerEvent.OnWait, new SkillWaitArgs());
         }
         internal void UpdateWeapon()
         {
@@ -748,7 +779,7 @@ namespace FEEngine
             EvaluatedUnitStats otherEvaluatedStats = toAttack.GetEvaluatedStats(this);
             // check if the attacker can move, and if the recipient is a valid target
             Item? myWeapon = EquippedWeapon;
-            if (!CanMove || IsAllied(toAttack) || myWeapon == null)
+            if (!CanAttack || IsAllied(toAttack) || myWeapon == null)
             {
                 return false;
             }
@@ -801,7 +832,9 @@ namespace FEEngine
             {
                 WeaponBehavior.Invoke(WeaponBehaviorEvent.AfterExchange, otherAfterExchangeArgs, otherWeapon.WeaponStats.Behavior);
             }
-            CanMove = false;
+            Wait();
+            CallEvent(SkillTriggerEvent.AfterExchange, new SkillAfterExchangeArgs(toAttack));
+            toAttack.CallEvent(SkillTriggerEvent.AfterExchange, new SkillAfterExchangeArgs(this));
             return true;
         }
         /// <summary>
@@ -892,9 +925,18 @@ namespace FEEngine
         /// The <see cref="Type.AssemblyQualifiedName"/> of the <see cref="Unit"/>'s behavior type
         /// </summary>
         public string? BehaviorName { get; set; }
+        internal AttachedData GetAttachedData(Type type)
+        {
+            if (!mAttachedData.ContainsKey(type))
+            {
+                mAttachedData.Add(type, new AttachedData());
+            }
+            return mAttachedData[type];
+        }
         [JsonConstructor]
         public Unit(IVec2<int> position, UnitAffiliation affiliation, UnitStats stats, string? behaviorName = null, Item? equippedWeapon = null, string? className = null, int? equippedItemIndex = null, string name = "Soldier")
         {
+            mAttachedData = new Dictionary<Type, AttachedData>();
             Inventory = new();
             Name = name;
             Position = position;
@@ -949,5 +991,6 @@ namespace FEEngine
         private readonly List<Skill> mSkills;
         private int mEquippedWeaponIndex, mBattalionIndex;
         private int? mEquippedItemIndex;
+        private readonly Dictionary<Type, AttachedData> mAttachedData;
     }
 }

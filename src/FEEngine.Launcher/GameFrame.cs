@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using FEEngine.GameLoader;
 using FEEngine.Math;
 using FEEngine.Menus;
 
@@ -89,7 +90,7 @@ namespace FEEngine.Launcher
             var attribute = assembly.GetCustomAttribute<AssemblyAssetLoaderAttribute>();
             if (attribute != null)
             {
-                Loader = attribute.Loader;
+                Loader = attribute.CreateLoader();
                 Loader.Load(mGame);
             }
             else

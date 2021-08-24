@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using FEEngine;
-using FEEngine.Math;
 using FEEngine.Classes;
-using ExampleGame;
+using FEEngine.GameLoader;
+using FEEngine.Math;
 
-[assembly: AssemblyAssetLoader(typeof(ExampleGameAssetLoader))]
+[assembly: AssemblyAssetLoader(typeof(ExampleGame.ExampleGameAssetLoader))]
 
 namespace ExampleGame
 {
     public class ExampleGameAssetLoader : AssetLoader 
     {
-        public override void Load(Game game)
+        protected override void LoadContent(Game game)
         {
             IVec2<int> size = new Vec2I(25, 15);
             var units = new List<int>();
