@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using FEEngine.Math;
 
 namespace FEEngine.Menus.UnitContextMenuPages
 {
@@ -30,10 +29,10 @@ namespace FEEngine.Menus.UnitContextMenuPages
             List<Unit> units = new();
             Unit selectedUnit = this.VerifyValue(UIController.SelectedUnit);
             Map map = this.VerifyValue(selectedUnit.Parent);
-            IVec2<int> range = gambit.Range;
+            Vector2 range = gambit.Range;
             foreach (Unit unit in map)
             {
-                int distance = MathUtil.SubVectors(selectedUnit.Position, unit.Position).TaxicabLength();
+                int distance = (selectedUnit.Position - unit.Position).TaxicabLength;
                 if (distance < range.X || distance > range.Y)
                 {
                     continue;

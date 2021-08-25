@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using FEEngine.Math;
 using FEEngine.Menus;
 
 namespace FEEngine
@@ -17,13 +16,13 @@ namespace FEEngine
             mLastColorFlip = 0.0;
             mRed = false;
             mSelectedIndex = -1;
-            CursorPosition = new Vec2I(0);
+            CursorPosition = new Vector2(0);
             mGame = game;
         }
         /// <summary>
         /// The current cursor position on the <see cref="FEEngine.Map"/>
         /// </summary>
-        public IVec2<int> CursorPosition { get; private set; }
+        public Vector2 CursorPosition { get; private set; }
         internal void Update()
         {
             foreach (UpdateMethod updateMethod in mUpdateHooks)
@@ -40,28 +39,28 @@ namespace FEEngine
                 Map.Player = this;
             }
             InputManager.State state = mGame.InputManager.GetState();
-            IVec2<int> dimensions = Map.Dimensions;
-            CursorPosition = MathUtil.ClampVector(CursorPosition, new Vec2I(0), MathUtil.SubVectors(dimensions, new Vec2I(1)));
+            Vector2 dimensions = Map.Dimensions;
+            CursorPosition = CursorPosition.Clamp(new Vector2(0), dimensions - new Vector2(1));
             if (mGame.PhaseManager.CurrentPhase == Unit.UnitAffiliation.Player)
             {
-                IVec2<int> delta = new Vec2I(0);
+                var delta = new Vector2(0);
                 if (state.Up)
                 {
-                    MathUtil.AddVectors(ref delta, new Vec2I(0, 1));
+                    delta += new Vector2(0, 1);
                 }
                 if (state.Down)
                 {
-                    MathUtil.AddVectors(ref delta, new Vec2I(0, -1));
+                    delta += new Vector2(0, -1);
                 }
                 if (state.Left)
                 {
-                    MathUtil.AddVectors(ref delta, new Vec2I(-1, 0));
+                    delta += new Vector2(-1, 0);
                 }
                 if (state.Right)
                 {
-                    MathUtil.AddVectors(ref delta, new Vec2I(1, 0));
+                    delta += new Vector2(1, 0);
                 }
-                if (delta.TaxicabLength() > 0)
+                if (delta.TaxicabLength > 0)
                 {
                     bool canMoveCursor = true;
                     Register<Unit> unitRegister = mGame.Registry.GetRegister<Unit>();
@@ -69,13 +68,13 @@ namespace FEEngine
                     if (mSelectedIndex != -1)
                     {
                         Unit unit = unitRegister[mSelectedIndex];
-                        int futureLength = MathUtil.SubVectors(MathUtil.AddVectors(delta, CursorPosition), unit.Position).TaxicabLength();
+                        int futureLength = (delta + CursorPosition - unit.Position).TaxicabLength;
                         canMoveCursor = futureLength <= unit.CurrentMovement;
                     }
                     // check if the currently selected unit can pass the next tile
                     if (canMoveCursor && mSelectedIndex != -1)
                     {
-                        Tile? nextTile = Map.GetTileAt(MathUtil.AddVectors(delta, CursorPosition));
+                        Tile? nextTile = Map.GetTileAt(delta + CursorPosition);
                         if (nextTile != null)
                         {
                             Unit unit = unitRegister[mSelectedIndex];
@@ -85,7 +84,7 @@ namespace FEEngine
                     // check if there is an enemy unit at the cursor's new position
                     if (canMoveCursor && mSelectedIndex != -1)
                     {
-                        Unit? candidateUnit = Map.GetUnitAt(MathUtil.AddVectors(delta, CursorPosition));
+                        Unit? candidateUnit = Map.GetUnitAt(delta + CursorPosition);
                         if (candidateUnit != null)
                         {
                             Unit unit = unitRegister[mSelectedIndex];
@@ -94,11 +93,9 @@ namespace FEEngine
                     }
                     if (canMoveCursor)
                     {
-                        delta = MathUtil.SubVectors(MathUtil.ClampVector(MathUtil.AddVectors(delta, CursorPosition), new Vec2I(0), MathUtil.SubVectors(dimensions, new Vec2I(1))), CursorPosition);
-                        IVec2<int> temp = CursorPosition;
-                        MathUtil.AddVectors(ref temp, delta);
-                        CursorPosition = temp;
-                        this.VerifyValue(UIController.FindMenu<TileInfoMenu>()).SelectedTile = new Vec2I(CursorPosition);
+                        delta = (delta + CursorPosition).Clamp(new Vector2(0), dimensions - new Vector2(1)) - CursorPosition;
+                        CursorPosition += delta;
+                        this.VerifyValue(UIController.FindMenu<TileInfoMenu>()).SelectedTile = CursorPosition;
                     }
                 }
                 if (state.OK)
@@ -147,7 +144,7 @@ namespace FEEngine
                     }
                     cursorColor = mRed ? Color.Red : Color.Black;
                 }
-                context.RenderChar(MathUtil.AddVectors(CursorPosition, new Vec2I(0, 1)), 'v', cursorColor);
+                context.RenderChar(CursorPosition + (0, 1), 'v', cursorColor);
             }
         }
         private Map Map

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using FEEngine;
 using FEEngine.Classes;
 using FEEngine.GameLoader;
-using FEEngine.Math;
 
 [assembly: AssemblyAssetLoader(typeof(ExampleGame.ExampleGameAssetLoader))]
 
@@ -13,7 +12,7 @@ namespace ExampleGame
     {
         protected override void LoadContent(Game game)
         {
-            IVec2<int> size = new Vec2I(25, 15);
+            Vector2 size = (25, 15);
             var units = new List<int>();
             units.AddRange(AddUnits(Unit.UnitAffiliation.Player, size.Y - 5, size.X, game));
             units.AddRange(AddUnits(Unit.UnitAffiliation.Enemy, size.Y - 2, size.X, game));
@@ -35,7 +34,7 @@ namespace ExampleGame
             for (int x = 0; x < mapWidth; x++)
             {
                 int unitY = y + (x % 2);
-                var unit = new Unit(new Vec2I(x, unitY), affiliation, stats)
+                var unit = new Unit((x, unitY), affiliation, stats)
                 {
                     Class = new Soldier(),
                 };
@@ -57,7 +56,7 @@ namespace ExampleGame
                 HitRate = 80,
                 CritRate = 0,
                 Type = WeaponType.Lance,
-                Range = new Vec2I(1),
+                Range = (1, 1),
                 Weight = 1,
                 Durability = 25
             };

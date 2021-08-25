@@ -1,5 +1,4 @@
 ﻿using System;
-using FEEngine.Math;
 
 namespace FEEngine
 {
@@ -33,12 +32,12 @@ namespace FEEngine
     /// </summary>
     public class SkillMoveArgs : SkillEventArgs
     {
-        internal SkillMoveArgs(IVec2<int> newPos, bool retreated) : base(SkillTriggerEvent.OnMove)
+        internal SkillMoveArgs(Vector2 newPos, bool retreated) : base(SkillTriggerEvent.OnMove)
         {
             NewPosition = newPos;
             Retreated = retreated;
         }
-        public IVec2<int> NewPosition { get; }
+        public Vector2 NewPosition { get; }
         public bool Retreated { get; }
     }
     /// <summary>

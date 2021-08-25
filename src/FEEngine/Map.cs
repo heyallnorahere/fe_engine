@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using FEEngine.Math;
 
 namespace FEEngine
 {
@@ -21,9 +20,9 @@ namespace FEEngine
             {
                 mGame = game;
             }
-            public IVec2<int> MinSize => Map.MinSize;
+            public Vector2 MinSize => Map.MinSize;
             public void Render(RenderContext context) => Map.Render(context);
-            public void SetSize(IVec2<int> size) => Map.SetSize(size);
+            public void SetSize(Vector2 size) => Map.SetSize(size);
             private Map Map
             {
                 get
@@ -89,11 +88,11 @@ namespace FEEngine
         /// The culmination <see cref="Width"/> and <see cref="Height"/>
         /// </summary>
         [JsonIgnore]
-        public IVec2<int> Dimensions
+        public Vector2 Dimensions
         {
             get
             {
-                return new Vec2I(Width, Height);
+                return new Vector2(Width, Height);
             }
             set
             {
@@ -111,17 +110,17 @@ namespace FEEngine
         public List<int> SpecialTiles { get; set; }
         [JsonIgnore]
         internal Player? Player { get; set; }
-        public IVec2<int> MinSize { get => Dimensions; }
+        public Vector2 MinSize { get => Dimensions; }
         /// <summary>
         /// Finds a <see cref="Unit"/> at the specified position
         /// </summary>
         /// <param name="position">The position to search at</param>
         /// <returns>A <see cref="Unit"/> object if found; otherwise, null</returns>
-        public Unit? GetUnitAt(IVec2<int> position)
+        public Unit? GetUnitAt(Vector2 position)
         {
             foreach (Unit unit in this)
             {
-                if (MathUtil.AreVectorsEqual(unit.Position, position))
+                if (unit.Position == position)
                 {
                     return unit;
                 }
@@ -133,13 +132,13 @@ namespace FEEngine
         /// </summary>
         /// <param name="position">The position to search at</param>
         /// <returns>A <see cref="Tile"/> object if found; otherwise, null</returns>
-        public Tile? GetTileAt(IVec2<int> position)
+        public Tile? GetTileAt(Vector2 position)
         {
             Register<Tile> tileRegister = this.VerifyValue(mRegister).Parent.GetRegister<Tile>();
             foreach (int index in SpecialTiles)
             {
                 Tile tile = tileRegister[index];
-                if (MathUtil.AreVectorsEqual(tile.Position, position))
+                if (tile.Position == position)
                 {
                     return tile;
                 }
@@ -216,8 +215,8 @@ namespace FEEngine
             int padding = xDifference / 2;
             context.PushPair(new RenderContext.OffsetClipPair()
             {
-                Offset = new Vec2I(padding, 0),
-                Clip = MathUtil.SubVectors(mRenderSize, new Vec2I(padding, 0))
+                Offset = new Vector2(padding, 0),
+                Clip = mRenderSize - new Vector2(padding, 0)
             });
             RenderMap(context);
             context.PopPair();
@@ -249,20 +248,20 @@ namespace FEEngine
         {
             return GetEnumerator();
         }
-        public void SetSize(IVec2<int> size)
+        public void SetSize(Vector2 size)
         {
             mRenderSize = size;
         }
         [JsonConstructor]
         public Map(int width, int height, List<int>? units = null, List<int>? specialTiles = null)
         {
-            mRenderSize = new Vec2I(0);
+            mRenderSize = new Vector2(0);
             Width = width;
             Height = height;
             Units = units ?? new List<int>();
             SpecialTiles = specialTiles ?? new List<int>();
             Player = null;
         }
-        private IVec2<int> mRenderSize;
+        private Vector2 mRenderSize;
     }
 }

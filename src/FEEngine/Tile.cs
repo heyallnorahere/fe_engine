@@ -1,5 +1,4 @@
-﻿using FEEngine.Math;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace FEEngine
@@ -21,7 +20,7 @@ namespace FEEngine
             /// </summary>
             All
         }
-        public Tile(IVec2<int> position, MovementLimitEnum movementLimit)
+        public Tile(Vector2 position, MovementLimitEnum movementLimit)
         {
             Position = position;
             MovementLimit = movementLimit;
@@ -44,7 +43,7 @@ namespace FEEngine
         /// <summary>
         /// The position of this tile
         /// </summary>
-        public IVec2<int> Position { get; private set; }
+        public Vector2 Position { get; private set; }
         /// <summary>
         /// What kinds of units can move on or past this tile
         /// </summary>

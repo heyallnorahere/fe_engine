@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using FEEngine.Math;
 
 namespace FEEngine.Menus.UnitContextMenuPages
 {
@@ -33,10 +32,10 @@ namespace FEEngine.Menus.UnitContextMenuPages
             Map map = Extensions.VerifyValue(null, currentUnit.Parent);
             if (weapon != null)
             {
-                IVec2<int> range = Extensions.VerifyValue(null, weapon.WeaponStats).Range;
+                Vector2 range = Extensions.VerifyValue(null, weapon.WeaponStats).Range;
                 foreach (Unit unit in map)
                 {
-                    int distance = MathUtil.SubVectors(currentUnit.Position, unit.Position).TaxicabLength();
+                    int distance = (currentUnit.Position - unit.Position).TaxicabLength;
                     if (distance < range.X || distance > range.Y || currentUnit.IsAllied(unit))
                     {
                         continue;

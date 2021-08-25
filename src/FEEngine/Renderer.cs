@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using FEEngine.Math;
 
 namespace FEEngine
 {
@@ -11,8 +10,8 @@ namespace FEEngine
     public interface IRenderable
     {
         void Render(RenderContext context);
-        IVec2<int> MinSize { get; }
-        void SetSize(IVec2<int> size);
+        Vector2 MinSize { get; }
+        void SetSize(Vector2 size);
     }
     public enum Color
     {
@@ -30,7 +29,7 @@ namespace FEEngine
     /// </summary>
     public class RenderContext
     {
-        public RenderContext(List<char> characterBuffer, List<Color> colorBuffer, IVec2<int> bufferSize)
+        public RenderContext(List<char> characterBuffer, List<Color> colorBuffer, Vector2 bufferSize)
         {
             mStack = new();
             mCharacterBuffer = characterBuffer;
@@ -42,7 +41,7 @@ namespace FEEngine
         /// </summary>
         public struct OffsetClipPair
         {
-            public IVec2<int> Offset, Clip;
+            public Vector2 Offset, Clip;
         }
         /// <summary>
         /// Pushes a <see cref="OffsetClipPair"/> onto the stack
@@ -66,14 +65,14 @@ namespace FEEngine
         /// <param name="character">What character to render</param>
         /// <param name="color">The <see cref="Color"/> to render the character as</param>
         /// <returns></returns>
-        public bool RenderChar(IVec2<int> position, char character, Color color = Color.White)
+        public bool RenderChar(Vector2 position, char character, Color color = Color.White)
         {
             OffsetClipPair currentData = GetCurrentOffsetClipData();
-            if (MathUtil.IsVectorOutOfBounds(position, MathUtil.SubVectors(currentData.Clip, currentData.Offset)))
+            if (position.IsOutOfBounds(currentData.Clip - currentData.Offset))
             {
                 return false;
             }
-            int bufferIndex = Renderer.GetBufferIndex(MathUtil.AddVectors(position, currentData.Offset), mBufferSize);
+            int bufferIndex = Renderer.GetBufferIndex(position + currentData.Offset, mBufferSize);
             mCharacterBuffer[bufferIndex] = character;
             mColorBuffer[bufferIndex] = color;
             return true;
@@ -85,12 +84,12 @@ namespace FEEngine
         /// <param name="text">What text to render</param>
         /// <param name="color">The <see cref="Color"/> to render the text as</param>
         /// <returns></returns>
-        public bool RenderString(IVec2<int> position, string text, Color color = Color.White)
+        public bool RenderString(Vector2 position, string text, Color color = Color.White)
         {
             int xOffset = 0;
             foreach (char character in text)
             {
-                if (!RenderChar(MathUtil.AddVectors(position, new Vec2I(xOffset, 0)), character, color))
+                if (!RenderChar(position + (xOffset, 0), character, color))
                 {
                     return false;
                 }
@@ -102,16 +101,16 @@ namespace FEEngine
         {
             OffsetClipPair data = new()
             {
-                Offset = new Vec2I(0),
-                Clip = new Vec2I(mBufferSize)
+                Offset = new Vector2(0),
+                Clip = new Vector2(mBufferSize)
             };
             OffsetClipPair[] array = new OffsetClipPair[mStack.Count];
             mStack.CopyTo(array, 0);
             for (int i = array.Length - 1; i >= 0; i--)
             {
                 OffsetClipPair pair = array[i];
-                MathUtil.AddVectors(ref data.Offset, pair.Offset);
-                IVec2<int> clipWithOffset = MathUtil.AddVectors(data.Offset, pair.Clip);
+                data.Offset += pair.Offset;
+                Vector2 clipWithOffset = data.Offset + pair.Clip;
                 if (clipWithOffset.X < data.Clip.X)
                 {
                     data.Clip.X = clipWithOffset.X;
@@ -126,7 +125,7 @@ namespace FEEngine
         private readonly Stack<OffsetClipPair> mStack;
         private readonly List<char> mCharacterBuffer;
         private readonly List<Color> mColorBuffer;
-        private readonly IVec2<int> mBufferSize;
+        private readonly Vector2 mBufferSize;
     }
     public class Renderer
     {
@@ -154,7 +153,7 @@ namespace FEEngine
             {
                 for (int x = 0; x < mBufferSize.X; x++)
                 {
-                    int bufferIndex = GetBufferIndex(new Vec2I(x, y), mBufferSize);
+                    int bufferIndex = GetBufferIndex(new Vector2(x, y), mBufferSize);
                     char character = mCharacterBuffer[bufferIndex];
                     Color color = mColorBuffer[bufferIndex];
                     buffer.Add(new KeyValuePair<char, Color>(character, color));
@@ -186,7 +185,7 @@ namespace FEEngine
         /// <summary>
         /// The size of the allocated buffer
         /// </summary>
-        public IVec2<int> BufferSize
+        public Vector2 BufferSize
         {
             get => mBufferSize;
             set
@@ -215,7 +214,7 @@ namespace FEEngine
             {
                 for (int y = 0; y < mBufferSize.Y; y++)
                 {
-                    int bufferIndex = GetBufferIndex(new Vec2I(x, y), mBufferSize);
+                    int bufferIndex = GetBufferIndex(new Vector2(x, y), mBufferSize);
                     mCharacterBuffer[bufferIndex] = ' ';
                     mColorBuffer[bufferIndex] = Color.Black;
                 }
@@ -227,14 +226,14 @@ namespace FEEngine
         /// <param name="position">The position to calculate</param>
         /// <param name="bufferSize">The virtual 2D size of the buffer</param>
         /// <returns>The computed index</returns>
-        public static int GetBufferIndex(IVec2<int> position, IVec2<int> bufferSize)
+        public static int GetBufferIndex(Vector2 position, Vector2 bufferSize)
         {
             return (position.Y * bufferSize.X) + position.X;
         }
         public Renderer()
         {
             // 119 x 30 is the default win32 console size, if i recall
-            BufferSize = new Vec2I(100, 30);
+            BufferSize = new Vector2(100, 30);
         }
         static Renderer()
         {
@@ -242,7 +241,7 @@ namespace FEEngine
         }
         private readonly List<char> mCharacterBuffer = new();
         private readonly List<Color> mColorBuffer = new();
-        private IVec2<int> mBufferSize = new Vec2I(0);
+        private Vector2 mBufferSize = new(0);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void WriteColoredChar_Native(char character, Color color);
         [MethodImpl(MethodImplOptions.InternalCall)]

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using FEEngine.Math;
 
 namespace FEEngine
 {
@@ -8,7 +7,7 @@ namespace FEEngine
         public static int MaxLogSize { get; set; }
         public class RenderAgent : IRenderable
         {
-            public IVec2<int> MinSize
+            public Vector2 MinSize
             {
                 get
                 {
@@ -21,7 +20,7 @@ namespace FEEngine
                             longestMessageLength = text.Length;
                         }
                     }
-                    return new Vec2I(longestMessageLength, MaxLogSize);
+                    return new Vector2(longestMessageLength, MaxLogSize);
                 }
             }
             public void Render(RenderContext context)
@@ -31,14 +30,14 @@ namespace FEEngine
                 {
                     int yPosition = startAt - i;
                     Message message = log[i];
-                    context.RenderString(new Vec2I(0, yPosition), message.Text, message.Color);
+                    context.RenderString(new Vector2(0, yPosition), message.Text, message.Color);
                 }
             }
-            public void SetSize(IVec2<int> size)
+            public void SetSize(Vector2 size)
             {
                 mRenderSize = size;
             }
-            private IVec2<int> mRenderSize = new Vec2I(0);
+            private Vector2 mRenderSize = new(0);
         }
         public static void Print(Color color, string format, params object[] args)
         {

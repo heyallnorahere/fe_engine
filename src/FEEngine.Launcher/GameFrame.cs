@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using FEEngine.GameLoader;
-using FEEngine.Math;
 using FEEngine.Menus;
 
 namespace FEEngine.Launcher
@@ -12,7 +11,7 @@ namespace FEEngine.Launcher
         public GameFrame(Dictionary<string, Assembly> assemblies, Game game, Player player, string? filename)
         {
             mAssemblyIndex = 0;
-            mSize = new Vec2I(0);
+            mSize = new Vector2(0);
             mGame = game;
             mAssemblies = assemblies;
             mLayout = new BorderLayout();
@@ -33,7 +32,7 @@ namespace FEEngine.Launcher
                 }
             }
         }
-        public IVec2<int> MinSize => mLayout.MinSize;
+        public Vector2 MinSize => mLayout.MinSize;
         public void Render(RenderContext context)
         {
             if (mLoadedAssembly)
@@ -44,7 +43,7 @@ namespace FEEngine.Launcher
             {
                 if (mAssemblies.Count <= 0)
                 {
-                    context.RenderString(new Vec2I(0, mSize.Y - 1), "No assemblies were loaded!");
+                    context.RenderString(new Vector2(0, mSize.Y - 1), "No assemblies were loaded!");
                 }
                 else
                 {
@@ -66,13 +65,13 @@ namespace FEEngine.Launcher
                             color = Color.White;
                         }
                         int y = mSize.Y - ((i + 1) * 2);
-                        IVec2<int> position = new Vec2I(x, y);
+                        var position = new Vector2(x, y);
                         context.RenderString(position, text, color);
                     }
                 }
             }
         }
-        public void SetSize(IVec2<int> size)
+        public void SetSize(Vector2 size)
         {
             mLayout.SetSize(size);
             mSize = size;
@@ -127,7 +126,7 @@ namespace FEEngine.Launcher
         private readonly Game mGame;
         private readonly Dictionary<string, Assembly> mAssemblies;
         private bool mLoadedAssembly;
-        private IVec2<int> mSize;
+        private Vector2 mSize;
         private int mAssemblyIndex;
         private Player? mPlayer;
         private readonly List<string> mOptions;

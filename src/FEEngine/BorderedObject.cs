@@ -1,6 +1,4 @@
-﻿using FEEngine.Math;
-
-namespace FEEngine
+﻿namespace FEEngine
 {
     /// <summary>
     /// A renderable object that takes child <see cref="IRenderable"/> objects, and renders them with a border
@@ -10,17 +8,17 @@ namespace FEEngine
         public BorderedObject(IRenderable child)
         {
             mChild = child;
-            mRenderSize = new Vec2I(0);
+            mRenderSize = new Vector2(0);
         }
-        public IVec2<int> MinSize => MathUtil.AddVectors(mChild.MinSize, new Vec2I(2));
+        public Vector2 MinSize => mChild.MinSize + new Vector2(2);
         public void Render(RenderContext context)
         {
             DrawBorder(context);
-            IVec2<int> childRenderSize = MathUtil.SubVectors(mRenderSize, new Vec2I(2));
+            Vector2 childRenderSize = mRenderSize - new Vector2(2);
             mChild.SetSize(childRenderSize);
             context.PushPair(new RenderContext.OffsetClipPair()
             {
-                Offset = new Vec2I(1),
+                Offset = new Vector2(1),
                 Clip = childRenderSize
             });
             mChild.Render(context);
@@ -30,22 +28,22 @@ namespace FEEngine
         {
             for (int x = 0; x < mRenderSize.X - 2; x++)
             {
-                context.RenderChar(new Vec2I(x + 1, y), '\u2550');
+                context.RenderChar(new Vector2(x + 1, y), '\u2550');
             }
         }
         private void DrawVerticalLine(int x, RenderContext context)
         {
             for (int y = 0; y < mRenderSize.Y - 2; y++)
             {
-                context.RenderChar(new Vec2I(x, y + 1), '\u2551');
+                context.RenderChar(new Vector2(x, y + 1), '\u2551');
             }
         }
         private void DrawCorners(RenderContext context)
         {
-            context.RenderChar(new Vec2I(0), '\u255A');
-            context.RenderChar(new Vec2I(mRenderSize.X - 1, 0), '\u255D');
-            context.RenderChar(new Vec2I(0, mRenderSize.Y - 1), '\u2554');
-            context.RenderChar(new Vec2I(mRenderSize.X - 1, mRenderSize.Y - 1), '\u2557');
+            context.RenderChar(new Vector2(0), '\u255A');
+            context.RenderChar(new Vector2(mRenderSize.X - 1, 0), '\u255D');
+            context.RenderChar(new Vector2(0, mRenderSize.Y - 1), '\u2554');
+            context.RenderChar(new Vector2(mRenderSize.X - 1, mRenderSize.Y - 1), '\u2557');
         }
         private void DrawBorder(RenderContext context)
         {
@@ -55,12 +53,12 @@ namespace FEEngine
             DrawVerticalLine(mRenderSize.X - 1, context);
             DrawCorners(context);
         }
-        public void SetSize(IVec2<int> size)
+        public void SetSize(Vector2 size)
         {
             mRenderSize = size;
         }
-        private IVec2<int> mRenderSize;
-        protected IVec2<int> RenderSize => mRenderSize;
+        private Vector2 mRenderSize;
+        protected Vector2 RenderSize => mRenderSize;
         private readonly IRenderable mChild;
     }
 }

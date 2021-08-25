@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using FEEngine.Math;
 
 namespace FEEngine
 {
@@ -24,16 +23,16 @@ namespace FEEngine
         {
             mChildren = new();
             Center = null;
-            mSize = new Vec2I(0);
+            mSize = new Vector2(0);
         }
-        public IVec2<int> MinSize
+        public Vector2 MinSize
         {
             get
             {
-                IVec2<int> size = new Vec2I(0);
+                var size = new Vector2(0);
                 foreach (ChildAlignmentPair pair in mChildren)
                 {
-                    IVec2<int> minSize = pair.Child.MinSize;
+                    Vector2 minSize = pair.Child.MinSize;
                     if (pair.Alignment == Alignment.Left || pair.Alignment == Alignment.Right)
                     {
                         size.X += minSize.X;
@@ -51,19 +50,19 @@ namespace FEEngine
                         }
                     }
                 }
-                MathUtil.AddVectors(ref size, Center?.MinSize ?? new Vec2I(0));
+                size += Center?.MinSize ?? new Vector2(0);
                 return size;
             }
         }
         public void Render(RenderContext context)
         {
-            IVec2<int> sizeRemaining = new Vec2I(mSize);
-            IVec2<int> originRemaining = new Vec2I(0);
+            var sizeRemaining = new Vector2(mSize);
+            var originRemaining = new Vector2(0);
             foreach (ChildAlignmentPair pair in mChildren)
             {
-                IVec2<int> childSize = new Vec2I(0);
-                IVec2<int> childPos = new Vec2I(0);
-                IVec2<int> minSize = pair.Child.MinSize;
+                var childSize = new Vector2(0);
+                var childPos = new Vector2(0);
+                var minSize = pair.Child.MinSize;
                 switch (pair.Alignment)
                 {
                     case Alignment.Bottom:
@@ -118,7 +117,7 @@ namespace FEEngine
             }
             context.PopPair();
         }
-        public void SetSize(IVec2<int> size)
+        public void SetSize(Vector2 size)
         {
             mSize = size;
         }
@@ -136,7 +135,7 @@ namespace FEEngine
             });
         }
         public IRenderable? Center { get; set; }
-        private IVec2<int> mSize;
+        private Vector2 mSize;
         private readonly List<ChildAlignmentPair> mChildren;
     }
 }

@@ -1,6 +1,4 @@
-﻿using FEEngine.Math;
-
-namespace FEEngine
+﻿namespace FEEngine
 {
     /// <summary>
     /// A <see cref="BorderedMenu"/> is a <see cref="BorderedObject"/> with a title bar
@@ -27,19 +25,19 @@ namespace FEEngine
                 char borderChar = '\u2550';
                 for (currentX = 0; currentX < lineSegmentWidth; currentX++)
                 {
-                    context.RenderChar(new Vec2I(currentX + 1, y), borderChar);
+                    context.RenderChar(new Vector2(currentX + 1, y), borderChar);
                 }
-                context.RenderString(new Vec2I(currentX + 1, y), title);
+                context.RenderString(new Vector2(currentX + 1, y), title);
                 currentX += title.Length;
                 if (title.Length < titleLength)
                 {
-                    context.RenderChar(new Vec2I(currentX + 1, y), borderChar);
+                    context.RenderChar(new Vector2(currentX + 1, y), borderChar);
                     currentX++;
                 }
                 lineSegmentWidth += currentX + 1;
                 for (; currentX < lineSegmentWidth; currentX++)
                 {
-                    context.RenderChar(new Vec2I(currentX + 1, y), borderChar);
+                    context.RenderChar(new Vector2(currentX + 1, y), borderChar);
                 }
             }
             else

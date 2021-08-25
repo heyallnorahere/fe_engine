@@ -4,7 +4,6 @@ using System.Runtime.InteropServices;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using FEEngine.Classes;
-using FEEngine.Math;
 using FEEngine.Scripting;
 
 namespace FEEngine
@@ -381,7 +380,7 @@ namespace FEEngine
         /// <summary>
         /// The position of the <see cref="Unit"/> on the map
         /// </summary>
-        public IVec2<int> Position { get; private set; }
+        public Vector2 Position { get; private set; }
         /// <summary>
         /// A list, containing <see cref="Register{T}"/> indexes of <see cref="Item"/>s. Do not use this to add items, use <see cref="Add(Item)"/> instead
         /// </summary>
@@ -637,18 +636,18 @@ namespace FEEngine
         /// <param name="newPos">The position to move to</param>
         /// <param name="movementType">How to deal with the <see cref="Unit"/>'s movement points</param>
         /// <returns>Whether or not the <see cref="Unit"/> succeeded to move</returns>
-        public bool Move(IVec2<int> newPos, MovementType movementType = MovementType.ConsumeMovement)
+        public bool Move(Vector2 newPos, MovementType movementType = MovementType.ConsumeMovement)
         {
             if (!CanMove)
             {
                 return false;
             }
-            IVec2<int> delta = MathUtil.SubVectors(newPos, Position);
-            if (MathUtil.IsVectorOutOfBounds(newPos, this.VerifyValue(Parent?.Dimensions)))
+            Vector2 delta = newPos - Position;
+            if (newPos.IsOutOfBounds(this.VerifyValue(Parent).Dimensions))
             {
                 return false;
             }
-            int deltaLength = delta.TaxicabLength();
+            int deltaLength = delta.TaxicabLength;
             if (movementType == MovementType.ConsumeMovement && deltaLength > CurrentMovement)
             {
                 return false;
@@ -783,9 +782,9 @@ namespace FEEngine
             {
                 return false;
             }
-            int distance = MathUtil.SubVectors(Position, toAttack.Position).TaxicabLength();
+            int distance = (Position - toAttack.Position).TaxicabLength;
             WeaponStats stats = this.VerifyValue(myWeapon.WeaponStats);
-            IVec2<int> range = stats.Range;
+            Vector2 range = stats.Range;
             if (distance < range.X || distance > range.Y)
             {
                 return false;
@@ -793,7 +792,7 @@ namespace FEEngine
             Item? otherWeapon = toAttack.EquippedWeapon;
             bool iAmInRange = false;
             if (otherWeapon != null) {
-                IVec2<int> otherRange = this.VerifyValue(otherWeapon.WeaponStats).Range;
+                Vector2 otherRange = this.VerifyValue(otherWeapon.WeaponStats).Range;
                 iAmInRange = distance > otherRange.X && distance < otherRange.Y;
             }
             WeaponAfterExchangeArgs afterExchangeArgs = new(this, toAttack);
@@ -934,7 +933,7 @@ namespace FEEngine
             return mAttachedData[type];
         }
         [JsonConstructor]
-        public Unit(IVec2<int> position, UnitAffiliation affiliation, UnitStats stats, string? behaviorName = null, Item? equippedWeapon = null, string? className = null, int? equippedItemIndex = null, string name = "Soldier")
+        public Unit(Vector2 position, UnitAffiliation affiliation, UnitStats stats, string? behaviorName = null, Item? equippedWeapon = null, string? className = null, int? equippedItemIndex = null, string name = "Soldier")
         {
             mAttachedData = new Dictionary<Type, AttachedData>();
             Inventory = new();

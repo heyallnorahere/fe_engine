@@ -1,16 +1,14 @@
-﻿using FEEngine.Math;
-
-namespace FEEngine.Menus
+﻿namespace FEEngine.Menus
 {
     public class TileInfoMenu : IMenu
     {
         internal TileInfoMenu()
         {
-            mRenderSize = new Vec2I(0);
-            SelectedTile = new Vec2I();
+            mRenderSize = new Vector2(0);
+            SelectedTile = new Vector2();
         }
-        public IVec2<int> MinSize { get => new Vec2I(20, 26 - Logger.MaxLogSize); }
-        public IVec2<int> SelectedTile { get; internal set; }
+        public Vector2 MinSize => (20, 26 - Logger.MaxLogSize);
+        public Vector2 SelectedTile { get; internal set; }
         public string GetTitle()
         {
             return "Tile info";
@@ -26,7 +24,7 @@ namespace FEEngine.Menus
         }
         public void Render(RenderContext context)
         {
-            IVec2<int> origin = new Vec2I(0, mRenderSize.Y - 1);
+            var origin = new Vector2(0, mRenderSize.Y - 1);
             Registry registry = this.VerifyValue(UIController.GameInstance).Registry;
             Register<Map> mapRegister = registry.GetRegister<Map>();
             Map map = mapRegister[this.VerifyValue(UIController.GameInstance).CurrentMapIndex];
@@ -46,13 +44,13 @@ namespace FEEngine.Menus
                 affiliationColor = Unit.GetColorForAffiliation(unit.Affiliation);
                 className = unit.Class.Name;
             }
-            context.RenderString(MathUtil.AddVectors(origin, new Vec2I(1, -1)), string.Format("Unit: {0}", unitDescText));
-            IVec2<int> affiliationTextPos = MathUtil.AddVectors(origin, new Vec2I(1, -3));
+            context.RenderString(origin + (1, -1), string.Format("Unit: {0}", unitDescText));
+            Vector2 affiliationTextPos = origin + (1, -3);
             context.RenderString(affiliationTextPos, "Affiliation:");
-            context.RenderString(MathUtil.AddVectors(affiliationTextPos, new Vec2I(2, -1)), affiliationName, affiliationColor);
-            IVec2<int> classTextPos = MathUtil.AddVectors(origin, new Vec2I(1, -6));
+            context.RenderString(affiliationTextPos + (2, -1), affiliationName, affiliationColor);
+            Vector2 classTextPos = origin + (1, -6);
             context.RenderString(classTextPos, "Class:");
-            context.RenderString(MathUtil.AddVectors(classTextPos, new Vec2I(2, -1)), className);
+            context.RenderString(classTextPos + (2, -1), className);
             Tile? tile = map.GetTileAt(SelectedTile);
             string tileContentText = "Plain";
             string whoCanPassTile = GetStringForMovementLimit(Tile.MovementLimitEnum.All);
@@ -61,17 +59,17 @@ namespace FEEngine.Menus
                 // todo: figure out the tiles content
                 whoCanPassTile = GetStringForMovementLimit(tile.MovementLimit);
             }
-            IVec2<int> tileContentTextPos = MathUtil.AddVectors(origin, new Vec2I(1, -9));
+            Vector2 tileContentTextPos = origin + (1, -9);
             context.RenderString(tileContentTextPos, "Tile:");
-            context.RenderString(MathUtil.AddVectors(tileContentTextPos, new Vec2I(2, -1)), tileContentText);
-            IVec2<int> whoCanPassTileTextPos = MathUtil.SubVectors(tileContentTextPos, new Vec2I(0, 2));
+            context.RenderString(tileContentTextPos + (2, -1), tileContentText);
+            Vector2 whoCanPassTileTextPos = tileContentTextPos - (0, 2);
             context.RenderString(whoCanPassTileTextPos, "Supports:");
-            context.RenderString(MathUtil.AddVectors(whoCanPassTileTextPos, new Vec2I(2, -1)), whoCanPassTile);
+            context.RenderString(whoCanPassTileTextPos + (2, -1), whoCanPassTile);
         }
-        public void SetSize(IVec2<int> size)
+        public void SetSize(Vector2 size)
         {
             mRenderSize = size;
         }
-        private IVec2<int> mRenderSize;
+        private Vector2 mRenderSize;
     }
 }

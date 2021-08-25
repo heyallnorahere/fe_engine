@@ -2,7 +2,6 @@
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using FEEngine.Math;
 
 namespace FEEngine
 {
@@ -11,11 +10,11 @@ namespace FEEngine
     /// </summary>
     public class JsonSerializer
     {
-        private class Vec2Converter<T> : CustomCreationConverter<IVec2<T>> where T : struct, IComparable, IComparable<T>, IConvertible, IEquatable<T>, IFormattable
+        private class Vec2Converter : CustomCreationConverter<Vector2>
         {
-            public override IVec2<T> Create(Type type)
+            public override Vector2 Create(Type type)
             {
-                return new GenericVec2<T>();
+                return new Vector2();
             }
         }
         public delegate void SerializationPlugin(Newtonsoft.Json.JsonSerializer serializer);
@@ -41,7 +40,7 @@ namespace FEEngine
             JsonReader reader = new JsonTextReader(textReader);
             Newtonsoft.Json.JsonSerializer serializer = new();
             plugin?.Invoke(serializer);
-            serializer.Converters.Add(new Vec2Converter<int>());
+            serializer.Converters.Add(new Vec2Converter());
             T? value = serializer.Deserialize<T>(reader);
             reader.Close();
             return value;

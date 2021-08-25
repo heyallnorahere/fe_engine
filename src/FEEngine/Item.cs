@@ -1,7 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using FEEngine.Math;
 using FEEngine.Scripting;
 
 namespace FEEngine
@@ -23,7 +22,7 @@ namespace FEEngine
         public WeaponStats()
         {
             mBehavior = null;
-            Range = new Vec2I(1);
+            Range = new Vector2(1);
         }
         /// <summary>
         /// Gets the <see cref="char"/> value associated with the passed weapon data
@@ -76,7 +75,7 @@ namespace FEEngine
         /// <summary>
         /// The range of the weapon; X is min, Y is max
         /// </summary>
-        public IVec2<int> Range { get; set; }
+        public Vector2 Range { get; set; }
         /// <summary>
         /// The weight of the weapon
         /// </summary>

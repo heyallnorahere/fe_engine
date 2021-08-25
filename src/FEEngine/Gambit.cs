@@ -1,6 +1,4 @@
-﻿using FEEngine.Math;
-
-namespace FEEngine
+﻿namespace FEEngine
 {
     public enum GambitType
     {
@@ -54,7 +52,7 @@ namespace FEEngine
             public Battalion Battalion { get; internal set; }
         }
         public abstract int MaxUses { get; }
-        public abstract IVec2<int> Range { get; }
+        public abstract Vector2 Range { get; }
         private readonly GambitType mGambitType;
     }
 }
