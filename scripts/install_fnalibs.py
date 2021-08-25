@@ -10,13 +10,16 @@ argparser.add_argument("-c", "--cmake-command", default="cmake")
 parsed_args = argparser.parse_args()
 FNALIBS_BUILD_DIRECTORY="fnalibs-build"
 print("Configuring...")
-subprocess.call([parsed_args.cmake_command, path.join(parsed_args.root_dir, "vendor", "fnalibs"), "-B", FNALIBS_BUILD_DIRECTORY, "-DCMAKE_BUILD_TYPE=Release", "-DBUILD_SHARED_LIBS=ON"])
+if subprocess.call([parsed_args.cmake_command, path.join(parsed_args.root_dir, "vendor", "fnalibs"), "-B", FNALIBS_BUILD_DIRECTORY, "-DCMAKE_BUILD_TYPE=Release", "-DBUILD_SHARED_LIBS=ON"]) != 0:
+    exit(1)
 print("Building...")
-subprocess.call([parsed_args.cmake_command, "--build", FNALIBS_BUILD_DIRECTORY, "--config", "Release"])
+if subprocess.call([parsed_args.cmake_command, "--build", FNALIBS_BUILD_DIRECTORY, "--config", "Release"]) != 0:
+    exit(1)
 system = platform.system()
 print("Installing...")
 if system == "Linux":
-    subprocess.call(["sudo", parsed_args.cmake_command, "--install", FNALIBS_BUILD_DIRECTORY])
+    if subprocess.call(["sudo", parsed_args.cmake_command, "--install", FNALIBS_BUILD_DIRECTORY]) != 0:
+        exit(1)
 else:
     extensions = {
         "Windows": "dll",
