@@ -242,13 +242,5 @@ namespace FEEngine
         private readonly List<char> mCharacterBuffer = new();
         private readonly List<Color> mColorBuffer = new();
         private Vector2 mBufferSize = new(0);
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void WriteColoredChar_Native(char character, Color color);
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void ClearNativeBuffer_Native();
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void Present_Native();
-        [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void DisableCursor_Native();
     }
 }
