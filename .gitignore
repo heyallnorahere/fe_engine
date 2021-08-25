@@ -595,3 +595,8 @@ schemas/
 
 # copied game binaries
 Games/
+
+# fnalibs
+fnalibs-build/
+*.dylib
+*.dll
