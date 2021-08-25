@@ -6,10 +6,17 @@ using Newtonsoft.Json.Converters;
 namespace FEEngine
 {
     /// <summary>
-    /// The class that handles all the inputs
+    /// The object that handles all the inputs
     /// </summary>
-    public class InputManager
+    public abstract class InputManager
     {
+        public enum Key
+        {
+            Escape, Enter,
+            Q, W, E, R, T, Y, U, I, O, P,
+            A, S, D, F, G, H, J, K, L,
+            Z, X, C, V, B, N, M
+        }
         /// <summary>
         /// An object that specifies which buttons have been pressed
         /// </summary>
@@ -213,98 +220,68 @@ namespace FEEngine
             /// Default: <see cref="ConsoleKey.W"/>
             /// </summary>
             [JsonConverter(typeof(StringEnumConverter))]
-            public ConsoleKey Up { get; set; }
+            public Key Up { get; set; }
             /// <summary>
             /// Default: <see cref="ConsoleKey.S"/>
             /// </summary>
             [JsonConverter(typeof(StringEnumConverter))]
-            public ConsoleKey Down { get; set; }
+            public Key Down { get; set; }
             /// <summary>
             /// Default: <see cref="ConsoleKey.A"/>
             /// </summary>
             [JsonConverter(typeof(StringEnumConverter))]
-            public ConsoleKey Left { get; set; }
+            public Key Left { get; set; }
             /// <summary>
             /// Default: <see cref="ConsoleKey.D"/>
             /// </summary>
             [JsonConverter(typeof(StringEnumConverter))]
-            public ConsoleKey Right { get; set; }
+            public Key Right { get; set; }
             /// <summary>
             /// Default: <see cref="ConsoleKey.Q"/>
             /// </summary>
             [JsonConverter(typeof(StringEnumConverter))]
-            public ConsoleKey Quit { get; set; }
+            public Key Quit { get; set; }
             /// <summary>
             /// Default: <see cref="ConsoleKey.Enter"/>
             /// </summary>
             [JsonConverter(typeof(StringEnumConverter))]
-            public ConsoleKey OK { get; set; }
+            public Key OK { get; set; }
             /// <summary>
             /// Default: <see cref="ConsoleKey.Escape"/>
             /// </summary>
             [JsonConverter(typeof(StringEnumConverter))]
-            public ConsoleKey Back { get; set; }
+            public Key Back { get; set; }
         }
         /// <summary>
         /// The current <see cref="KeyBindings"/>
         /// </summary>
-        public static KeyBindings Bindings { get; set; }
-        private delegate void SetStateCallback();
-        private static void ParseKey(ConsoleKey key)
-        {
-            // why am i allowed to do this (edit: im no longer using Ref<>... whoops)
-            var keys = new Dictionary<ConsoleKey, SetStateCallback>
-            {
-                [Bindings.Up] = () => { state.Up = true; },
-                [Bindings.Down] = () => { state.Down = true; },
-                [Bindings.Left] = () => { state.Left = true; },
-                [Bindings.Right] = () => { state.Right = true; },
-                [Bindings.Quit] = () => { state.Quit = true; },
-                [Bindings.OK] = () => { state.OK = true; },
-                [Bindings.Back] = () => { state.Back = true; }
-            };
-            foreach (var pair in keys)
-            {
-                if (key == pair.Key)
-                {
-                    pair.Value();
-                }
-            }
-        }
-        static InputManager()
+        public KeyBindings Bindings { get; set; }
+        internal InputManager()
         {
             KeyBindings bindings = new();
-            bindings.Up = ConsoleKey.W;
-            bindings.Down = ConsoleKey.S;
-            bindings.Left = ConsoleKey.A;
-            bindings.Right = ConsoleKey.D;
-            bindings.Quit = ConsoleKey.Q;
-            bindings.OK = ConsoleKey.Enter;
-            bindings.Back = ConsoleKey.Escape;
+            bindings.Up = Key.W;
+            bindings.Down = Key.S;
+            bindings.Left = Key.A;
+            bindings.Right = Key.D;
+            bindings.Quit = Key.Q;
+            bindings.OK = Key.Enter;
+            bindings.Back = Key.Escape;
             Bindings = bindings;
         }
-        internal static void Update()
-        {
-            state.Reset();
-            while (Console.KeyAvailable)
-            {
-                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-                ParseKey(keyInfo.Key);
-            }
-        }
+        internal abstract void Update();
         /// <summary>
         /// Gets the current <see cref="State"/>
         /// </summary>
         /// <returns>The current <see cref="State"/></returns>
-        public static State GetState()
+        public State GetState()
         {
-            return state;
+            return mState;
         }
         /// <summary>
         /// Reads the bindings from the specified JSON file
         /// </summary>
         /// <param name="path">The path of the file to read from</param>
-        public static void ReadBindings(string path)
+        public void ReadBindings(string path)
         {
             Bindings = JsonSerializer.DeserializeFile<KeyBindings>(path);
         }
@@ -312,11 +289,10 @@ namespace FEEngine
         /// Writes the bindings to the specified JSON file
         /// </summary>
         /// <param name="path">The path of the file to write to</param>
-        public static void WriteBindings(string path)
+        public void WriteBindings(string path)
         {
             JsonSerializer.Serialize(path, Bindings);
         }
-        private InputManager() { }
-        private readonly static State state = new();
+        protected readonly State mState = new();
     }
 }

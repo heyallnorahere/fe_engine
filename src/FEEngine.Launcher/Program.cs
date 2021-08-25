@@ -37,7 +37,7 @@ namespace FEEngine.Launcher
                     autoloadKey = gameFilename;
                 }
             }
-            var game = new Game("data/bindings.json");
+            var game = new Game(bindingsFile: "data/bindings.json");
             var player = new Player(game);
             var frame = new GameFrame(assemblies, game, player, autoloadKey);
             game.Renderer.Root = frame;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using FEEngine.Frontends;
 using FEEngine.Menus;
 
 namespace FEEngine
@@ -18,8 +19,10 @@ namespace FEEngine
         /// The index of the current <see cref="Map"/> that is being played
         /// </summary>
         public int CurrentMapIndex { get; set; }
-        public Game(string? bindingsFile = null)
+        public Game(string frontend = "Console", string? bindingsFile = null)
         {
+            mFrontend = Frontend.Create(frontend);
+            mInputManager = mFrontend.CreateInputManager();
             UIController.Init(this);
             PhaseManager = new(Unit.UnitAffiliation.Ally);
             mRenderer = new();
@@ -30,7 +33,7 @@ namespace FEEngine
             {
                 if (File.Exists(mKeyBindingsFile))
                 {
-                    InputManager.ReadBindings(mKeyBindingsFile);
+                    mInputManager.ReadBindings(mKeyBindingsFile);
                 }
             }
             SetupRegisters();
@@ -39,7 +42,7 @@ namespace FEEngine
         {
             if (mKeyBindingsFile != null)
             {
-                InputManager.WriteBindings(mKeyBindingsFile);
+                mInputManager.WriteBindings(mKeyBindingsFile);
             }
         }
         /// <summary>
@@ -55,13 +58,11 @@ namespace FEEngine
         /// <summary>
         /// The game's <see cref="FEEngine.Renderer"/>
         /// </summary>
-        public Renderer Renderer
-        {
-            get
-            {
-                return mRenderer;
-            }
-        }
+        public Renderer Renderer => mRenderer;
+        /// <summary>
+        /// The game's <see cref="FEEngine.InputManager"/>
+        /// </summary>
+        public InputManager InputManager => mInputManager;
         /// <summary>
         /// Starts the game loop
         /// </summary>
@@ -73,19 +74,13 @@ namespace FEEngine
             {
                 PhaseManager.CyclePhase(mapRegister[CurrentMapIndex]);
             }
-            while (true)
-            {
-                Update(player);
-                if (InputManager.GetState().Quit)
-                {
-                    break;
-                }
-                Render();
-            }
+            mFrontend.SetUpdateCallback(Update);
+            mFrontend.SetRenderCallback(Render);
+            mFrontend.Run(player);
         }
         private void Update(Player player)
         {
-            InputManager.Update();
+            mInputManager.Update();
             if (UIController.IsUnitContextMenuOpen)
             {
                 UIController.FindMenu<UnitContextMenu>()?.Update();
@@ -136,5 +131,7 @@ namespace FEEngine
         private readonly Registry mRegistry;
         private readonly string? mKeyBindingsFile;
         private readonly Renderer mRenderer;
+        private readonly InputManager mInputManager;
+        private readonly Frontend mFrontend;
     }
 }

@@ -34,7 +34,7 @@ namespace FEEngine.Menus
                 {
                     mCurrentSelection = mChildren.Count - 1;
                 }
-                InputManager.State state = InputManager.GetState();
+                InputManager.State state = this.VerifyValue(UIController.GameInstance).InputManager.GetState();
                 if (state.Up && mCurrentSelection > 0)
                 {
                     mCurrentSelection--;
@@ -132,7 +132,7 @@ namespace FEEngine.Menus
             protected override void UpdatePage()
             {
                 RefreshMenuItems();
-                InputManager.State state = InputManager.GetState();
+                InputManager.State state = this.VerifyValue(UIController.GameInstance).InputManager.GetState();
                 if (state.Back)
                 {
                     UIController.SelectedUnit?.Move(this.VerifyValue(mParent.OriginalUnitPosition), Unit.MovementType.RefundMovement);

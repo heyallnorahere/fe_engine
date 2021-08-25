@@ -108,7 +108,7 @@ namespace FEEngine.Launcher
         }
         private void Update()
         {
-            var state = InputManager.GetState();
+            var state = mGame.InputManager.GetState();
             if (mAssemblyIndex > 0 && state.Up)
             {
                 mAssemblyIndex--;

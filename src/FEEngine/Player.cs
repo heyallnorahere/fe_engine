@@ -39,7 +39,7 @@ namespace FEEngine
             {
                 Map.Player = this;
             }
-            InputManager.State state = InputManager.GetState();
+            InputManager.State state = mGame.InputManager.GetState();
             IVec2<int> dimensions = Map.Dimensions;
             CursorPosition = MathUtil.ClampVector(CursorPosition, new Vec2I(0), MathUtil.SubVectors(dimensions, new Vec2I(1)));
             if (mGame.PhaseManager.CurrentPhase == Unit.UnitAffiliation.Player)
