@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "FEEngine.Launcher": {
-      "commandName": "Project",
-      "workingDirectory": "$(SolutionDir)"
-    }
-  }
-}
