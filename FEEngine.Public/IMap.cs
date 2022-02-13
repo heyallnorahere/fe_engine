@@ -14,14 +14,27 @@
    limitations under the License.
 */
 
-using System.Runtime.CompilerServices;
-[assembly: InternalsVisibleTo("FEEngine")]
+using System.Collections.Generic;
 
-namespace FEEngine.Internal
+namespace FEEngine
 {
-    internal class DefaultFactory : Factory
+    public struct MapDesc : ICreationDesc
     {
-        protected override IMap? CreateMap(MapDesc desc) => new Map(desc);
-        protected override IUnit? CreateUnit(UnitDesc desc) => new Unit(desc);
+        /// <summary>
+        /// The size of this map. Must be at least 1x1.
+        /// </summary>
+        public Vector Size = (0, 0);
+        public string? DebugName = null;
+
+        public bool Verify() => Size.X >= 1 && Size.Y >= 1;
+    }
+
+    [FactoryInterface]
+    public interface IMap
+    {
+        public Vector Size { get; }
+        public string? DebugName { get; }
+
+        public IReadOnlyCollection<IUnit> Units { get; }
     }
 }

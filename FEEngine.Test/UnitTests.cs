@@ -1,4 +1,4 @@
-﻿/*
+/*
    Copyright 2022 Nora Beda
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +14,27 @@
    limitations under the License.
 */
 
-namespace FEEngine
+using Xunit;
+
+namespace FEEngine.Test
 {
-    public interface IFactory
+    public class UnitTests
     {
-        // nothing yet...
+        [Fact]
+        public void Creation()
+        {
+            var desc = new UnitDesc
+            {
+                Name = "Test Unit"
+            };
+
+            Factory? factory = Engine.GetFactory();
+            Assert.NotNull(factory);
+
+            var unit = factory?.Create<IUnit>(desc);
+            Assert.NotNull(unit);
+
+            Assert.Equal(unit?.Name, desc.Name);
+        }
     }
 }

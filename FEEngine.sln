@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FEEngine.Public", "FEEngine
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FEEngine.Internal", "FEEngine.Internal\FEEngine.Internal.csproj", "{77CB62AA-A2A3-4365-A29B-2FC2B0E965FA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FEEngine.Test", "FEEngine.Test\FEEngine.Test.csproj", "{274C2D27-E3A0-45CD-A3A5-0081B9D39A3F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{77CB62AA-A2A3-4365-A29B-2FC2B0E965FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77CB62AA-A2A3-4365-A29B-2FC2B0E965FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77CB62AA-A2A3-4365-A29B-2FC2B0E965FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{274C2D27-E3A0-45CD-A3A5-0081B9D39A3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{274C2D27-E3A0-45CD-A3A5-0081B9D39A3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{274C2D27-E3A0-45CD-A3A5-0081B9D39A3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{274C2D27-E3A0-45CD-A3A5-0081B9D39A3F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

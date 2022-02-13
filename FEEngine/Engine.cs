@@ -23,11 +23,11 @@ namespace FEEngine
     {
         static Engine()
         {
-            mFactories = new Dictionary<string, IFactory>();
+            mFactories = new Dictionary<string, Factory>();
             RegisterFactory<DefaultFactory>("Default");
         }
 
-        public static bool RegisterFactory<T>(string name) where T : IFactory, new()
+        public static bool RegisterFactory<T>(string name) where T : Factory, new()
         {
             if (mFactories.ContainsKey(name))
             {
@@ -38,9 +38,9 @@ namespace FEEngine
             return true;
         }
 
-        public static IFactory? GetFactory(string name = "Default")
+        public static Factory? GetFactory(string name = "Default")
         {
-            IFactory? factory = null;
+            Factory? factory = null;
             if (mFactories.ContainsKey(name))
             {
                 factory = mFactories[name];
@@ -49,6 +49,6 @@ namespace FEEngine
             return factory;
         }
 
-        private static readonly Dictionary<string, IFactory> mFactories;
+        private static readonly Dictionary<string, Factory> mFactories;
     }
 }
