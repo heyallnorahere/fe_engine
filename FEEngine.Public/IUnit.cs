@@ -23,6 +23,11 @@ namespace FEEngine
         /// </summary>
         public string? Name = null;
 
+        /// <summary>
+        /// The position at which this unit starts.
+        /// </summary>
+        public Vector StartingPosition = (0, 0);
+
         public bool Verify() => true;
     }
 
@@ -32,6 +37,25 @@ namespace FEEngine
     [FactoryInterface]
     public interface IUnit
     {
+        /// <summary>
+        /// The name of this unit.
+        /// </summary>
         public string? Name { get; }
+
+        /// <summary>
+        /// The position of this unit.
+        /// </summary>
+        public Vector Position { get; }
+
+        /// <summary>
+        /// The map that contains this unit.
+        /// </summary>
+        public IMap? Map { get; }
+
+        /// <summary>
+        /// Sets the map that contains this unit.
+        /// </summary>
+        /// <param name="map">The map to set.</param>
+        public void SetMap(IMap map);
     }
 }

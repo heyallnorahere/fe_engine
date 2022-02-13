@@ -23,14 +23,36 @@ namespace FEEngine.Internal
         public Map(MapDesc desc)
         {
             mDesc = desc;
-            mUnits = new HashSet<IUnit>();
+            mUnits = new List<IUnit>();
         }
 
+        public bool IsOutOfBounds(Vector point) => point.X >= mDesc.Size.X || point.Y >= mDesc.Size.Y;
         public Vector Size => mDesc.Size;
-        public string? DebugName => mDesc.DebugName;
-        public IReadOnlyCollection<IUnit> Units => mUnits;
+        public string? Name => mDesc.Name;
+
+        public int AddUnit(IUnit unit)
+        {
+            int index = mUnits.FindIndex(u => u == unit);
+            if (index != -1)
+            {
+                return index;
+            }
+
+            if (unit.Map != null || IsOutOfBounds(unit.Position))
+            {
+                return -1;
+            }
+
+            index = mUnits.Count;
+            mUnits.Add(unit);
+
+            unit.SetMap(this);
+            return index;
+        }
+
+        public IReadOnlyList<IUnit> Units => mUnits;
 
         private readonly MapDesc mDesc;
-        private readonly HashSet<IUnit> mUnits;
+        private readonly List<IUnit> mUnits;
     }
 }

@@ -24,7 +24,11 @@ namespace FEEngine
         /// The size of this map. Must be at least 1x1.
         /// </summary>
         public Vector Size = (0, 0);
-        public string? DebugName = null;
+
+        /// <summary>
+        /// The name of this map. Can be null.
+        /// </summary>
+        public string? Name = null;
 
         public bool Verify() => Size.X >= 1 && Size.Y >= 1;
     }
@@ -32,9 +36,26 @@ namespace FEEngine
     [FactoryInterface]
     public interface IMap
     {
+        /// <summary>
+        /// The size of this map.
+        /// </summary>
         public Vector Size { get; }
-        public string? DebugName { get; }
 
-        public IReadOnlyCollection<IUnit> Units { get; }
+        /// <summary>
+        /// The name of this map.
+        /// </summary>
+        public string? Name { get; }
+
+        /// <summary>
+        /// Adds a unit to this map.
+        /// </summary>
+        /// <param name="unit">The unit to add.</param>
+        /// <returns>The index of the added unit. Returns -1 if the function failed.</returns>
+        public int AddUnit(IUnit unit);
+
+        /// <summary>
+        /// The units contained by this map.
+        /// </summary>
+        public IReadOnlyList<IUnit> Units { get; }
     }
 }

@@ -28,10 +28,7 @@ namespace FEEngine.Test
                 Name = "Test Unit"
             };
 
-            Factory? factory = Engine.GetFactory();
-            Assert.NotNull(factory);
-
-            var unit = factory?.Create<IUnit>(desc);
+            var unit = Utilities.DefaultFactory.Create<IUnit>(desc);
             Assert.NotNull(unit);
 
             Assert.Equal(unit?.Name, desc.Name);

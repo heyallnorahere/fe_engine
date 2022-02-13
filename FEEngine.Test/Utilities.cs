@@ -14,25 +14,19 @@
    limitations under the License.
 */
 
-namespace FEEngine.Internal
+using System;
+
+namespace FEEngine.Test
 {
-    internal class Unit : IUnit
+    internal class Utilities
     {
-        public Unit(UnitDesc desc)
+        public static Factory DefaultFactory
         {
-            mName = desc.Name;
-            mPosition = desc.StartingPosition;
-            mMap = null;
+            get
+            {
+                Factory? factory = Engine.GetFactory();
+                return factory ?? throw new NullReferenceException("No default factory!");
+            }
         }
-
-        public string? Name => mName;
-        public Vector Position => mPosition;
-
-        public IMap? Map => mMap;
-        public void SetMap(IMap map) => mMap = map;
-
-        private readonly string? mName;
-        private Vector mPosition;
-        private IMap? mMap;
     }
 }
