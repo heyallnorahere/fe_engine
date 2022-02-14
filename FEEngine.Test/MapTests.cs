@@ -42,42 +42,32 @@ namespace FEEngine.Test
         }
 
         [Theory]
-        [InlineData(1, 1, 0, 0, true)]
-        [InlineData(2, 3, 1, 2, true)]
-        [InlineData(1, 1, 0, 1, false)]
-        [InlineData(1, 1, 1, 0, false)]
-        [InlineData(2, 1, 1, 1, false)]
-        public void UnitAdding(int width, int height, int x, int y, bool shouldSucceed)
+        [InlineData(2, 1, true)]
+        [InlineData(1, 2, true)]
+        [InlineData(10, 1, false)]
+        [InlineData(0, 10, false)]
+        public void MoveAction(int x, int y, bool succeeds)
         {
-            var mapDesc = new MapDesc
+            if (Utilities.SetupTestMap((10, 10), (0, 0), out IMap? map, out IUnit? unit))
             {
-                Size = (width, height),
-                Name = "Test Map"
-            };
+                map.AddUnit(unit);
 
-            var unitDesc = new UnitDesc
-            {
-                Name = "Test Unit",
-                StartingPosition = (x, y)
-            };
+                Vector offset = (x, y);
+                Vector newPosition = unit.Position + offset;
 
-            var factory = Utilities.DefaultFactory;
-            var map = factory.Create<IMap>(mapDesc);
-            var unit = factory.Create<IUnit>(unitDesc);
+                var action = Action.Create(Action.ID.Move, offset);
+                Assert.NotNull(action);
 
-            Assert.NotNull(map);
-            Assert.NotNull(unit);
-
-            if (map != null && unit != null)
-            {
-                int index = map.AddUnit(unit);
-                if (shouldSucceed)
+                if (action != null)
                 {
-                    Assert.NotEqual(index, -1);
-                }
-                else
-                {
-                    Assert.Equal(index, -1);
+                    unit.AddAction(action);
+                    bool succeeded = map.Flush();
+
+                    Assert.Equal(succeeds, succeeded);
+                    if (succeeded)
+                    {
+                        Assert.Equal(newPosition, unit.Position);
+                    }
                 }
             }
         }

@@ -15,6 +15,7 @@
 */
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FEEngine.Test
 {
@@ -27,6 +28,33 @@ namespace FEEngine.Test
                 Factory? factory = Engine.GetFactory();
                 return factory ?? throw new NullReferenceException("No default factory!");
             }
+        }
+
+        public static bool SetupTestMap(Vector size, Vector pos,
+            [NotNullWhen(true)] out IMap? map, [NotNullWhen(true)] out IUnit? unit)
+        {
+            var mapDesc = new MapDesc
+            {
+                Size = size,
+                Name = "Test Map"
+            };
+
+            var unitDesc = new UnitDesc
+            {
+                Name = "Test Unit",
+                StartingPosition = pos
+            };
+
+            var factory = DefaultFactory;
+            map = factory.Create<IMap>(mapDesc);
+            unit = factory.Create<IUnit>(unitDesc);
+
+            if (map != null && unit != null)
+            {
+                return map.AddUnit(unit) != -1;
+            }
+
+            return false;
         }
     }
 }

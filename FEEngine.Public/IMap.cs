@@ -32,10 +32,20 @@ namespace FEEngine
 
         public bool Verify() => Size.X >= 1 && Size.Y >= 1;
     }
-
+    
+    /// <summary>
+    /// A map is a grid of <see cref="IUnit"/>s.
+    /// </summary>
     [FactoryInterface]
     public interface IMap
     {
+        /// <summary>
+        /// Checks if a given point is out of bounds.
+        /// </summary>
+        /// <param name="point">The point to test.</param>
+        /// <returns>See above.</returns>
+        public bool IsOutOfBounds(Vector point);
+
         /// <summary>
         /// The size of this map.
         /// </summary>
@@ -57,5 +67,18 @@ namespace FEEngine
         /// The units contained by this map.
         /// </summary>
         public IReadOnlyList<IUnit> Units { get; }
+
+        /// <summary>
+        /// Pushes an action to be run when the map is flushed.
+        /// </summary>
+        /// <param name="action">The action to push.</param>
+        /// <returns>The index of the pushed action.</returns>
+        public int PushAction(Action action);
+
+        /// <summary>
+        /// Flushes the map and runs every action pushed by <see cref="PushAction(Action)"/>.
+        /// </summary>
+        /// <returns>If all actions succeeded. If no actions were pushed, returns true.</returns>
+        public bool Flush();
     }
 }

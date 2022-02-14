@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+using System;
 using System.Collections.Generic;
 
 namespace FEEngine.Internal
@@ -24,6 +25,7 @@ namespace FEEngine.Internal
         {
             mDesc = desc;
             mUnits = new List<IUnit>();
+            mActions = new List<Action>();
         }
 
         public bool IsOutOfBounds(Vector point) => point.X >= mDesc.Size.X || point.Y >= mDesc.Size.Y;
@@ -50,9 +52,52 @@ namespace FEEngine.Internal
             return index;
         }
 
+        public int PushAction(Action action)
+        {
+            int index = mActions.Count;
+            mActions.Add(action);
+            return index;
+        }
+
+        public bool Flush()
+        {
+            bool succeeded = true;
+
+            var units = new SortedDictionary<int, IUnit>();
+            foreach (IUnit unit in mUnits)
+            {
+                foreach (int index in unit.ActionIndices)
+                {
+                    if (units.ContainsKey(index))
+                    {
+                        throw new ArgumentException("An index appeared more than once!");
+                    }
+
+                    units.Add(index, unit);
+                }
+            }
+
+            foreach (int index in units.Keys)
+            {
+                Action action = mActions[index];
+                IUnit unit = units[index];
+
+                succeeded &= action.Invoke(unit);
+            }
+
+            mActions.Clear();
+            foreach (IUnit unit in units.Values)
+            {
+                unit.ClearActions();
+            }
+
+            return succeeded;
+        }
+
         public IReadOnlyList<IUnit> Units => mUnits;
 
         private readonly MapDesc mDesc;
         private readonly List<IUnit> mUnits;
+        private readonly List<Action> mActions;
     }
 }

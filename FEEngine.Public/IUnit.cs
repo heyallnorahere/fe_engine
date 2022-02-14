@@ -14,6 +14,8 @@
    limitations under the License.
 */
 
+using System.Collections.Generic;
+
 namespace FEEngine
 {
     public struct UnitDesc : ICreationDesc
@@ -45,7 +47,7 @@ namespace FEEngine
         /// <summary>
         /// The position of this unit.
         /// </summary>
-        public Vector Position { get; }
+        public Vector Position { get; set; }
 
         /// <summary>
         /// The map that contains this unit.
@@ -57,5 +59,21 @@ namespace FEEngine
         /// </summary>
         /// <param name="map">The map to set.</param>
         public void SetMap(IMap map);
+
+        /// <summary>
+        /// Adds an action to run when the map is flushed.
+        /// </summary>
+        /// <param name="action">The action to add.</param>
+        public bool AddAction(Action action);
+
+        /// <summary>
+        /// Resets <see cref="ActionIndices"/>.
+        /// </summary>
+        public void ClearActions();
+
+        /// <summary>
+        /// The index of the current action.
+        /// </summary>
+        public IReadOnlyList<int> ActionIndices { get; }
     }
 }

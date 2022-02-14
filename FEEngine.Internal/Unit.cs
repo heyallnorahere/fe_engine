@@ -14,6 +14,8 @@
    limitations under the License.
 */
 
+using System.Collections.Generic;
+
 namespace FEEngine.Internal
 {
     internal class Unit : IUnit
@@ -23,15 +25,36 @@ namespace FEEngine.Internal
             mName = desc.Name;
             mPosition = desc.StartingPosition;
             mMap = null;
+            mActionIndices = new List<int>();
         }
 
         public string? Name => mName;
-        public Vector Position => mPosition;
+        public Vector Position
+        {
+            get => mPosition;
+            set => mPosition = value;
+        }
 
         public IMap? Map => mMap;
         public void SetMap(IMap map) => mMap = map;
 
+        public bool AddAction(Action action)
+        {
+            if (mMap == null)
+            {
+                return false;
+            }
+
+            int index = mMap.PushAction(action);
+            mActionIndices.Add(index);
+            return true;
+        }
+
+        public void ClearActions() => mActionIndices.Clear();
+        public IReadOnlyList<int> ActionIndices => mActionIndices;
+
         private readonly string? mName;
+        private readonly List<int> mActionIndices;
         private Vector mPosition;
         private IMap? mMap;
     }
