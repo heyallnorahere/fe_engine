@@ -5,8 +5,4 @@
     <ProjectReference Include="..\FEEngine.Internal\FEEngine.Internal.csproj" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-  </PropertyGroup>
-
 </Project>
