@@ -19,9 +19,9 @@ using System.Collections.Generic;
 
 namespace FEEngine.Internal
 {
-    internal class Map : IMap
+    internal class DefaultMap : IMap
     {
-        public Map(MapDesc desc)
+        public DefaultMap(MapDesc desc)
         {
             mDesc = desc;
             mUnits = new List<IUnit>();

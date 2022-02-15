@@ -19,7 +19,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace FEEngine.Test
 {
-    internal class Utilities
+    internal static class Utilities
     {
         public static Factory DefaultFactory
         {

@@ -21,7 +21,8 @@ namespace FEEngine.Internal
 {
     internal class DefaultFactory : Factory
     {
-        protected override IMap? CreateMap(MapDesc desc) => new Map(desc);
-        protected override IUnit? CreateUnit(UnitDesc desc) => new Unit(desc);
+        protected override IMap? CreateMap(MapDesc desc) => new DefaultMap(desc);
+        protected override IUnit? CreateUnit(UnitDesc desc) => new DefaultUnit(desc);
+        protected override IItem? CreateItem(ItemDesc desc) => new DefaultItem(desc);
     }
 }

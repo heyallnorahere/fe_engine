@@ -18,9 +18,9 @@ using System.Collections.Generic;
 
 namespace FEEngine.Internal
 {
-    internal class Unit : IUnit
+    internal class DefaultUnit : IUnit
     {
-        public Unit(UnitDesc desc)
+        public DefaultUnit(UnitDesc desc)
         {
             mName = desc.Name;
             mPosition = desc.StartingPosition;

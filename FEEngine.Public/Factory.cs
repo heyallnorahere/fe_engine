@@ -39,6 +39,22 @@ namespace FEEngine
 
         public FactoryInterfaceAttribute(Type descType)
         {
+            if (descType.IsPrimitive)
+            {
+                throw new ArgumentException("An object description type must not be a primitive!");
+            }
+
+            if (!descType.IsValueType)
+            {
+                throw new ArgumentException("An object description type must be a struct!");
+            }
+
+            var interfaces = new List<Type>(descType.GetInterfaces());
+            if (!interfaces.Contains(typeof(ICreationDesc)))
+            {
+                throw new ArgumentException("All object description types must implement ICreationDesc!");
+            }
+
             DescType = descType;
         }
 
@@ -74,7 +90,17 @@ namespace FEEngine
                 descTypeName = type.Namespace + "." + descTypeName;
             }
 
-            return Type.GetType(descTypeName);
+            Type? descType = Type.GetType(descTypeName);
+            if (descType != null)
+            {
+                var interfaces = new List<Type>(descType.GetInterfaces());
+                if (interfaces.Contains(typeof(ICreationDesc)))
+                {
+                    return descType;
+                }
+            }
+
+            return null;
         }
 
         private delegate T? CreateDelegate<T, D>(D desc) where T : class where D : struct, ICreationDesc;
@@ -84,6 +110,7 @@ namespace FEEngine
 
             RegisterFactoryType<IMap, MapDesc>(CreateMap);
             RegisterFactoryType<IUnit, UnitDesc>(CreateUnit);
+            RegisterFactoryType<IItem, ItemDesc>(CreateItem);
         }
 
         private readonly Dictionary<Type, Delegate> mCreationFunctions;
@@ -134,5 +161,6 @@ namespace FEEngine
 
         protected abstract IMap? CreateMap(MapDesc desc);
         protected abstract IUnit? CreateUnit(UnitDesc desc);
+        protected abstract IItem? CreateItem(ItemDesc desc);
     }
 }
