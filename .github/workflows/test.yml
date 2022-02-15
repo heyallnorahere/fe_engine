@@ -5,20 +5,20 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet-version: [ 6.0.x, 5.0.x ]
+        dotnet-version: [ 6.0, 5.0 ]
     steps:
       - name: checkout repository
         uses: actions/checkout@v2
       - name: set up dotnet
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}
+          dotnet-version: ${{ matrix.dotnet-version }}.x
       - name: build
         shell: bash
         run: |
           dotnet restore
-          dotnet build -c Release
+          dotnet build -c Release -f net${{ matrix.dotnet-version }}
       - name: test
         shell: bash
         run: |
-          dotnet test -c Release
+          dotnet test -c Release -f net${{ matrix.dotnet-version }}
