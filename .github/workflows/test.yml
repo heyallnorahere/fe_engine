@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet-version: [ 6.0, 5.0 ]
+        dotnet-version: [ '6.0', '5.0' ]
     steps:
       - name: checkout repository
         uses: actions/checkout@v2
@@ -16,7 +16,7 @@ jobs:
       - name: build
         shell: bash
         run: |
-          dotnet restore
+          dotnet restore --use-current-runtime
           dotnet build -c Release -f net${{ matrix.dotnet-version }}
       - name: test
         shell: bash
