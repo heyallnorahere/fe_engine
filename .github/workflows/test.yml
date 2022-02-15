@@ -3,22 +3,21 @@ on: [ push ]
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        dotnet-version: [ '6.0', '5.0' ]
     steps:
       - name: checkout repository
         uses: actions/checkout@v2
       - name: set up dotnet
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}.x
+          dotnet-version: |
+            6.0.x
+            5.0.x
       - name: build
         shell: bash
         run: |
-          dotnet restore --use-current-runtime
-          dotnet build -c Release -f net${{ matrix.dotnet-version }}
+          dotnet restore
+          dotnet build -c Release
       - name: test
         shell: bash
         run: |
-          dotnet test -c Release -f net${{ matrix.dotnet-version }}
+          dotnet test -c Release
