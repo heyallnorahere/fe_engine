@@ -19,38 +19,51 @@ namespace FEEngine
     public delegate void ItemBehavior(IItem item, IUnit unit);
     public struct ItemData
     {
+        public ItemData()
+        {
+            Name = string.Empty;
+            Behavior = null;
+            MaxUses = 0;
+        }
+
         /// <summary>
         /// The name of this item. Cannot be empty.
         /// </summary>
-        public string Name = string.Empty;
+        public string Name;
 
         /// <summary>
         /// The delegate to be run when this item is used.
         /// Null behavior means this item cannot be used.
         /// </summary>
-        public ItemBehavior? Behavior = null;
+        public ItemBehavior? Behavior;
 
         /// <summary>
         /// The maximum number of times this item can be used.
         /// Must be greater than zero.
         /// </summary>
-        public int MaxUses = 0;
+        public int MaxUses;
 
         internal bool Verify() => Name.Length > 0 && MaxUses > 0;
     }
 
     public struct ItemDesc : ICreationDesc
     {
+        public ItemDesc()
+        {
+            Data = new ItemData();
+            UsesRemaining = 0;
+        }
+
         /// <summary>
         /// The data that describes how this item acts.
         /// </summary>
-        public ItemData Data = new ItemData();
+        public ItemData Data;
 
         /// <summary>
         /// The amount of uses this item starts with.
         /// If this field is less than or equal to zero, uses <see cref="ItemData.MaxUses"/>.
         /// </summary>
-        public int UsesRemaining = 0;
+        public int UsesRemaining;
 
         public bool Verify() => Data.Verify();
         public ICreationDesc Clone() => (ICreationDesc)MemberwiseClone();

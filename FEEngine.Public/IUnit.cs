@@ -20,15 +20,21 @@ namespace FEEngine
 {
     public struct UnitDesc : ICreationDesc
     {
+        public UnitDesc()
+        {
+            Name = null;
+            StartingPosition = (0, 0);
+        }
+
         /// <summary>
         /// The name of this unit. Can be null.
         /// </summary>
-        public string? Name = null;
+        public string? Name;
 
         /// <summary>
         /// The position at which this unit starts.
         /// </summary>
-        public Vector StartingPosition = (0, 0);
+        public Vector StartingPosition;
 
         public bool Verify() => true;
         public ICreationDesc Clone() => (ICreationDesc)MemberwiseClone();

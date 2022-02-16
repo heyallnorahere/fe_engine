@@ -20,15 +20,21 @@ namespace FEEngine
 {
     public struct MapDesc : ICreationDesc
     {
+        public MapDesc()
+        {
+            Size = (0, 0);
+            Name = null;
+        }
+
         /// <summary>
         /// The size of this map. Must be at least 1x1.
         /// </summary>
-        public Vector Size = (0, 0);
+        public Vector Size;
 
         /// <summary>
         /// The name of this map. Can be null.
         /// </summary>
-        public string? Name = null;
+        public string? Name;
 
         public bool Verify() => Size.X >= 1 && Size.Y >= 1;
         public ICreationDesc Clone() => (ICreationDesc)MemberwiseClone();
