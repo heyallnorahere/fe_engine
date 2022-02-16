@@ -31,6 +31,7 @@ namespace FEEngine
         public Vector StartingPosition = (0, 0);
 
         public bool Verify() => true;
+        public ICreationDesc Clone() => (ICreationDesc)MemberwiseClone();
     }
 
     /// <summary>

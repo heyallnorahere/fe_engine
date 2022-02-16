@@ -53,6 +53,7 @@ namespace FEEngine
         public int UsesRemaining = 0;
 
         public bool Verify() => Data.Verify();
+        public ICreationDesc Clone() => (ICreationDesc)MemberwiseClone();
     }
 
     /// <summary>
@@ -87,8 +88,8 @@ namespace FEEngine
         /// This <b>DOES NOT</b> invoke the item's behavior.
         /// </summary>
         /// <param name="uses">
-        ///     The amount of uses to subtract from <see cref="UsesRemaining"/>.
-        ///     Cannot be less than 1.
+        /// The amount of uses to subtract from <see cref="UsesRemaining"/>.
+        /// Cannot be less than 1.
         /// </param>
         /// <returns>If this item is to be removed from the unit's inventory.</returns>
         public bool OnItemUse(int uses = 1);

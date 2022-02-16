@@ -47,5 +47,40 @@ namespace FEEngine.Test
                 Assert.Equal(shouldBeUnusable, unusable);
             }
         }
+
+        [Theory]
+        [InlineData(5, 4)]
+        [InlineData(3, 3)]
+        [InlineData(7, 6)]
+        [InlineData(1, 1)]
+        public void Prototypes(int maxUses, int usesRemaining)
+        {
+            var desc = new ItemDesc
+            {
+                Data = new ItemData
+                {
+                    MaxUses = maxUses,
+                    Name = "Test Item"
+                }
+            };
+
+            var factory = Utilities.DefaultFactory;
+            var prototype = factory.CreatePrototype<IItem>(desc);
+            Assert.NotNull(prototype);
+
+            var item = prototype?.Instantiate((ref ICreationDesc desc) =>
+            {
+                if (desc is ItemDesc itemDesc)
+                {
+                    itemDesc.UsesRemaining = usesRemaining;
+                    desc = itemDesc;
+                }
+            });
+
+            Assert.NotNull(item);
+            Assert.Equal(desc.Data.Name, item?.Name);
+            Assert.Equal(maxUses, item?.MaxUses);
+            Assert.Equal(usesRemaining, item?.UsesRemaining);
+        }
     }
 }

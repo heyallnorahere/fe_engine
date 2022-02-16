@@ -31,6 +31,7 @@ namespace FEEngine
         public string? Name = null;
 
         public bool Verify() => Size.X >= 1 && Size.Y >= 1;
+        public ICreationDesc Clone() => (ICreationDesc)MemberwiseClone();
     }
     
     /// <summary>
