@@ -19,6 +19,68 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace FEEngine
 {
+    public struct UnitStats
+    {
+        public UnitStats()
+        {
+            Movement = 5;
+            Level = HP = 1;
+            Strength = Magic = Speed = Dexterity = 0;
+            Defense = Resistance = Charm = 0;
+        }
+
+        /// <summary>
+        /// How many tiles this unit can move in one turn.
+        /// </summary>
+        public int Movement;
+
+        /// <summary>
+        /// A measure of unit growth.
+        /// </summary>
+        public int Level;
+
+        /// <summary>
+        /// A "hit point."
+        /// https://fireemblemwiki.org/wiki/Hit_point
+        /// </summary>
+        public int HP;
+
+        /// <summary>
+        /// Aids a unit's ability to deal physical damage.
+        /// </summary>
+        public int Strength;
+
+        /// <summary>
+        /// Aids a unit's ability to deal magical damage.
+        /// </summary>
+        public int Magic;
+
+        /// <summary>
+        /// May allow a unit to strike twice against a target.
+        /// </summary>
+        public int Speed;
+
+        /// <summary>
+        /// Also known as "skill." Allows a unit to hit more accurately.
+        /// </summary>
+        public int Dexterity;
+
+        /// <summary>
+        /// Protects a unit against physical damage.
+        /// </summary>
+        public int Defense;
+
+        /// <summary>
+        /// Protects a unit against magical damage.
+        /// </summary>
+        public int Resistance;
+
+        /// <summary>
+        /// Allows a unit to rally battalions more effectively.
+        /// </summary>
+        public int Charm;
+    }
+
     public struct UnitDesc : ICreationDesc
     {
         public UnitDesc()
@@ -27,6 +89,7 @@ namespace FEEngine
             InitialInventory = null;
             EquippedWeapon = null;
             StartingPosition = (0, 0);
+            Stats = new UnitStats();
         }
 
         /// <summary>
@@ -48,6 +111,11 @@ namespace FEEngine
         /// The position at which this unit starts.
         /// </summary>
         public Vector StartingPosition;
+
+        /// <summary>
+        /// The initial stats of this unit.
+        /// </summary>
+        public UnitStats Stats;
 
         public bool Verify() => true;
         public ICreationDesc Clone() => (ICreationDesc)MemberwiseClone();
@@ -138,5 +206,16 @@ namespace FEEngine
         /// A list of items that this unit has possesion of.
         /// </summary>
         public IReadOnlyList<IItem> Inventory { get; }
+
+        /// <summary>
+        /// How much HP this unit has left.
+        /// This unit should be removed from the map once this value reaches 0.
+        /// </summary>
+        public int HP { get; set; }
+
+        /// <summary>
+        /// Various stats that define this unit's combat behavior.
+        /// </summary>
+        public UnitStats Stats { get; set; }
     }
 }

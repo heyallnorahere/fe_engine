@@ -23,7 +23,7 @@ namespace FEEngine.Internal
         public DefaultUnit(UnitDesc desc)
         {
             Name = desc.Name;
-            mPosition = desc.StartingPosition;
+            Position = desc.StartingPosition;
             mMap = null;
             mActionIndices = new List<int>();
             mEquippedWeapon = desc.EquippedWeapon;
@@ -33,14 +33,13 @@ namespace FEEngine.Internal
             {
                 mInventory.AddRange(desc.InitialInventory);
             }
+
+            Stats = desc.Stats;
+            HP = Stats.HP;
         }
 
         public string? Name { get; }
-        public Vector Position
-        {
-            get => mPosition;
-            set => mPosition = value;
-        }
+        public Vector Position { get; set; }
 
         public IMap? Map => mMap;
         public void SetMap(IMap map) => mMap = map;
@@ -124,10 +123,12 @@ namespace FEEngine.Internal
         public IItem? EquippedWeapon => mEquippedWeapon;
         public IReadOnlyList<IItem> Inventory => mInventory;
 
+        public int HP { get; set; }
+        public UnitStats Stats { get; set; }
+
         private IItem? mEquippedWeapon;
         private readonly List<IItem> mInventory;
         private readonly List<int> mActionIndices;
-        private Vector mPosition;
         private IMap? mMap;
     }
 }

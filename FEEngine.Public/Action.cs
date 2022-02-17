@@ -34,7 +34,9 @@ namespace FEEngine
                 if (data is Vector offset)
                 {
                     var newPosition = unit.Position + offset;
-                    if (unit.Map.IsOutOfBounds(newPosition))
+                    int movement = unit.Stats.Movement;
+
+                    if (unit.Map.IsOutOfBounds(newPosition) || newPosition.TaxicabLength > movement)
                     {
                         return false;
                     }
