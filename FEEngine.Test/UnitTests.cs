@@ -81,5 +81,50 @@ namespace FEEngine.Test
                 }
             }
         }
+
+        [Fact]
+        public void Inventory()
+        {
+            var unitDesc = new UnitDesc
+            {
+                Name = "Test Unit",
+            };
+
+            var itemDesc = new ItemDesc
+            {
+                Data = new ItemData
+                {
+                    Name = "Iron Sword",
+                    MaxUses = 40,
+                    WeaponData = new WeaponData
+                    {
+                        Might = 5,
+                        Weight = 5,
+                        Hit = 90,
+                        Crit = 0,
+                        MinRange = 1,
+                        MaxRange = 1,
+                        Type = WeaponType.Sword
+                    }
+                }
+            };
+
+            var factory = Utilities.DefaultFactory;
+            var unit = factory.Create<IUnit>(unitDesc);
+            var item = factory.Create<IItem>(itemDesc);
+
+            Assert.NotNull(unit);
+            Assert.NotNull(item);
+
+            if (unit != null && item != null)
+            {
+                int inventoryIndex = unit.AddItemToInventory(item);
+                Assert.NotEqual(-1, inventoryIndex);
+                Assert.Equal(item, unit.Inventory[inventoryIndex]);
+
+                Assert.True(unit.EquipWeapon(inventoryIndex));
+                Assert.Equal(item, unit.EquippedWeapon);
+            }
+        }
     }
 }

@@ -17,12 +17,87 @@
 namespace FEEngine
 {
     public delegate void ItemBehavior(IItem item, IUnit unit);
+
+    public enum WeaponType
+    {
+        None,
+        Sword,
+        Axe,
+        Lance,
+        Bow,
+        Gauntlets,
+        Magic
+    }
+
+    public struct WeaponData
+    {
+        public WeaponData()
+        {
+            Might = Weight = Hit = Crit = MinRange = MaxRange = -1;
+            Type = WeaponType.None;
+        }
+
+        /// <summary>
+        /// How much damage this weapon deals on its own.
+        /// Must be greater than 0.
+        /// </summary>
+        public int Might;
+
+        /// <summary>
+        /// How much this weapon slows down the unit.
+        /// Must be greater than 0.
+        /// </summary>
+        public int Weight;
+
+        /// <summary>
+        /// The base hit chance.
+        /// Must be greater than 0 and less than or equal to 100.
+        /// </summary>
+        public int Hit;
+
+        /// <summary>
+        /// The chance of triggering a critical hit.
+        /// Must be greater than or equal to 0 and less than or equal to 100.
+        /// </summary>
+        public int Crit;
+
+        /// <summary>
+        /// The minimum amount of tiles between the user and the target for this weapon to be used.
+        /// Must be greater than 0, and less than or equal to <see cref="MaxRange"/>.
+        /// </summary>
+        public int MinRange;
+
+        /// <summary>
+        /// The maximum amount of tiles between the user and the target for this weapon to be used.
+        /// Must be greater than 0, and greater than or equal to <see cref="MinRange"/>.
+        /// </summary>
+        public int MaxRange;
+
+        /// <summary>
+        /// The type of this weapon. Cannot be <see cref="WeaponType.None"/>.
+        /// </summary>
+        public WeaponType Type;
+
+        internal bool Verify()
+        {
+            return Might > 0 &&
+                Weight > 0 &&
+                Hit > 0 && Hit <= 100 &&
+                Crit >= 0 && Crit <= 100 &&
+                MinRange > 0 &&
+                MaxRange > 0 &&
+                MaxRange >= MinRange &&
+                Type != WeaponType.None;
+        }
+    }
+
     public struct ItemData
     {
         public ItemData()
         {
             Name = string.Empty;
             Behavior = null;
+            WeaponData = null;
             MaxUses = 0;
         }
 
@@ -34,8 +109,16 @@ namespace FEEngine
         /// <summary>
         /// The delegate to be run when this item is used.
         /// Null behavior means this item cannot be used.
+        /// However, if this is not null, <see cref="WeaponData"/> must be null.
         /// </summary>
         public ItemBehavior? Behavior;
+
+        /// <summary>
+        /// This field describes how this item acts as a weapon.
+        /// Null weapon data means this item is not a weapon.
+        /// However, if this is not null, <see cref="Behavior"/> must be null.
+        /// </summary>
+        public WeaponData? WeaponData;
 
         /// <summary>
         /// The maximum number of times this item can be used.
@@ -43,7 +126,33 @@ namespace FEEngine
         /// </summary>
         public int MaxUses;
 
-        internal bool Verify() => Name.Length > 0 && MaxUses > 0;
+        internal bool Verify()
+        {
+            bool itemTypeDetermined = false;
+            foreach (var item in new object?[]
+            {
+                Behavior,
+                WeaponData
+            })
+            {
+                if (item != null)
+                {
+                    if (itemTypeDetermined)
+                    {
+                        return false;
+                    }
+
+                    if (item is WeaponData weaponData && !weaponData.Verify())
+                    {
+                        return false;
+                    }
+
+                    itemTypeDetermined = true;
+                }
+            }
+
+            return Name.Length > 0 && MaxUses > 0 && (WeaponData?.Verify() ?? true);
+        }
     }
 
     public struct ItemDesc : ICreationDesc
@@ -87,6 +196,12 @@ namespace FEEngine
         public ItemBehavior? Behavior { get; }
 
         /// <summary>
+        /// The data that describes how this weapon acts.
+        /// If this property is null, this item is not a weapon.
+        /// </summary>
+        public WeaponData? WeaponData { get; }
+
+        /// <summary>
         /// The maximum amount of times this item can be used.
         /// </summary>
         public int MaxUses { get; }
@@ -95,6 +210,11 @@ namespace FEEngine
         /// This property represents many uses remaining until this item is rendered unusable.
         /// </summary>
         public int UsesRemaining { get; }
+
+        /// <summary>
+        /// The unit that owns this item.
+        /// </summary>
+        public IUnit? Owner { get; set; }
 
         /// <summary>
         /// This function is called when this item is used.

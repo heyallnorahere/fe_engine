@@ -15,6 +15,7 @@
 */
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FEEngine
 {
@@ -23,6 +24,8 @@ namespace FEEngine
         public UnitDesc()
         {
             Name = null;
+            InitialInventory = null;
+            EquippedWeapon = null;
             StartingPosition = (0, 0);
         }
 
@@ -30,6 +33,16 @@ namespace FEEngine
         /// The name of this unit. Can be null.
         /// </summary>
         public string? Name;
+
+        /// <summary>
+        /// The items that this unit starts with. Can be null.
+        /// </summary>
+        public IList<IItem>? InitialInventory;
+
+        /// <summary>
+        /// The weapon that this unit starts with equipped.
+        /// </summary>
+        public IItem? EquippedWeapon;
 
         /// <summary>
         /// The position at which this unit starts.
@@ -65,6 +78,7 @@ namespace FEEngine
         /// Sets the map that contains this unit.
         /// </summary>
         /// <param name="map">The map to set.</param>
+        [MemberNotNull(nameof(Map))]
         public void SetMap(IMap map);
 
         /// <summary>
@@ -82,5 +96,47 @@ namespace FEEngine
         /// The index of the current action.
         /// </summary>
         public IReadOnlyList<int> ActionIndices { get; }
+
+        /// <summary>
+        /// Equips a weapon present in the inventory to <see cref="EquippedWeapon"/>.
+        /// If a weapon is already equipped it will be unequipped.
+        /// </summary>
+        /// <param name="index">The index of the weapon. in the unit's inventory.</param>
+        /// <returns>If the unit was able to equip the weapon.</returns>
+        [MemberNotNullWhen(true, nameof(EquippedWeapon))]
+        public bool EquipWeapon(int index);
+
+        /// <summary>
+        /// Unequips the item in <see cref="EquippedWeapon"/> to the inventory.
+        /// </summary>
+        /// <returns>
+        /// The index of the item in the inventory,
+        /// or -1 if <see cref="EquippedWeapon"/> is null.
+        /// </returns>
+        public int UnequipWeapon();
+
+        /// <summary>
+        /// Adds an item to <see cref="Inventory"/>.
+        /// </summary>
+        /// <param name="item">The item to add.</param>
+        /// <returns>The index of the added item.</returns>
+        public int AddItemToInventory(IItem item);
+
+        /// <summary>
+        /// Removes an item from <see cref="Inventory"/>.
+        /// </summary>
+        /// <param name="index">The index at which to remove an item.</param>
+        /// <returns>The item removed, or null if that index does not exist.</returns>
+        public IItem? RemoveItemFromInventory(int index);
+
+        /// <summary>
+        /// The weapon currently equipped.
+        /// </summary>
+        public IItem? EquippedWeapon { get; }
+
+        /// <summary>
+        /// A list of items that this unit has possesion of.
+        /// </summary>
+        public IReadOnlyList<IItem> Inventory { get; }
     }
 }

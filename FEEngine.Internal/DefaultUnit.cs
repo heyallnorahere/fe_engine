@@ -22,13 +22,20 @@ namespace FEEngine.Internal
     {
         public DefaultUnit(UnitDesc desc)
         {
-            mName = desc.Name;
+            Name = desc.Name;
             mPosition = desc.StartingPosition;
             mMap = null;
             mActionIndices = new List<int>();
+            mEquippedWeapon = desc.EquippedWeapon;
+
+            mInventory = new List<IItem>();
+            if (desc.InitialInventory != null)
+            {
+                mInventory.AddRange(desc.InitialInventory);
+            }
         }
 
-        public string? Name => mName;
+        public string? Name { get; }
         public Vector Position
         {
             get => mPosition;
@@ -53,7 +60,72 @@ namespace FEEngine.Internal
         public void ClearActions() => mActionIndices.Clear();
         public IReadOnlyList<int> ActionIndices => mActionIndices;
 
-        private readonly string? mName;
+        public bool EquipWeapon(int index)
+        {
+            if (index < 0 || index >= mInventory.Count)
+            {
+                return false;
+            }
+
+            IItem weapon = mInventory[index];
+            if (weapon.WeaponData == null)
+            {
+                return false;
+            }
+
+            mInventory.RemoveAt(index);
+            if (mEquippedWeapon != null)
+            {
+                mInventory.Add(mEquippedWeapon);
+            }
+
+            mEquippedWeapon = weapon;
+            return true;
+        }
+
+        public int UnequipWeapon()
+        {
+            if (mEquippedWeapon == null)
+            {
+                return -1;
+            }
+
+            int index = mInventory.Count;
+            mInventory.Add(mEquippedWeapon);
+            mEquippedWeapon = null;
+            return index;
+        }
+
+        public int AddItemToInventory(IItem item)
+        {
+            if (item.Owner != null)
+            {
+                return -1;
+            }
+
+            item.Owner = this;
+            int index = mInventory.Count;
+            mInventory.Add(item);
+            return index;
+        }
+
+        public IItem? RemoveItemFromInventory(int index)
+        {
+            if (index < 0 || index > mInventory.Count)
+            {
+                return null;
+            }
+
+            IItem item = mInventory[index];
+            mInventory.RemoveAt(index);
+            return item;
+        }
+
+        public IItem? EquippedWeapon => mEquippedWeapon;
+        public IReadOnlyList<IItem> Inventory => mInventory;
+
+        private IItem? mEquippedWeapon;
+        private readonly List<IItem> mInventory;
         private readonly List<int> mActionIndices;
         private Vector mPosition;
         private IMap? mMap;

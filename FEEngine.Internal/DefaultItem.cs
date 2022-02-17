@@ -24,6 +24,7 @@ namespace FEEngine.Internal
         {
             Name = desc.Data.Name;
             Behavior = desc.Data.Behavior;
+            WeaponData = desc.Data.WeaponData;
             MaxUses = desc.Data.MaxUses;
             
             int usesRemaining = desc.UsesRemaining;
@@ -32,8 +33,10 @@ namespace FEEngine.Internal
 
         public string Name { get; }
         public ItemBehavior? Behavior { get; }
+        public WeaponData? WeaponData { get; }
         public int MaxUses { get; }
         public int UsesRemaining => mUsesRemaining;
+        public IUnit? Owner { get; set; }
 
         public bool OnItemUse(int uses)
         {
