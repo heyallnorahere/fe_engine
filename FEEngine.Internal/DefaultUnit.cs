@@ -126,6 +126,28 @@ namespace FEEngine.Internal
         public int HP { get; set; }
         public UnitStats Stats { get; set; }
 
+        public bool UseItem(int index)
+        {
+            if (index < 0 || index >= mInventory.Count)
+            {
+                return false;
+            }
+
+            IItem item = mInventory[index];
+            if (item.Behavior == null)
+            {
+                return false;
+            }
+
+            item.Behavior(item, this);
+            if (item.OnItemUse())
+            {
+                mInventory.RemoveAt(index);
+            }
+
+            return true;
+        }
+
         private IItem? mEquippedWeapon;
         private readonly List<IItem> mInventory;
         private readonly List<int> mActionIndices;

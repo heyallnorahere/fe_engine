@@ -26,7 +26,7 @@ namespace FEEngine
             Movement = 5;
             Level = HP = 1;
             Strength = Magic = Speed = Dexterity = 0;
-            Defense = Resistance = Charm = 0;
+            Defense = Resistance = Luck = Charm = 0;
         }
 
         /// <summary>
@@ -74,6 +74,11 @@ namespace FEEngine
         /// Protects a unit against magical damage.
         /// </summary>
         public int Resistance;
+
+        /// <summary>
+        /// How lucky this unit is. Helps with critical hit/avoid rates and magic hit rates.
+        /// </summary>
+        public int Luck;
 
         /// <summary>
         /// Allows a unit to rally battalions more effectively.
@@ -217,5 +222,12 @@ namespace FEEngine
         /// Various stats that define this unit's combat behavior.
         /// </summary>
         public UnitStats Stats { get; set; }
+
+        /// <summary>
+        /// Uses an item in the unit's <see cref="Inventory">inventory</see>.
+        /// </summary>
+        /// <param name="index">The index of the item in said inventory.</param>
+        /// <returns>If the item was successfully used.</returns>
+        public bool UseItem(int index);
     }
 }
