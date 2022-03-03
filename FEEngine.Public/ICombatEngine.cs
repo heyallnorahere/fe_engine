@@ -96,14 +96,34 @@ namespace FEEngine
         public int Crit;
 
         /// <summary>
-        /// The attacking unit.
+        /// If this attack is a counter.
         /// </summary>
-        public IUnit Attacker;
+        public bool Counter;
+    }
+
+    public struct RoundData
+    {
+        /// <summary>
+        /// The data describing the attacking unit.
+        /// </summary>
+        public UnitCombatData Attacker;
 
         /// <summary>
-        /// The unit being attacked.
+        /// The data describing the defending unit.
         /// </summary>
-        public IUnit Target;
+        public UnitCombatData Target;
+
+        /// <summary>
+        /// A list of objects describing strikes.
+        /// Is not iterated on by the interpreter.
+        /// See <see cref="Indices"/>.
+        /// </summary>
+        public IReadOnlyList<AttackData> Data;
+
+        /// <summary>
+        /// Indices of elements in <see cref="Data"/> to be executed by the interpreter.
+        /// </summary>
+        public IReadOnlyList<int> Indices;
     }
 
     public struct CombatResult
@@ -116,7 +136,12 @@ namespace FEEngine
         /// <summary>
         /// If the attack hit.
         /// </summary>
-        public bool AttackHit;
+        public bool DidHit;
+
+        /// <summary>
+        /// If the attack hit a critical hit (3x damage).
+        /// </summary>
+        public bool DidCrit;
     }
 
     /// <summary>
@@ -147,7 +172,7 @@ namespace FEEngine
         /// If the initiating unit can attack the target, returns the calculated data.
         /// Otherwise, returns null.
         /// </returns>
-        public IReadOnlyList<AttackData>? Calculate(UnitCombatData attackerData, UnitCombatData targetData);
+        public RoundData? Calculate(UnitCombatData attackerData, UnitCombatData targetData);
 
         /// <summary>
         /// Executes an attack between two units.
