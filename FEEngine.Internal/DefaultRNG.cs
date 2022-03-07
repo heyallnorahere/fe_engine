@@ -20,6 +20,9 @@ namespace FEEngine.Internal
 {
     internal class DefaultRNG : IRandomNumberGenerator
     {
+        public const int Min = 0;
+        public const int Max = 99;
+
         public DefaultRNG(RandomNumberGeneratorDesc desc)
         {
             if (desc.Seed >= 0)
@@ -34,15 +37,20 @@ namespace FEEngine.Internal
 
         public bool HitChance(int displayedPercentage)
         {
-            // todo: true hit
-            return true;
+            int rn1 = Generate();
+            int rn2 = Generate();
+
+            int avg = (rn1 + rn2) / 2;
+            return avg < displayedPercentage;
         }
 
         public bool CritChance(int displayedPercentage)
         {
-            int result = mRandom.Next(0, 100);
-            return result <= displayedPercentage;
+            int result = Generate();
+            return result < displayedPercentage;
         }
+
+        private int Generate() => mRandom.Next(Min, Max);
 
         private readonly Random mRandom;
     }

@@ -34,15 +34,6 @@ namespace FEEngine.Test
             ItemPrototypes = ManifestItemParser.Load(assembly, factory);
         }
 
-        public static Factory DefaultFactory
-        {
-            get
-            {
-                Factory? factory = Engine.GetFactory();
-                return factory ?? throw new NullReferenceException("No default factory!");
-            }
-        }
-
         public static IReadOnlyDictionary<string, FactoryPrototype<IItem>> ItemPrototypes { get; }
 
         public static bool SetupTestMap(Vector size, Vector pos,
@@ -60,9 +51,9 @@ namespace FEEngine.Test
                 StartingPosition = pos
             };
 
-            var factory = DefaultFactory;
-            map = factory.Create<IMap>(mapDesc);
-            unit = factory.Create<IUnit>(unitDesc);
+            var factory = Engine.GetFactory();
+            map = factory?.Create<IMap>(mapDesc);
+            unit = factory?.Create<IUnit>(unitDesc);
 
             if (map != null && unit != null)
             {

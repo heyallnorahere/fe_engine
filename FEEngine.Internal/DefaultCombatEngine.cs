@@ -124,10 +124,18 @@ namespace FEEngine.Internal
             {
                 data.Hit = 0;
             }
+            else if (data.Hit > 100)
+            {
+                data.Hit = 100;
+            }
 
             if (data.Crit < 0)
             {
                 data.Crit = 0;
+            }
+            else if (data.Crit > 100)
+            {
+                data.Crit = 100;
             }
 
             return data;
@@ -248,17 +256,24 @@ namespace FEEngine.Internal
             {
                 DamageDealt = 0,
                 DidHit = mRNG.HitChance(data.Hit),
-                DidCrit = false
+                DidCrit = false,
+                DidKill = false
             };
             
             if (result.DidHit)
             {
                 result.DamageDealt = data.Damage;
-                result.DidCrit = mRNG.CritChance(data.Crit);
 
+                result.DidCrit = mRNG.CritChance(data.Crit);
                 if (result.DidCrit)
                 {
                     result.DamageDealt *= 3;
+                }
+
+                target.Unit.HP -= result.DamageDealt;
+                if (target.Unit.HP <= 0)
+                {
+                    result.DidKill = true;
                 }
             }
 

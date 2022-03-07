@@ -34,7 +34,8 @@ namespace FEEngine.Test
                 Name = "Test Map"
             };
 
-            var map = Utilities.DefaultFactory.Create<IMap>(desc);
+            var factory = Engine.GetFactory();
+            var map = factory?.Create<IMap>(desc);
             Assert.NotNull(map);
 
             Assert.Equal(map?.Size, desc.Size);

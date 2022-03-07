@@ -37,7 +37,8 @@ namespace FEEngine.Test
                 }
             };
 
-            var item = Utilities.DefaultFactory.Create<IItem>(desc);
+            var factory = Engine.GetFactory();
+            var item = factory?.Create<IItem>(desc);
             Assert.NotNull(item);
 
             if (item != null)
@@ -64,8 +65,8 @@ namespace FEEngine.Test
                 }
             };
 
-            var factory = Utilities.DefaultFactory;
-            var prototype = factory.CreatePrototype<IItem>(desc);
+            var factory = Engine.GetFactory();
+            var prototype = factory?.CreatePrototype<IItem>(desc);
             Assert.NotNull(prototype);
 
             var item = prototype?.Instantiate((ref ICreationDesc desc) =>

@@ -32,7 +32,8 @@ namespace FEEngine.Test
                 StartingPosition = (x, y)
             };
 
-            var unit = Utilities.DefaultFactory.Create<IUnit>(desc);
+            var factory = Engine.GetFactory();
+            var unit = factory?.Create<IUnit>(desc);
             Assert.NotNull(unit);
 
             Assert.Equal(desc.Name, unit?.Name);
@@ -59,9 +60,9 @@ namespace FEEngine.Test
                 StartingPosition = (x, y)
             };
 
-            var factory = Utilities.DefaultFactory;
-            var map = factory.Create<IMap>(mapDesc);
-            var unit = factory.Create<IUnit>(unitDesc);
+            var factory = Engine.GetFactory();
+            var map = factory?.Create<IMap>(mapDesc);
+            var unit = factory?.Create<IUnit>(unitDesc);
 
             Assert.NotNull(map);
             Assert.NotNull(unit);
@@ -109,8 +110,8 @@ namespace FEEngine.Test
                 }
             };
 
-            var factory = Utilities.DefaultFactory;
-            var unit = factory.Create<IUnit>(unitDesc);
+            var factory = Engine.GetFactory();
+            var unit = factory?.Create<IUnit>(unitDesc);
 
             var prototype = Utilities.ItemPrototypes["iron-sword"];
             var item = prototype.Instantiate();

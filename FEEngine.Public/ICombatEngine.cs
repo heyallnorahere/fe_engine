@@ -147,6 +147,11 @@ namespace FEEngine
         /// If the attack hit a critical hit (3x damage).
         /// </summary>
         public bool DidCrit;
+
+        /// <summary>
+        /// If the attack killed the target.
+        /// </summary>
+        public bool DidKill;
     }
 
     /// <summary>
@@ -184,6 +189,8 @@ namespace FEEngine
         /// Executes an attack between two units.
         /// </summary>
         /// <param name="data">The data describing a strike from the attacker.</param>
+        /// <param name="attacker">The data describing the attacking unit.</param>
+        /// <param name="target">The data describing the target unit.</param>
         /// <returns>
         /// The result of the attacking unit's strike, or null if the data was invalid.
         /// </returns>

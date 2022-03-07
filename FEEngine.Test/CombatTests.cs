@@ -127,5 +127,86 @@ namespace FEEngine.Test
             Assert.Equal(validPrt, effectiveStatValues["Prt"]);
             Assert.Equal(validRsl, effectiveStatValues["Rsl"]);
         }
+
+        [Fact]
+        public void Combat()
+        {
+            var mapDesc = new MapDesc
+            {
+                Size = (2, 1),
+                Name = "Test Map"
+            };
+
+            var stats = new UnitStats
+            {
+                Movement = 5,
+                Level = 1,
+                HP = 20,
+                Strength = 10,
+                Magic = 0,
+                Speed = 7,
+                Dexterity = 12,
+                Defense = 8,
+                Resistance = 6,
+                Luck = 2,
+                Charm = 0
+            };
+
+            Factory? factory = Engine.GetFactory();
+            IMap? map = factory!.Create<IMap>(mapDesc);
+            Assert.NotNull(map);
+
+            var prototype = Utilities.ItemPrototypes["iron-sword"];
+            for (int i = 0; i < map.Size.X; i++)
+            {
+                var unitDesc = new UnitDesc
+                {
+                    Name = $"Soldier {i + 1}",
+                    EquippedWeapon = prototype.Instantiate(),
+                    StartingPosition = (i, 0),
+                    Stats = stats
+                };
+
+                IUnit? unit = factory.Create<IUnit>(unitDesc);
+                Assert.NotNull(unit);
+
+                int index = map!.AddUnit(unit!);
+                Assert.NotEqual(-1, index);
+            }
+
+            IUnit attacker = map.Units[0];
+            IUnit target = map.Units[1];
+
+            var combatEngineDesc = new CombatEngineDesc
+            {
+                RNG = new TestRNG(false)
+            };
+
+            ICombatEngine? combatEngine = factory.Create<ICombatEngine>(combatEngineDesc);
+            Assert.NotNull(combatEngine);
+
+            var attackerData = combatEngine!.GetCombatData(attacker);
+            var targetData = combatEngine.GetCombatData(target);
+
+            var roundData = combatEngine.Calculate(attackerData, targetData);
+            Assert.NotNull(roundData);
+
+            Assert.Equal(attackerData, roundData!.Value.Attacker);
+            Assert.Equal(targetData, roundData.Value.Target);
+
+            Assert.Equal(2, roundData.Value.Indices.Count);
+            Assert.Equal(2, roundData.Value.Data.Count);
+
+            foreach (int index in roundData.Value.Indices)
+            {
+                var data = roundData.Value.Data[index];
+                var result = combatEngine.Execute(data, attackerData, targetData);
+
+                Assert.NotNull(result);
+                Assert.True(result!.Value.DidHit);
+                Assert.False(result.Value.DidCrit);
+                Assert.False(result.Value.DidKill);
+            }
+        }
     }
 }
