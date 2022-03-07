@@ -174,7 +174,7 @@ namespace FEEngine
         /// </summary>
         public int UsesRemaining;
 
-        public bool Verify() => Data.Verify();
+        public bool Verify() => Data.Verify() && UsesRemaining <= Data.MaxUses;
         public ICreationDesc Clone() => (ICreationDesc)MemberwiseClone();
     }
 

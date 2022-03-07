@@ -15,12 +15,25 @@
 */
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace FEEngine.Test
 {
     internal static class Utilities
     {
+        static Utilities()
+        {
+            Factory? factory = Engine.GetFactory();
+            if (factory == null)
+            {
+                throw new Exception("No default factory exists!");
+            }
+
+            var assembly = typeof(Utilities).Assembly;
+            ItemPrototypes = ManifestItemParser.Load(assembly, factory);
+        }
+
         public static Factory DefaultFactory
         {
             get
@@ -29,6 +42,8 @@ namespace FEEngine.Test
                 return factory ?? throw new NullReferenceException("No default factory!");
             }
         }
+
+        public static IReadOnlyDictionary<string, FactoryPrototype<IItem>> ItemPrototypes { get; }
 
         public static bool SetupTestMap(Vector size, Vector pos,
             [NotNullWhen(true)] out IMap? map, [NotNullWhen(true)] out IUnit? unit)

@@ -26,7 +26,8 @@ namespace FEEngine.Internal
             RegisterFactoryType<IMap, MapDesc>(desc => new DefaultMap(desc));
             RegisterFactoryType<IUnit, UnitDesc>(desc => new DefaultUnit(desc));
             RegisterFactoryType<IItem, ItemDesc>(desc => new DefaultItem(desc));
-            RegisterFactoryType<ICombatEngine, CombatEngineDesc>(desc => new DefaultCombatEngine());
+            RegisterFactoryType<ICombatEngine, CombatEngineDesc>(desc => new DefaultCombatEngine(desc));
+            RegisterFactoryType<IRandomNumberGenerator, RandomNumberGeneratorDesc>(desc => new DefaultRNG(desc));
         }
     }
 }

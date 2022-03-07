@@ -1,6 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FEEngine.Public\FEEngine.Public.csproj" />
     <ProjectReference Include="..\FEEngine.Internal\FEEngine.Internal.csproj" />
   </ItemGroup>

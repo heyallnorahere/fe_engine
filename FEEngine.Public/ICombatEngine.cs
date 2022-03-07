@@ -22,7 +22,12 @@ namespace FEEngine
 {
     public struct CombatEngineDesc : ICreationDesc
     {
-        internal int Unused = 0;
+        public CombatEngineDesc()
+        {
+            RNG = null;
+        }
+
+        public IRandomNumberGenerator? RNG;
 
         public bool Verify() => true;
         public ICreationDesc Clone() => (ICreationDesc)MemberwiseClone();
@@ -147,6 +152,7 @@ namespace FEEngine
     /// <summary>
     /// A combat engine carries out combat instructions.
     /// </summary>
+    [FactoryInterface]
     public interface ICombatEngine
     {
         /// <summary>
@@ -181,7 +187,7 @@ namespace FEEngine
         /// <returns>
         /// The result of the attacking unit's strike, or null if the data was invalid.
         /// </returns>
-        public CombatResult? Execute(AttackData data);
+        public CombatResult? Execute(AttackData data, UnitCombatData attacker, UnitCombatData target);
 
         /// <summary>
         /// Calculate combat data for a given unit.

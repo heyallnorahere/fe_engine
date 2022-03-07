@@ -111,7 +111,9 @@ namespace FEEngine.Test
 
             var factory = Utilities.DefaultFactory;
             var unit = factory.Create<IUnit>(unitDesc);
-            var item = factory.Create<IItem>(itemDesc);
+
+            var prototype = Utilities.ItemPrototypes["iron-sword"];
+            var item = prototype.Instantiate();
 
             Assert.NotNull(unit);
             Assert.NotNull(item);

@@ -1,0 +1,15 @@
+{
+  "Name": "Iron Sword",
+  "MaxUses": 40,
+  "WeaponData": {
+    "Might": 5,
+    "Weight": 5,
+    "Hit": 90,
+    "Crit": 0,
+    "Range": {
+      "Min": 1,
+      "Max": 1
+    },
+    "Type": "Sword"
+  }
+}

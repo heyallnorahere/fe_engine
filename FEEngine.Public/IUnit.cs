@@ -122,7 +122,16 @@ namespace FEEngine
         /// </summary>
         public UnitStats Stats;
 
-        public bool Verify() => true;
+        public bool Verify()
+        {
+            bool valid = true;
+            if (EquippedWeapon != null)
+            {
+                valid &= EquippedWeapon.WeaponData != null;
+            }
+
+            return valid;
+        }
         public ICreationDesc Clone() => (ICreationDesc)MemberwiseClone();
     }
 

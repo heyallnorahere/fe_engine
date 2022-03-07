@@ -38,6 +38,18 @@ namespace FEEngine
             return true;
         }
 
+        public static Factory? RemoveFactory(string name)
+        {
+            if (!mFactories.ContainsKey(name))
+            {
+                return null;
+            }
+
+            Factory factory = mFactories[name];
+            mFactories.Remove(name);
+            return factory;
+        }
+
         public static Factory? GetFactory(string name = "Default")
         {
             Factory? factory = null;

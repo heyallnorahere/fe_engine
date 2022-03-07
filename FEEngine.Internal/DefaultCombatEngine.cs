@@ -38,6 +38,11 @@ namespace FEEngine.Internal
     /// </summary>
     internal class DefaultCombatEngine : ICombatEngine
     {
+        public DefaultCombatEngine(CombatEngineDesc desc)
+        {
+            mRNG = desc.RNG ?? new DefaultRNG(new RandomNumberGeneratorDesc());
+        }
+
         private class InternalWeaponData
         {
             public IItem? Item { get; set; }
@@ -101,7 +106,7 @@ namespace FEEngine.Internal
             int defense = magic ? targetData.Stats.Rsl : targetData.Stats.Prt;
             int avo = magic ? targetData.Stats.MagicAvo : targetData.Stats.Avo;
 
-            return new AttackData
+            var data = new AttackData
             {
                 Damage = attackerData.Stats.Atk - defense,
                 Hit = attackerData.Stats.Hit - avo,
@@ -109,6 +114,23 @@ namespace FEEngine.Internal
 
                 Counter = counter
             };
+
+            if (data.Damage < 0)
+            {
+                data.Damage = 0;
+            }
+
+            if (data.Hit < 0)
+            {
+                data.Hit = 0;
+            }
+
+            if (data.Crit < 0)
+            {
+                data.Crit = 0;
+            }
+
+            return data;
         }
 
         public RoundData? Calculate(UnitCombatData attackerData, UnitCombatData targetData)
@@ -215,9 +237,32 @@ namespace FEEngine.Internal
             return null;
         }
 
-        public CombatResult? Execute(AttackData data)
+        public CombatResult? Execute(AttackData data, UnitCombatData attacker, UnitCombatData target)
         {
-            throw new NotImplementedException();
+            if (!CanAttack(attacker, target))
+            {
+                return null;
+            }
+
+            var result = new CombatResult
+            {
+                DamageDealt = 0,
+                DidHit = mRNG.HitChance(data.Hit),
+                DidCrit = false
+            };
+            
+            if (result.DidHit)
+            {
+                result.DamageDealt = data.Damage;
+                result.DidCrit = mRNG.CritChance(data.Crit);
+
+                if (result.DidCrit)
+                {
+                    result.DamageDealt *= 3;
+                }
+            }
+
+            return result;
         }
 
         public UnitCombatData GetCombatData(IUnit unit)
@@ -248,11 +293,11 @@ namespace FEEngine.Internal
 
                 if (magic)
                 {
-                    effectiveStats.Hit = weaponData.Hit + stats.Dexterity;
+                    effectiveStats.Hit = weaponData.Hit + ((stats.Dexterity + stats.Luck) / 2);
                 }
                 else
                 {
-                    effectiveStats.Hit = weaponData.Hit + ((stats.Dexterity + stats.Luck) / 2);
+                    effectiveStats.Hit = weaponData.Hit + stats.Dexterity;
                 }
 
                 // todo: equipment, battalions, abilities
@@ -287,6 +332,8 @@ namespace FEEngine.Internal
             }
 
             return effectiveStats;
-        }    
+        }
+
+        private readonly IRandomNumberGenerator mRNG;
     }
 }
