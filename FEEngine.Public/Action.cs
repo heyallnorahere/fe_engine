@@ -32,6 +32,19 @@ namespace FEEngine
         public IList<CombatResult?>? Results;
     };
 
+    public struct ItemActionArgs
+    {
+        public ItemActionArgs()
+        {
+            InventoryIndex = -1;
+            ItemUses = 1;
+            Unusable = null;
+        }
+
+        public int InventoryIndex, ItemUses;
+        public ValueWrapper<bool>? Unusable;
+    }
+
     public sealed class Action
     {
         private static class IDCallbacks
@@ -113,12 +126,51 @@ namespace FEEngine
 
                 return false;
             }
+
+            public static bool Item(IUnit unit, object? data)
+            {
+                if (data is ItemActionArgs args)
+                {
+                    if (args.ItemUses <= 0)
+                    {
+                        return false;
+                    }
+
+                    if (args.InventoryIndex < 0 || args.InventoryIndex >= unit.Inventory.Count)
+                    {
+                        return false;
+                    }
+
+                    IItem item = unit.Inventory[args.InventoryIndex];
+                    if (item.Behavior == null)
+                    {
+                        return false;
+                    }
+
+                    if (item.UsesRemaining <= 0)
+                    {
+                        return false;
+                    }
+
+                    item.Behavior(item, unit);
+                    bool unusable = item.OnItemUse(args.ItemUses);
+                    if (args.Unusable != null)
+                    {
+                        args.Unusable.Value = unusable;
+                    }
+
+                    return true;
+                }
+
+                return false;
+            }
         }
 
         public enum ID
         {
             Move,
-            Attack
+            Attack,
+            Item
         }
 
         /// <summary>

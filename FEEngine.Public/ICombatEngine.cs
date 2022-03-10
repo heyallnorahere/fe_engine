@@ -104,6 +104,11 @@ namespace FEEngine
         /// If this attack is a counter.
         /// </summary>
         public bool Counter;
+
+        /// <summary>
+        /// The weapon used.
+        /// </summary>
+        public IItem Weapon;
     }
 
     public struct RoundData

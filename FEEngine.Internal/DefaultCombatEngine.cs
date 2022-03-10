@@ -102,7 +102,7 @@ namespace FEEngine.Internal
 
         private static AttackData Calculate(InternalUnitCombatData attackerData, InternalUnitCombatData targetData, bool counter)
         {
-            if (attackerData.Weapon == null)
+            if (attackerData.Weapon?.Item == null)
             {
                 throw new ArgumentException("Cannot attack without a weapon!");
             }
@@ -117,7 +117,8 @@ namespace FEEngine.Internal
                 Hit = attackerData.Stats.Hit - avo,
                 Crit = attackerData.Stats.Crit - targetData.Stats.CritAvo,
 
-                Counter = counter
+                Counter = counter,
+                Weapon = attackerData.Weapon.Item
             };
 
             if (data.Damage < 0)
@@ -269,6 +270,9 @@ namespace FEEngine.Internal
             if (result.DidHit)
             {
                 result.DamageDealt = data.Damage;
+
+                // todo: combat art?
+                data.Weapon.OnItemUse();
 
                 result.DidCrit = mRNG.CritChance(data.Crit);
                 if (result.DidCrit)

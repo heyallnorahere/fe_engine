@@ -61,13 +61,13 @@ namespace FEEngine
 
         private static ItemBehavior? GetBehavior(string name)
         {
-            int lastSeparator = name.LastIndexOf('.');
-            if (lastSeparator < 0)
+            int separator = name.IndexOf(';');
+            if (separator < 0)
             {
                 return null;
             }
 
-            var typeName = name[..lastSeparator];
+            var typeName = name[..separator];
             if (typeName.Length == 0)
             {
                 return null;
@@ -79,14 +79,19 @@ namespace FEEngine
                 return null;
             }
 
-            var methodName = name[(lastSeparator + 1)..];
+            var methodName = name[(separator + 1)..];
             if (methodName.Length == 0)
             {
                 return null;
             }
 
-            var method = type.GetMethod(methodName, new Type[] { typeof(IItem), typeof(IUnit) });
+            var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Static, new Type[] { typeof(IItem), typeof(IUnit) });
             if (method == null)
+            {
+                return null;
+            }
+
+            if (method.ReturnType != typeof(void))
             {
                 return null;
             }

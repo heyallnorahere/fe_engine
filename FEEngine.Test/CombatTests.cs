@@ -283,23 +283,14 @@ namespace FEEngine.Test
             succeeded = map.Flush();
             Assert.True(succeeded);
 
-            bool didAttackHit = false;
+            Assert.Equal(2, results.Count);
             foreach (var result in results)
             {
-                if (result != null)
-                {
-                    if (!didAttackHit)
-                    {
-                        didAttackHit = true;
-                    }
-
-                    Assert.True(result.Value.DidHit);
-                    Assert.False(result.Value.DidCrit);
-                    Assert.False(result.Value.DidKill);
-                }
+                Assert.NotNull(result);
+                Assert.True(result.Value.DidHit);
+                Assert.False(result.Value.DidCrit);
+                Assert.False(result.Value.DidKill);
             }
-
-            Assert.True(didAttackHit);
         }
     }
 }

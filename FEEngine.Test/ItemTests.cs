@@ -83,5 +83,63 @@ namespace FEEngine.Test
             Assert.Equal(maxUses, item?.MaxUses);
             Assert.Equal(usesRemaining, item?.UsesRemaining);
         }
+
+        [Theory]
+        [InlineData(10)]
+        [InlineData(9)]
+        [InlineData(5)]
+        [InlineData(3)]
+        [InlineData(1)]
+        [InlineData(0)]
+        public void UsableItem(int healthDifference)
+        {
+            var prototype = Utilities.ItemPrototypes["vulnerary"];
+            var item = prototype.Instantiate();
+            Assert.NotNull(item);
+
+            var mapDesc = new MapDesc
+            {
+                Name = "Test Map",
+                Size = (1, 1)
+            };
+
+            var factory = Engine.GetFactory();
+            var map = factory!.Create<IMap>(mapDesc);
+            Assert.NotNull(map);
+
+            var unitDesc = new UnitDesc
+            {
+                Name = "Test Unit",
+                InitialInventory = new IItem[] { item },
+                Stats = new UnitStats
+                {
+                    HP = 11
+                }
+            };
+
+            var unit = factory.Create<IUnit>(unitDesc);
+            Assert.NotNull(unit);
+
+            int mapIndex = map.AddUnit(unit);
+            Assert.NotEqual(-1, mapIndex);
+
+            var actionArgs = new ItemActionArgs
+            {
+                InventoryIndex = 0,
+                Unusable = new ValueWrapper<bool>()
+            };
+
+            var action = Action.Create(Action.ID.Item, actionArgs);
+            Assert.NotNull(action);
+
+            unit.HP -= healthDifference;
+            unit.AddAction(action);
+
+            bool succeeded = map.Flush();
+            Assert.True(succeeded);
+
+            Assert.False(actionArgs.Unusable.Value);
+            Assert.Equal(unit.Stats.HP, unit.HP);
+        }
     }
 }

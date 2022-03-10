@@ -1,6 +1,6 @@
 {
   "Name": "Iron Sword",
-  "MaxUses": 40,
+  "ItemBehavior": null,
   "WeaponData": {
     "Might": 5,
     "Weight": 5,
@@ -11,5 +11,6 @@
       "Max": 1
     },
     "Type": "Sword"
-  }
+  },
+  "MaxUses": 40
 }

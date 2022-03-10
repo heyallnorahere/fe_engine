@@ -26,4 +26,8 @@
     <EmbeddedResource Include="ItemPrototypes\*.json" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="ItemPrototypes\vulnerary.json" />
+  </ItemGroup>
+
 </Project>
