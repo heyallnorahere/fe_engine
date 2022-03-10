@@ -29,10 +29,24 @@ namespace FEEngine
         public ICreationDesc Clone() => (ICreationDesc)MemberwiseClone();
     }
 
+    /// <summary>
+    /// Evaluates if an event is triggered based on a percentage chance.
+    /// </summary>
     [FactoryInterface]
     public interface IRandomNumberGenerator
     {
+        /// <summary>
+        /// Determines if an attack will hit. Should implement True Hit.
+        /// </summary>
+        /// <param name="displayedPercentage">The displayed hit chance.</param>
+        /// <returns>If the attack hit.</returns>
         public bool HitChance(int displayedPercentage);
+
+        /// <summary>
+        /// Determines if a critical hit is triggered.
+        /// </summary>
+        /// <param name="displayedPercentage">The displayed crit chance.</param>
+        /// <returns>If the attack was a crit.</returns>
         public bool CritChance(int displayedPercentage);
     }
 }

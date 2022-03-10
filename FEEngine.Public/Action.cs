@@ -20,6 +20,18 @@ using System.Reflection;
 
 namespace FEEngine
 {
+    public struct AttackActionArgs
+    {
+        public AttackActionArgs()
+        {
+            RoundData = null;
+            Results = null;
+        }
+
+        public RoundData? RoundData;
+        public IList<CombatResult?>? Results;
+    };
+
     public sealed class Action
     {
         private static class IDCallbacks
@@ -50,8 +62,56 @@ namespace FEEngine
 
             public static bool Attack(IUnit unit, object? data)
             {
-                // todo: attack
-                throw new NotImplementedException();
+                if (data is AttackActionArgs args)
+                {
+                    if (args.RoundData == null)
+                    {
+                        return false;
+                    }
+
+                    var roundData = args.RoundData.Value;
+                    if (roundData.Attacker.Unit != unit)
+                    {
+                        return false;
+                    }
+
+                    if (!roundData.Engine.CanAttack(roundData.Attacker, roundData.Target))
+                    {
+                        return false;
+                    }
+
+                    foreach (int index in roundData.Indices)
+                    {
+                        var attackData = roundData.Data[index];
+
+                        UnitCombatData currentAttacker, currentTarget;
+                        if (attackData.Counter)
+                        {
+                            currentAttacker = roundData.Target;
+                            currentTarget = roundData.Attacker;
+                        }
+                        else
+                        {
+                            currentAttacker = roundData.Attacker;
+                            currentTarget = roundData.Target;
+                        }
+
+                        var result = roundData.Engine.Execute(attackData, currentAttacker, currentTarget);
+                        if (args.Results != null)
+                        {
+                            args.Results.Add(result);
+                        }
+
+                        if (!roundData.Engine.CanAttack(currentAttacker, currentTarget))
+                        {
+                            break;
+                        }
+                    }
+
+                    return true;
+                }
+
+                return false;
             }
         }
 

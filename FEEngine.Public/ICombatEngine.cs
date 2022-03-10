@@ -129,6 +129,11 @@ namespace FEEngine
         /// Indices of elements in <see cref="Data"/> to be executed by the interpreter.
         /// </summary>
         public IReadOnlyList<int> Indices;
+
+        /// <summary>
+        /// The <see cref="ICombatEngine"/> that generated this structure.
+        /// </summary>
+        public ICombatEngine Engine;
     }
 
     public struct CombatResult
@@ -162,10 +167,11 @@ namespace FEEngine
     {
         /// <summary>
         /// Checks if one unit can attack another.
-        /// The user must:
+        /// The following conditions must be met:
         /// <list type="bullet">
-        /// <item>Have a weapon equipped.</item>
-        /// <item>Be in attacking range of the target.</item>
+        /// <item>The attacker must have a weapon equipped.</item>
+        /// <item>The attacker must be in attacking range of the target.</item>
+        /// <item>Both parties must have at least 1 HP.</item>
         /// </list>
         /// </summary>
         /// <param name="attackerData">The data describing the attacking unit.</param>

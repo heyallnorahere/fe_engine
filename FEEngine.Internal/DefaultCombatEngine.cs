@@ -71,12 +71,12 @@ namespace FEEngine.Internal
             return false;
         }
 
-        public bool CanAttack(UnitCombatData userData, UnitCombatData targetData)
+        public bool CanAttack(UnitCombatData attackerData, UnitCombatData targetData)
         {
-            IUnit user = userData.Unit;
+            IUnit attacker = attackerData.Unit;
             IUnit target = targetData.Unit;
 
-            if (!GetWeaponData(user, out InternalWeaponData? weaponData))
+            if (!GetWeaponData(attacker, out InternalWeaponData? weaponData))
             {
                 return false;
             }
@@ -84,8 +84,13 @@ namespace FEEngine.Internal
             int minRange = weaponData.Data.MinRange;
             int maxRange = weaponData.Data.MaxRange;
 
-            int distance = (target.Position - user.Position).TaxicabLength;
-            return distance >= minRange && distance <= maxRange;
+            int distance = (target.Position - attacker.Position).TaxicabLength;
+            if (distance < minRange || distance > maxRange)
+            {
+                return false;
+            }
+
+            return attacker.HP > 0 && target.HP > 0;
         }
 
         private struct InternalUnitCombatData
@@ -238,7 +243,8 @@ namespace FEEngine.Internal
                     Attacker = attackerData,
                     Target = targetData,
                     Data = attackData,
-                    Indices = indices
+                    Indices = indices,
+                    Engine = this
                 };
             }
 

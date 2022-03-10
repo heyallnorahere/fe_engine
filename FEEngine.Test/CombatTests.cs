@@ -15,6 +15,8 @@
 */
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Xunit;
 
 namespace FEEngine.Test
@@ -128,9 +130,20 @@ namespace FEEngine.Test
             Assert.Equal(validRsl, effectiveStatValues["Rsl"]);
         }
 
-        [Fact]
-        public void Combat()
+        private static bool SetupCombatEnvironment(Factory factory, [NotNullWhen(true)] out IMap? map, [NotNullWhen(true)] out ICombatEngine? combatEngine)
         {
+            var combatEngineDesc = new CombatEngineDesc
+            {
+                RNG = new TestRNG(false)
+            };
+
+            combatEngine = factory.Create<ICombatEngine>(combatEngineDesc);
+            if (combatEngine == null)
+            {
+                map = null;
+                return false;
+            }
+
             var mapDesc = new MapDesc
             {
                 Size = (2, 1),
@@ -152,9 +165,11 @@ namespace FEEngine.Test
                 Charm = 0
             };
 
-            Factory? factory = Engine.GetFactory();
-            IMap? map = factory!.Create<IMap>(mapDesc);
-            Assert.NotNull(map);
+            map = factory.Create<IMap>(mapDesc);
+            if (map == null)
+            {
+                return false;
+            }
 
             var prototype = Utilities.ItemPrototypes["iron-sword"];
             for (int i = 0; i < map.Size.X; i++)
@@ -168,22 +183,30 @@ namespace FEEngine.Test
                 };
 
                 IUnit? unit = factory.Create<IUnit>(unitDesc);
-                Assert.NotNull(unit);
+                if (unit == null)
+                {
+                    return false;
+                }
 
-                int index = map!.AddUnit(unit!);
-                Assert.NotEqual(-1, index);
+                int index = map.AddUnit(unit);
+                if (index < 0)
+                {
+                    return false;
+                }
             }
 
-            IUnit attacker = map.Units[0];
+            return true;
+        }
+
+        [Fact]
+        public void Combat()
+        {
+            var factory = Engine.GetFactory();
+            bool succeeded = SetupCombatEnvironment(factory!, out IMap? map, out ICombatEngine? combatEngine);
+            Assert.True(succeeded);
+
+            IUnit attacker = map!.Units[0];
             IUnit target = map.Units[1];
-
-            var combatEngineDesc = new CombatEngineDesc
-            {
-                RNG = new TestRNG(false)
-            };
-
-            ICombatEngine? combatEngine = factory.Create<ICombatEngine>(combatEngineDesc);
-            Assert.NotNull(combatEngine);
 
             var attackerData = combatEngine!.GetCombatData(attacker);
             var targetData = combatEngine.GetCombatData(target);
@@ -191,7 +214,8 @@ namespace FEEngine.Test
             var roundData = combatEngine.Calculate(attackerData, targetData);
             Assert.NotNull(roundData);
 
-            Assert.Equal(attackerData, roundData!.Value.Attacker);
+            Assert.Equal(combatEngine, roundData.Value.Engine);
+            Assert.Equal(attackerData, roundData.Value.Attacker);
             Assert.Equal(targetData, roundData.Value.Target);
 
             Assert.Equal(2, roundData.Value.Indices.Count);
@@ -199,14 +223,83 @@ namespace FEEngine.Test
 
             foreach (int index in roundData.Value.Indices)
             {
+                UnitCombatData currentAttacker, currentTarget;
                 var data = roundData.Value.Data[index];
-                var result = combatEngine.Execute(data, attackerData, targetData);
 
+                if (data.Counter)
+                {
+                    currentAttacker = targetData;
+                    currentTarget = attackerData;
+                }
+                else
+                {
+                    currentAttacker = attackerData;
+                    currentTarget = targetData;
+                }
+
+                var result = combatEngine.Execute(data, currentAttacker, currentTarget);
                 Assert.NotNull(result);
+
                 Assert.True(result!.Value.DidHit);
                 Assert.False(result.Value.DidCrit);
                 Assert.False(result.Value.DidKill);
             }
+        }
+
+        [Fact]
+        public void AttackAction()
+        {
+            var factory = Engine.GetFactory();
+            bool succeeded = SetupCombatEnvironment(factory!, out IMap? map, out ICombatEngine? combatEngine);
+            Assert.True(succeeded);
+
+            IUnit attacker = map!.Units[0];
+            IUnit target = map.Units[1];
+
+            var attackerData = combatEngine!.GetCombatData(attacker);
+            var targetData = combatEngine.GetCombatData(target);
+
+            var roundData = combatEngine.Calculate(attackerData, targetData);
+            Assert.NotNull(roundData);
+
+            Assert.Equal(combatEngine, roundData.Value.Engine);
+            Assert.Equal(attackerData, roundData.Value.Attacker);
+            Assert.Equal(targetData, roundData.Value.Target);
+
+            Assert.Equal(2, roundData.Value.Indices.Count);
+            Assert.Equal(2, roundData.Value.Data.Count);
+
+            var results = new List<CombatResult?>();
+            var actionArgs = new AttackActionArgs
+            {
+                RoundData = roundData,
+                Results = results
+            };
+
+            var action = Action.Create(Action.ID.Attack, actionArgs);
+            Assert.NotNull(action);
+            attacker.AddAction(action);
+
+            succeeded = map.Flush();
+            Assert.True(succeeded);
+
+            bool didAttackHit = false;
+            foreach (var result in results)
+            {
+                if (result != null)
+                {
+                    if (!didAttackHit)
+                    {
+                        didAttackHit = true;
+                    }
+
+                    Assert.True(result.Value.DidHit);
+                    Assert.False(result.Value.DidCrit);
+                    Assert.False(result.Value.DidKill);
+                }
+            }
+
+            Assert.True(didAttackHit);
         }
     }
 }
