@@ -31,7 +31,30 @@ namespace FEEngine.Test
             }
 
             var assembly = typeof(Utilities).Assembly;
-            ItemPrototypes = ManifestItemParser.Load(assembly, factory);
+            ItemPrototypes = ManifestItemParser.Load(assembly, factory, new ManifestItemParser.Callbacks
+            {
+                KeyParser = KeyParser,
+                ResourceQualifier = ResourceQualifier
+            });
+        }
+
+        private static bool ResourceQualifier(string key) => key.StartsWith("FEEngine.Test.ItemPrototypes.");
+        private static void KeyParser(ref string key)
+        {
+            int lastSeparator = key.LastIndexOf('.');
+            if (lastSeparator < 0)
+            {
+                throw new ArgumentException("Invalid resource name!");
+            }
+
+            int filenameSeparator = key.LastIndexOf('.', lastSeparator - 1);
+            if (filenameSeparator < 0)
+            {
+                throw new ArgumentException("Invalid resource name!");
+            }
+
+            int filenameStart = filenameSeparator + 1;
+            key = key[filenameStart..lastSeparator];
         }
 
         public static IReadOnlyDictionary<string, FactoryPrototype<IItem>> ItemPrototypes { get; }

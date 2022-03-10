@@ -61,7 +61,7 @@ namespace FEEngine.Test
             }
 
             var stats = (UnitStats)statObj;
-            var prototype = Utilities.ItemPrototypes["iron-sword"];
+            var prototype = Utilities.ItemPrototypes["GenericSword"];
             var unitDesc = new UnitDesc
             {
                 Name = "Test Unit",
@@ -171,7 +171,7 @@ namespace FEEngine.Test
                 return false;
             }
 
-            var prototype = Utilities.ItemPrototypes["iron-sword"];
+            var prototype = Utilities.ItemPrototypes["GenericSword"];
             for (int i = 0; i < map.Size.X; i++)
             {
                 var unitDesc = new UnitDesc

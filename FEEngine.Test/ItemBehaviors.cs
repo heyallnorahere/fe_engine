@@ -14,21 +14,13 @@
    limitations under the License.
 */
 
-using System;
-
 namespace FEEngine.Test
 {
     public static class ItemBehaviors
     {
         public static void HealingItem(IItem item, IUnit unit)
         {
-            int healedAmount = item.Name switch
-            {
-                "Vulnerary" => 10,
-                _ => throw new ArgumentException("Invalid item name!")
-            };
-
-            unit.HP += healedAmount;
+            unit.HP += 10;
             if (unit.HP > unit.Stats.HP)
             {
                 unit.HP = unit.Stats.HP;

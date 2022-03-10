@@ -91,29 +91,10 @@ namespace FEEngine.Test
                 Name = "Test Unit",
             };
 
-            var itemDesc = new ItemDesc
-            {
-                Data = new ItemData
-                {
-                    Name = "Iron Sword",
-                    MaxUses = 40,
-                    WeaponData = new WeaponData
-                    {
-                        Might = 5,
-                        Weight = 5,
-                        Hit = 90,
-                        Crit = 0,
-                        MinRange = 1,
-                        MaxRange = 1,
-                        Type = WeaponType.Sword
-                    }
-                }
-            };
-
             var factory = Engine.GetFactory();
             var unit = factory?.Create<IUnit>(unitDesc);
 
-            var prototype = Utilities.ItemPrototypes["iron-sword"];
+            var prototype = Utilities.ItemPrototypes["GenericSword"];
             var item = prototype.Instantiate();
 
             Assert.NotNull(unit);

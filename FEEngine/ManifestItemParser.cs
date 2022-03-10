@@ -24,12 +24,8 @@ namespace FEEngine
 {
     public static class ManifestItemParser
     {
-        public enum KeyFormat
-        {
-            Filename,
-            FilenameNoExtension,
-            FullName
-        }
+        public delegate void KeyParser(ref string key);
+        public delegate bool ResourceQualifier(string key);
 
         [JsonObject]
         private struct JsonWeaponRange
@@ -85,7 +81,8 @@ namespace FEEngine
                 return null;
             }
 
-            var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Static, new Type[] { typeof(IItem), typeof(IUnit) });
+            var parameterTypes = new Type[] { typeof(IItem), typeof(IUnit) };
+            var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Static, parameterTypes);
             if (method == null)
             {
                 return null;
@@ -142,37 +139,13 @@ namespace FEEngine
             };
         }
 
-        private static string GetKeyFromName(string name, KeyFormat format)
+        public struct Callbacks
         {
-            if (format == KeyFormat.FullName)
-            {
-                return name;
-            }
-
-            int lastSeparator = name.LastIndexOf('.');
-            if (lastSeparator < 0)
-            {
-                throw new ArgumentException("Invalid resource name!");
-            }
-
-            int filenameSeparator = name.LastIndexOf('.', lastSeparator - 1);
-            if (filenameSeparator < 0)
-            {
-                throw new ArgumentException("Invalid resource name!");
-            }
-
-            int filenameStart = filenameSeparator + 1;
-            if (format == KeyFormat.FilenameNoExtension)
-            {
-                return name[filenameStart..lastSeparator];
-            }
-            else
-            {
-                return name[filenameStart..];
-            }
+            public KeyParser? KeyParser;
+            public ResourceQualifier? ResourceQualifier;
         }
 
-        public static IReadOnlyDictionary<string, FactoryPrototype<IItem>> Load(Assembly assembly, Factory factory, KeyFormat keyFormat = KeyFormat.FilenameNoExtension)
+        public static IReadOnlyDictionary<string, FactoryPrototype<IItem>> Load(Assembly assembly, Factory factory, Callbacks? callbacks = null)
         {
             var prototypes = new Dictionary<string, FactoryPrototype<IItem>>();
 
@@ -180,6 +153,12 @@ namespace FEEngine
             foreach (string name in names)
             {
                 if (!name.EndsWith(".json"))
+                {
+                    continue;
+                }
+
+                bool validResource = callbacks?.ResourceQualifier?.Invoke(name) ?? false;
+                if (!validResource)
                 {
                     continue;
                 }
@@ -194,15 +173,25 @@ namespace FEEngine
                 var jsonReader = new JsonTextReader(streamReader);
 
                 var serializer = JsonSerializer.CreateDefault();
-                var data = serializer.Deserialize<JsonItemData>(jsonReader);
+                serializer.MissingMemberHandling = MissingMemberHandling.Error;
 
-                var itemDesc = Convert(data);
-                var prototype = factory.CreatePrototype<IItem>(itemDesc);
-
-                if (prototype != null)
+                try
                 {
-                    string key = GetKeyFromName(name, keyFormat);
-                    prototypes.Add(key, prototype);
+                    var data = serializer.Deserialize<JsonItemData>(jsonReader);
+
+                    var itemDesc = Convert(data);
+                    var prototype = factory.CreatePrototype<IItem>(itemDesc);
+
+                    if (prototype != null)
+                    {
+                        string key = name;
+                        callbacks?.KeyParser?.Invoke(ref key);
+                        prototypes.Add(key, prototype);
+                    }
+                }
+                catch (JsonSerializationException)
+                {
+                    continue;
                 }
             }
 

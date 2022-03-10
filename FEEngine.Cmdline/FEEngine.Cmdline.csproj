@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\FEEngine\FEEngine.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="Resources\**\*.json" />
+    <EmbeddedResource Include="Resources\**\*.json" />
+  </ItemGroup>
+
+</Project>

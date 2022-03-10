@@ -93,7 +93,7 @@ namespace FEEngine.Test
         [InlineData(0)]
         public void UsableItem(int healthDifference)
         {
-            var prototype = Utilities.ItemPrototypes["vulnerary"];
+            var prototype = Utilities.ItemPrototypes["HealingItem"];
             var item = prototype.Instantiate();
             Assert.NotNull(item);
 
@@ -138,7 +138,7 @@ namespace FEEngine.Test
             bool succeeded = map.Flush();
             Assert.True(succeeded);
 
-            Assert.False(actionArgs.Unusable.Value);
+            Assert.False(actionArgs.Unusable);
             Assert.Equal(unit.Stats.HP, unit.HP);
         }
     }

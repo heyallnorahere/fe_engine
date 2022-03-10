@@ -1,0 +1,6 @@
+{
+    "Name": "Healing Item",
+    "ItemBehavior": "FEEngine.Test.ItemBehaviors, FEEngine.Test;HealingItem",
+    "WeaponData": null,
+    "MaxUses": 3
+}

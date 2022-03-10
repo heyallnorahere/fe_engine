@@ -14,21 +14,29 @@
    limitations under the License.
 */
 
-namespace FEEngine
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace FEEngine.Cmdline.Resources.Items
 {
-    public sealed class ValueWrapper<T> where T : struct
+    public static class Behaviors
     {
-        public ValueWrapper(T value)
+        public static void HealingItem(IItem item, IUnit unit)
         {
-            Value = value;
-        }
+            int healedAmount = item.Name switch
+            {
+                "Vulnerary" => 10,
+                _ => throw new ArgumentException("Invalid item name!")
+            };
 
-        public ValueWrapper()
-        {
-            Value = default;
+            unit.HP += healedAmount;
+            if (unit.HP > unit.Stats.HP)
+            {
+                unit.HP = unit.Stats.HP;
+            }
         }
-
-        public T Value { get; set; }
-        public static implicit operator T(ValueWrapper<T> wrapper) => wrapper.Value;
     }
 }
