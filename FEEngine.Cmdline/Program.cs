@@ -14,11 +14,43 @@
    limitations under the License.
 */
 
+using FEEngine.Cmdline.UI;
 using System;
 using System.IO;
 
 namespace FEEngine.Cmdline
 {
+    internal class TestView : IView
+    {
+        public TestView()
+        {
+            var values = Enum.GetValues<ConsoleColor>();
+            mColor = values[sCurrentColor++];
+        }
+
+        public void Render(UICommandList commandList)
+        {
+            for (int x = 0; x < mSize.X; x++)
+            {
+                for (int y = 0; y < mSize.Y; y++)
+                {
+                    int i = x + y * mSize.X;
+                    char c = (char)((i % 26) + 'a');
+
+                    commandList.Push((x, y), c, mColor);
+                }
+            }
+        }
+
+        public Vector MinSize => (10, 10);
+        public void SetSize(Vector size) => mSize = size;
+
+        private Vector mSize;
+        private readonly ConsoleColor mColor;
+
+        private static int sCurrentColor = 1;
+    }
+
     public class Program
     {
         /// <summary>
@@ -46,6 +78,7 @@ namespace FEEngine.Cmdline
             mFactory = null;
             mItems = null;
             mMap = null;
+            mUIRoot = null;
             mRunning = false;
         }
 
@@ -60,6 +93,19 @@ namespace FEEngine.Cmdline
 
             // load items
             mItems = new ItemDatabase();
+
+            // create ui root
+            mUIRoot = new UIRoot((150, 50));
+
+            // create basic border layout
+            var layout = new BorderLayout();
+            mUIRoot.Node = layout;
+            layout.Center = new TestView();
+
+            foreach (var alignment in Enum.GetValues<BorderLayout.Alignment>())
+            {
+                layout.AddChild(new TestView(), alignment);
+            }
 
             // parse arguments
             string mapDescriptor;
@@ -115,7 +161,7 @@ namespace FEEngine.Cmdline
 
             while (mRunning)
             {
-                Renderer.Draw(position, character);
+                mUIRoot.Render();
                 Renderer.HandleInputs();
             }
         }
@@ -123,11 +169,13 @@ namespace FEEngine.Cmdline
         public Factory Factory => mFactory!;
         public ItemDatabase Items => mItems!;
         public IMap Map => mMap!;
+        public UIRoot UIRoot => mUIRoot!;
         public bool Running => mRunning;
 
         private Factory? mFactory;
         private ItemDatabase? mItems;
         private IMap? mMap;
+        private UIRoot? mUIRoot;
         private bool mRunning;
     }
 }
