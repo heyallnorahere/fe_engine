@@ -15,50 +15,75 @@
 */
 
 using System;
+using System.IO;
 
 namespace FEEngine.Cmdline
 {
     public class Program
     {
+        /// <summary>
+        /// The currently-running process.
+        /// </summary>
         public static Program Instance { get; }
+
         static Program()
         {
             Instance = new Program();
         }
 
-        public static int Main(string[] args)
+        public static void Main(string[] args)
         {
             if (Console.IsInputRedirected || Console.IsOutputRedirected)
             {
-                Console.WriteLine("FEEngine cannot run in this environment!");
-                return 1;
+                throw new IOException("FEEngine cannot run in this environment!");
             }
 
-            return Instance.Run(args);
+            Instance.Run(args);
         }
 
         private Program()
         {
             mFactory = null;
             mItems = null;
+            mMap = null;
         }
 
-        private int Run(string[] args)
+        private void Run(string[] args)
         {
+            // get factory
             mFactory = Engine.GetFactory();
             if (mFactory == null)
             {
-                return 1;
+                throw new Exception("No default factory found!");
             }
 
+            // load items
             mItems = new ItemDatabase();
-            return 0;
+
+            // load map
+            string mapDescriptor;
+            if (args.Length > 0)
+            {
+                mapDescriptor = args[0];
+            }
+            else
+            {
+                mapDescriptor = $"{MapSerializer.ManifestPrefix}FEEngine.Cmdline.Resources.Maps.Default.json";
+            }
+
+            mMap = MapSerializer.Deserialize(mapDescriptor);
+            Console.WriteLine("Map data:");
+            Console.WriteLine($"\tName: {mMap.Name ?? "null"}");
+            Console.WriteLine($"\tSize: ({mMap.Size.X}, {mMap.Size.Y})");
+            Console.WriteLine($"\tUnits: {mMap.Units.Count}");
         }
 
-        public Factory Factory => mFactory ?? throw new NullReferenceException();
-        public ItemDatabase Items => mItems ?? throw new NullReferenceException();
+        public Factory Factory => mFactory!;
+        public ItemDatabase Items => mItems!;
+        public IMap Map => mMap!;
 
         private Factory? mFactory;
         private ItemDatabase? mItems;
+        private IMap? mMap;
     }
 }

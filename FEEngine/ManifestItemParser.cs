@@ -27,14 +27,12 @@ namespace FEEngine
         public delegate void KeyParser(ref string key);
         public delegate bool ResourceQualifier(string key);
 
-        [JsonObject]
         private struct JsonWeaponRange
         {
             public int Min { get; set; }
             public int Max { get; set; }
         }
 
-        [JsonObject]
         private struct JsonWeaponData
         {
             public int Might { get; set; }
@@ -45,7 +43,6 @@ namespace FEEngine
             public WeaponType Type { get; set; }
         }
 
-        [JsonObject(ItemNullValueHandling = NullValueHandling.Include)]
         private struct JsonItemData
         {
             public string Name { get; set; }

@@ -1,0 +1,33 @@
+{
+    "Name": "Test Map",
+    "Size": {
+        "X": 20,
+        "Y": 20
+    },
+    "Units": [
+        {
+            "Name": "Soldier #1",
+            "Inventory": [],
+            "EquippedWeapon": {
+                "DatabaseID": "Weapons/IronSword"
+            },
+            "Position": {
+                "X": 0,
+                "Y": 0
+            },
+            "Stats": {
+                "Movement": 5,
+                "Level": 1,
+                "HP": 20,
+                "Strength": 10,
+                "Magic": 0,
+                "Speed": 9,
+                "Dexterity": 7,
+                "Defense": 8,
+                "Resistance": 5,
+                "Luck": 7,
+                "Charm": 11
+            }
+        }
+    ]
+}

@@ -101,6 +101,7 @@ namespace FEEngine
         private readonly ICreationDesc mBaseDesc;
         private readonly Factory mFactory;
     }
+
     public delegate void PrototypeDelegate(ref ICreationDesc desc);
 
     /// <summary>

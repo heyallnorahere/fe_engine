@@ -26,7 +26,12 @@ namespace FEEngine.Internal
             Position = desc.StartingPosition;
             mMap = null;
             mActionIndices = new List<int>();
+
             mEquippedWeapon = desc.EquippedWeapon;
+            if (mEquippedWeapon != null)
+            {
+                mEquippedWeapon.Owner = this;
+            }
 
             mInventory = new List<IItem>();
             if (desc.InitialInventory != null)
