@@ -15,6 +15,7 @@
 */
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FEEngine
 {
@@ -34,7 +35,22 @@ namespace FEEngine
         public int X, Y;
         public int TaxicabLength => Math.Abs(X) + Math.Abs(Y);
 
+        public override bool Equals([NotNullWhen(true)] object? obj)
+        {
+            if (obj is Vector vector)
+            {
+                return X == vector.X && Y == vector.Y;
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode() => HashCode.Combine(X, Y);
+
         public static implicit operator Vector((int x, int y) t) => new(t.x, t.y);
+
+        public static bool operator ==(Vector lhs, Vector rhs) => lhs.Equals(rhs);
+        public static bool operator !=(Vector lhs, Vector rhs) => !lhs.Equals(rhs);
 
         public static Vector operator +(Vector lhs, Vector rhs) => (lhs.X + rhs.X, lhs.Y + rhs.Y);
         public static Vector operator +(Vector lhs, int rhs) => lhs + (rhs, rhs);

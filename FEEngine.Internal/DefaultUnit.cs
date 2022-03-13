@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+using System;
 using System.Collections.Generic;
 
 namespace FEEngine.Internal
@@ -27,16 +28,31 @@ namespace FEEngine.Internal
             mMap = null;
             mActionIndices = new List<int>();
 
-            mEquippedWeapon = desc.EquippedWeapon;
-            if (mEquippedWeapon != null)
+            mInventory = new List<IItem>();
+            if (desc.EquippedWeapon != null)
             {
-                mEquippedWeapon.Owner = this;
+                int index = AddItemToInventory(desc.EquippedWeapon);
+                if (index < 0)
+                {
+                    throw new ArgumentException($"Could not add weapon to inventory: {desc.EquippedWeapon.Name}");
+                }
+
+                if (!EquipWeapon(index))
+                {
+                    throw new ArgumentException($"Could not equip weapon: {desc.EquippedWeapon.Name}");
+                }
             }
 
-            mInventory = new List<IItem>();
             if (desc.InitialInventory != null)
             {
-                mInventory.AddRange(desc.InitialInventory);
+                foreach (IItem item in desc.InitialInventory)
+                {
+                    int index = AddItemToInventory(item);
+                    if (index < 0)
+                    {
+                        throw new ArgumentException($"Could not add item to inventory: {item.Name}");
+                    }
+                }
             }
 
             Stats = desc.Stats;

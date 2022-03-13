@@ -34,10 +34,16 @@ namespace FEEngine.Internal
 
         public int AddUnit(IUnit unit)
         {
-            int index = mUnits.FindIndex(u => u == unit);
+            int index = mUnits.IndexOf(unit);
             if (index != -1)
             {
                 return index;
+            }
+
+            index = mUnits.FindIndex(u => u.Position == unit.Position);
+            if (index != -1)
+            {
+                return -1;
             }
 
             if (unit.Map != null || IsOutOfBounds(unit.Position))

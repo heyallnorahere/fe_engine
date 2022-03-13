@@ -9,8 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="Resources\**\*.json" />
-    <EmbeddedResource Include="Resources\**\*.json" />
+    <JsonContent Include="Resources\**\*.json" />
+
+    <None Remove="@(JsonContent)" />
+    <Content Remove="@(JsonContent)" />
+    <EmbeddedResource Include="@(JsonContent)" />
   </ItemGroup>
 
 </Project>
