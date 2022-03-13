@@ -46,6 +46,7 @@ namespace FEEngine.Cmdline
             mFactory = null;
             mItems = null;
             mMap = null;
+            mRunning = false;
         }
 
         private void Run(string[] args)
@@ -60,7 +61,7 @@ namespace FEEngine.Cmdline
             // load items
             mItems = new ItemDatabase();
 
-            // load map
+            // parse arguments
             string mapDescriptor;
             if (args.Length > 0)
             {
@@ -71,19 +72,62 @@ namespace FEEngine.Cmdline
                 mapDescriptor = $"{MapSerializer.ManifestPrefix}FEEngine.Cmdline.Resources.Maps.Default.json";
             }
 
+            // load map
             mMap = MapSerializer.Deserialize(mapDescriptor);
-            Console.WriteLine("Map data:");
-            Console.WriteLine($"\tName: {mMap.Name ?? "null"}");
-            Console.WriteLine($"\tSize: ({mMap.Size.X}, {mMap.Size.Y})");
-            Console.WriteLine($"\tUnits: {mMap.Units.Count}");
+
+            mRunning = true;
+            Renderer.OnCtrlC += () => mRunning = false;
+
+            Vector position = (0, 0);
+            const char character = 'a';
+
+            Renderer.OnInput += keyInfo =>
+            {
+                Vector originalPosition = position;
+                switch (keyInfo.Key)
+                {
+                    case ConsoleKey.D:
+                        position.X++;
+                        break;
+                    case ConsoleKey.A:
+                        if (position.X > 0)
+                        {
+                            position.X--;
+                        }
+                        break;
+                    case ConsoleKey.S:
+                        position.Y++;
+                        break;
+                    case ConsoleKey.W:
+                        if (position.Y > 0)
+                        {
+                            position.Y--;
+                        }
+                        break;
+                }
+
+                if (position != originalPosition)
+                {
+                    Renderer.Draw(originalPosition, ' ');
+                    Renderer.Draw(position, character);
+                }
+            };
+
+            while (mRunning)
+            {
+                Renderer.Draw(position, character);
+                Renderer.HandleInputs();
+            }
         }
 
         public Factory Factory => mFactory!;
         public ItemDatabase Items => mItems!;
         public IMap Map => mMap!;
+        public bool Running => mRunning;
 
         private Factory? mFactory;
         private ItemDatabase? mItems;
         private IMap? mMap;
+        private bool mRunning;
     }
 }
