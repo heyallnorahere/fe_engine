@@ -14,6 +14,9 @@
    limitations under the License.
 */
 
+using System;
+using System.Collections.Generic;
+
 namespace FEEngine.Cmdline.UI
 {
     /// <summary>
@@ -84,10 +87,82 @@ namespace FEEngine.Cmdline.UI
         {
             mView = new View();
             mCommandList = new UICommandList();
-            // todo: some kind of callback to create borders
+            mCommandList.OnExecute += RenderBorders;
 
             CanvasSize = canvasSize;
             Node = null;
+        }
+
+        private const int Left = 0x1;
+        private const int Right = 0x2;
+        private const int Up = 0x4;
+        private const int Down = 0x8;
+
+        private void RenderBorders(List<UICommandList.DrawCommand> drawCommands)
+        {
+            var borderPositions = new Dictionary<Vector, ConsoleColor>();
+            foreach (var command in drawCommands)
+            {
+                if (command.Data == BorderLayout.BorderCharacter)
+                {
+                    if (borderPositions.ContainsKey(command.Position))
+                    {
+                        borderPositions[command.Position] = command.Color;
+                    }
+                    else
+                    {
+                        borderPositions.Add(command.Position, command.Color);
+                    }
+                }
+                else if (borderPositions.ContainsKey(command.Position))
+                {
+                    borderPositions.Remove(command.Position);
+                }
+            }
+
+            var otherCommands = drawCommands.FindAll(command => !borderPositions.ContainsKey(command.Position));
+            drawCommands.Clear();
+            drawCommands.AddRange(otherCommands);
+
+            foreach (Vector position in borderPositions.Keys)
+            {
+                int surroundings = 0;
+                var setBitFlag = (Vector delta, int value) =>
+                {
+                    if (borderPositions.ContainsKey(position + delta))
+                    {
+                        surroundings |= value;
+                    }
+                };
+
+                setBitFlag((-1, 0), Left);
+                setBitFlag((1, 0), Right);
+                setBitFlag((0, -1), Up);
+                setBitFlag((0, 1), Down);
+
+                char character = surroundings switch
+                {
+                    Left | Right => '\u2550',
+                    Up | Down => '\u2551',
+                    Down | Right => '\u2554',
+                    Down | Left => '\u2557',
+                    Up | Right => '\u255a',
+                    Up | Left => '\u255d',
+                    Up | Down | Right => '\u2560',
+                    Up | Down | Left => '\u2563',
+                    Down | Left | Right => '\u2566',
+                    Up | Left | Right => '\u2569',
+                    Up | Down | Left | Right => '\u256c',
+                    _ => throw new ArgumentException("Invalid bit flag combination!")
+                };
+
+                drawCommands.Add(new UICommandList.DrawCommand
+                {
+                    Position = position,
+                    Data = character,
+                    Color = borderPositions[position]
+                });
+            }
         }
 
         /// <summary>
