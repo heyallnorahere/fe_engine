@@ -15,42 +15,12 @@
 */
 
 using FEEngine.Cmdline.UI;
+using FEEngine.Cmdline.UI.Views;
 using System;
 using System.IO;
 
 namespace FEEngine.Cmdline
 {
-    internal class TestView : IView
-    {
-        public TestView()
-        {
-            var values = Enum.GetValues<ConsoleColor>();
-            mColor = values[sCurrentColor++];
-        }
-
-        public void Render(UICommandList commandList)
-        {
-            for (int x = 0; x < mSize.X; x++)
-            {
-                for (int y = 0; y < mSize.Y; y++)
-                {
-                    int i = x + y * mSize.X;
-                    char c = (char)((i % 26) + 'a');
-
-                    commandList.Push((x, y), c, mColor);
-                }
-            }
-        }
-
-        public Vector MinSize => (10, 10);
-        public void SetSize(Vector size) => mSize = size;
-
-        private Vector mSize;
-        private readonly ConsoleColor mColor;
-
-        private static int sCurrentColor = 1;
-    }
-
     public class Program
     {
         /// <summary>
@@ -100,12 +70,9 @@ namespace FEEngine.Cmdline
             // create basic border layout
             var layout = new BorderLayout();
             mUIRoot.Node = layout;
-            layout.Center = new TestView();
 
-            foreach (var alignment in Enum.GetValues<BorderLayout.Alignment>())
-            {
-                layout.AddChild(new TestView(), alignment);
-            }
+            var mapView = new MapView();
+            layout.Center = mapView;
 
             // parse arguments
             string mapDescriptor;
@@ -121,43 +88,56 @@ namespace FEEngine.Cmdline
             // load map
             mMap = MapSerializer.Deserialize(mapDescriptor);
 
-            mRunning = true;
-            Renderer.OnCtrlC += () => mRunning = false;
-
-            Vector position = (0, 0);
-            const char character = 'a';
-
-            Renderer.OnInput += keyInfo =>
+            // temporary cursor pos controller
+            Renderer.OnInput += keyData =>
             {
-                Vector originalPosition = position;
-                switch (keyInfo.Key)
+                switch (keyData.Key)
                 {
-                    case ConsoleKey.D:
-                        position.X++;
-                        break;
                     case ConsoleKey.A:
-                        if (position.X > 0)
                         {
-                            position.X--;
+                            var cursorPos = mapView.CursorPos;
+                            if (cursorPos.X > 0)
+                            {
+                                cursorPos.X--;
+                                mapView.CursorPos = cursorPos;
+                            }
+                        }
+                        break;
+                    case ConsoleKey.D:
+                        {
+                            var cursorPos = mapView.CursorPos;
+                            if (cursorPos.X < mMap.Size.X - 1)
+                            {
+                                cursorPos.X++;
+                                mapView.CursorPos = cursorPos;
+                            }
+                        }
+                        break;
+                    case ConsoleKey.W:
+                        {
+                            var cursorPos = mapView.CursorPos;
+                            if (cursorPos.Y > 0)
+                            {
+                                cursorPos.Y--;
+                                mapView.CursorPos = cursorPos;
+                            }
                         }
                         break;
                     case ConsoleKey.S:
-                        position.Y++;
-                        break;
-                    case ConsoleKey.W:
-                        if (position.Y > 0)
                         {
-                            position.Y--;
+                            var cursorPos = mapView.CursorPos;
+                            if (cursorPos.Y < mMap.Size.Y - 1)
+                            {
+                                cursorPos.Y++;
+                                mapView.CursorPos = cursorPos;
+                            }
                         }
                         break;
                 }
-
-                if (position != originalPosition)
-                {
-                    Renderer.Draw(originalPosition, ' ');
-                    Renderer.Draw(position, character);
-                }
             };
+
+            mRunning = true;
+            Renderer.OnCtrlC += () => mRunning = false;
 
             while (mRunning)
             {

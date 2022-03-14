@@ -91,7 +91,7 @@ namespace FEEngine.Cmdline
             if (positionPrinted)
             {
                 var data = mPrintedCharacters[position];
-                if (character == data.Data || color == data.Color)
+                if (character == data.Data && color == data.Color)
                 {
                     return true;
                 }

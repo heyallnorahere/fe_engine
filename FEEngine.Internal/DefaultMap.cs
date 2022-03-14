@@ -28,7 +28,11 @@ namespace FEEngine.Internal
             mActions = new List<Action>();
         }
 
-        public bool IsOutOfBounds(Vector point) => point.X >= mDesc.Size.X || point.Y >= mDesc.Size.Y;
+        public bool IsOutOfBounds(Vector point)
+        {
+            return point.X < 0 || point.Y < 0 || 
+                point.X >= mDesc.Size.X || point.Y >= mDesc.Size.Y;
+        }
         public Vector Size => mDesc.Size;
         public string? Name => mDesc.Name;
 

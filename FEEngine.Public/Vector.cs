@@ -61,6 +61,10 @@ namespace FEEngine
         public static Vector operator -(Vector lhs, int rhs) => lhs - (rhs, rhs);
         public static Vector operator -(int lhs, Vector rhs) => (lhs, lhs) - rhs;
 
+        public static Vector operator *(Vector lhs, Vector rhs) => (lhs.X * rhs.X, lhs.Y * rhs.Y);
+        public static Vector operator *(Vector lhs, int rhs) => lhs * (rhs, rhs);
+        public static Vector operator *(int lhs, Vector rhs) => (lhs, lhs) * rhs;
+
         public override string ToString() => $"({X}, {Y})";
     }
 }

@@ -140,6 +140,7 @@ namespace FEEngine.Cmdline.UI
                 setBitFlag((0, -1), Up);
                 setBitFlag((0, 1), Down);
 
+                // https://en.wikipedia.org/wiki/List_of_Unicode_characters#Box_Drawing
                 char character = surroundings switch
                 {
                     Left | Right => '\u2550',
