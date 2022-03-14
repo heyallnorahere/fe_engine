@@ -74,6 +74,11 @@ namespace FEEngine.Cmdline.UI
             }
 
             data.Clip -= data.Offset;
+            if (data.Clip.X <= 0 || data.Clip.Y <= 0)
+            {
+                throw new ArgumentException("Clips cannot be negative!");
+            }
+
             return data;
         }
 
@@ -84,7 +89,7 @@ namespace FEEngine.Cmdline.UI
         /// <param name="character">The character to draw.</param>
         /// <param name="color">The color to draw it with. Default resets.</param>
         /// <returns>The index of the pushed command, or -1 on failure.</returns>
-        public int Push(Vector position, char character, ConsoleColor color = ConsoleColor.Black)
+        public int Push(Vector position, char character, ConsoleColor color = ConsoleColor.White)
         {
             if (position.X < 0 || position.Y < 0)
             {

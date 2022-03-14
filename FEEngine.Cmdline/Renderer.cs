@@ -15,15 +15,27 @@
 */
 
 using System;
+using System.Collections.Generic;
 
 namespace FEEngine.Cmdline
 {
     public static class Renderer
     {
-        private static Vector mOriginalSize;
+        private struct Character
+        {
+            public char Data;
+            public ConsoleColor Color;
+        }
+
+        private static Vector sOriginalSize;
+        private static ConsoleColor? sColor;
+        private static Dictionary<Vector, Character> mPrintedCharacters;
+
         static Renderer()
         {
-            mOriginalSize = (0, 0);
+            sOriginalSize = (0, 0);
+            sColor = null;
+            mPrintedCharacters = new Dictionary<Vector, Character>();
 
             Console.TreatControlCAsInput = true;
             Console.CursorVisible = false;
@@ -47,10 +59,10 @@ namespace FEEngine.Cmdline
                     Console.Clear();
                     Console.WriteLine("Exiting FEEngine...");
 
-                    if (mOriginalSize != (0, 0) && OperatingSystem.IsWindows())
+                    if (sOriginalSize != (0, 0) && OperatingSystem.IsWindows())
                     {
-                        Console.WindowWidth = mOriginalSize.X;
-                        Console.WindowHeight = mOriginalSize.Y;
+                        Console.WindowWidth = sOriginalSize.X;
+                        Console.WindowHeight = sOriginalSize.Y;
                     }
 
                     OnCtrlC?.Invoke();
@@ -62,13 +74,27 @@ namespace FEEngine.Cmdline
             }
         }
 
-        public static void Clear() => Console.Clear();
+        public static void Clear()
+        {
+            Console.Clear();
+            mPrintedCharacters.Clear();
+        }
 
-        public static bool Draw(Vector position, char character, ConsoleColor color = ConsoleColor.Black)
+        public static bool Draw(Vector position, char character, ConsoleColor color = ConsoleColor.White)
         {
             if (position.X < 0 || position.Y < 0)
             {
                 return false;
+            }
+
+            bool positionPrinted = mPrintedCharacters.ContainsKey(position);
+            if (positionPrinted)
+            {
+                var data = mPrintedCharacters[position];
+                if (character == data.Data || color == data.Color)
+                {
+                    return true;
+                }
             }
 
             if (OperatingSystem.IsWindows())
@@ -89,9 +115,9 @@ namespace FEEngine.Cmdline
                         Console.WindowHeight = requiredSize.Y;
                     }
 
-                    if (mOriginalSize == (0, 0))
+                    if (sOriginalSize == (0, 0))
                     {
-                        mOriginalSize = currentSize;
+                        sOriginalSize = currentSize;
                     }
                 }
             }
@@ -99,13 +125,33 @@ namespace FEEngine.Cmdline
             Console.CursorLeft = position.X;
             Console.CursorTop = position.Y;
 
-            if (color != ConsoleColor.Black)
+            if (color != sColor)
             {
-                Console.ForegroundColor = color;
+                if (color != ConsoleColor.Black)
+                {
+                    Console.ForegroundColor = color;
+                }
+                else
+                {
+                    Console.ResetColor();
+                }
+
+                sColor = color;
+            }
+
+            var characterData = new Character
+            {
+                Data = character,
+                Color = color
+            };
+
+            if (positionPrinted)
+            {
+                mPrintedCharacters[position] = characterData;
             }
             else
             {
-                Console.ResetColor();
+                mPrintedCharacters.Add(position, characterData);
             }
 
             Console.Write(character);

@@ -23,6 +23,8 @@ namespace FEEngine.Cmdline.UI
     /// </summary>
     public sealed class BorderLayout : IView
     {
+        public const char BorderCharacter = '@'; // temp
+
         public enum Alignment
         {
             Top,
@@ -44,9 +46,23 @@ namespace FEEngine.Cmdline.UI
             mSize = (0, 0);
         }
 
+        private enum LineType
+        {
+            Vertical,
+            Horizontal
+        }
+
+        private struct BorderLine
+        {
+            public LineType Type;
+            public int P1, P2, P3;
+        }
+
         // todo: border characters
         public void Render(UICommandList commandList)
         {
+            var borderLines = new List<BorderLine>();
+
             Vector sizeRemaining = mSize;
             Vector originRemaining = (0, 0);
 
@@ -58,24 +74,41 @@ namespace FEEngine.Cmdline.UI
                 var minSize = child.View.MinSize;
                 switch (child.Alignment)
                 {
-                    case Alignment.Bottom:
+                    case Alignment.Top:
                         childPos.X = originRemaining.X;
                         childPos.Y = originRemaining.Y;
 
                         childSize.X = sizeRemaining.X;
                         childSize.Y = minSize.Y;
 
-                        originRemaining.Y += childSize.Y;
-                        sizeRemaining.Y -= childSize.Y;
+                        originRemaining.Y += childSize.Y + 1;
+                        sizeRemaining.Y -= childSize.Y + 1;
+
+                        borderLines.Add(new BorderLine
+                        {
+                            Type = LineType.Horizontal,
+                            P1 = childPos.X,
+                            P2 = childPos.X + childSize.X - 1,
+                            P3 = childPos.Y + childSize.Y
+                        });
+
                         break;
-                    case Alignment.Top:
+                    case Alignment.Bottom:
                         childPos.X = originRemaining.X;
                         childPos.Y = mSize.Y - minSize.Y;
 
                         childSize.X = sizeRemaining.X;
                         childSize.Y = minSize.Y;
 
-                        sizeRemaining.Y -= childSize.Y;
+                        sizeRemaining.Y -= childSize.Y + 1;
+                        borderLines.Add(new BorderLine
+                        {
+                            Type = LineType.Horizontal,
+                            P1 = childPos.X,
+                            P2 = childPos.X + childSize.X - 1,
+                            P3 = childPos.Y - 1
+                        });
+
                         break;
                     case Alignment.Left:
                         childPos.X = originRemaining.X;
@@ -84,8 +117,17 @@ namespace FEEngine.Cmdline.UI
                         childSize.X = minSize.X;
                         childSize.Y = sizeRemaining.Y;
 
-                        originRemaining.X += childSize.X;
-                        sizeRemaining.X -= childSize.X;
+                        originRemaining.X += childSize.X + 1;
+                        sizeRemaining.X -= childSize.X + 1;
+
+                        borderLines.Add(new BorderLine
+                        {
+                            Type = LineType.Vertical,
+                            P1 = childPos.Y,
+                            P2 = childPos.Y + childSize.Y - 1,
+                            P3 = childPos.X + childSize.X
+                        });
+
                         break;
                     case Alignment.Right:
                         childPos.X = mSize.X - minSize.X;
@@ -94,7 +136,15 @@ namespace FEEngine.Cmdline.UI
                         childSize.X = minSize.X;
                         childSize.Y = sizeRemaining.Y;
 
-                        sizeRemaining.X -= childSize.X;
+                        sizeRemaining.X -= childSize.X + 1;
+                        borderLines.Add(new BorderLine
+                        {
+                            Type = LineType.Vertical,
+                            P1 = childPos.Y,
+                            P2 = childPos.Y + childSize.Y - 1,
+                            P3 = childPos.X - 1
+                        });
+
                         break;
                 }
 
@@ -122,6 +172,25 @@ namespace FEEngine.Cmdline.UI
                 Center.Render(commandList);
 
                 commandList.OffsetClipStack.Pop();
+            }
+
+            foreach (var line in borderLines)
+            {
+                switch (line.Type)
+                {
+                    case LineType.Vertical:
+                        for (int y = line.P1; y <= line.P2; y++)
+                        {
+                            commandList.Push((line.P3, y), BorderCharacter);
+                        }
+                        break;
+                    case LineType.Horizontal:
+                        for (int x = line.P1; x <= line.P2; x++)
+                        {
+                            commandList.Push((x, line.P3), BorderCharacter);
+                        }
+                        break;
+                }
             }
         }
 
