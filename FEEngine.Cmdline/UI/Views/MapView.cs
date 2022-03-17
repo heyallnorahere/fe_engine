@@ -15,6 +15,7 @@
 */
 
 using System;
+using System.Collections.Generic;
 
 namespace FEEngine.Cmdline.UI.Views
 {
@@ -29,11 +30,45 @@ namespace FEEngine.Cmdline.UI.Views
         public MapView()
         {
             mCursorPos = (0, 0);
+            mViewOffset = (0, 0);
             mAvailableSize = (0, 0);
+        }
+        
+        private void InvalidateViewOffset()
+        {
+            Vector currentCursorRenderPos = ToScreenSpace(mCursorPos);
+            if (currentCursorRenderPos.X >= 0 && currentCursorRenderPos.X < mAvailableSize.X &&
+                currentCursorRenderPos.Y >= 0 && currentCursorRenderPos.Y < mAvailableSize.Y)
+            {
+                return;
+            }
+
+            Vector absRenderPos = ToScreenSpace(mCursorPos, (0, 0));
+            if (currentCursorRenderPos.X < 0)
+            {
+                mViewOffset.X = absRenderPos.X - 1;
+            }
+
+            if (currentCursorRenderPos.Y < 0)
+            {
+                mViewOffset.Y = absRenderPos.Y - 1;
+            }
+
+            if (currentCursorRenderPos.X >= mAvailableSize.X)
+            {
+                mViewOffset.X = absRenderPos.X + 1 - mAvailableSize.X;
+            }
+
+            if (currentCursorRenderPos.Y >= mAvailableSize.Y)
+            {
+                mViewOffset.Y = absRenderPos.Y + 1 - mAvailableSize.Y;
+            }
         }
 
         public void Render(UICommandList commandList)
         {
+            InvalidateViewOffset();
+
             int bufferSize = mAvailableSize.X * mAvailableSize.Y;
             var buffer = new RenderedCell[bufferSize];
 
@@ -47,20 +82,27 @@ namespace FEEngine.Cmdline.UI.Views
             }
 
             var renderedCursorPos = ToScreenSpace(mCursorPos) - (0, 1);
-            int cursorBufferIndex = GetBufferIndex(renderedCursorPos);
-            buffer[cursorBufferIndex] = new RenderedCell
+            int bufferIndex = GetBufferIndex(renderedCursorPos);
+            buffer[bufferIndex] = new RenderedCell
             {
                 Data = 'v',
                 Color = ConsoleColor.White
             };
 
             var map = Program.Instance.Map;
+            var unitPositions = new HashSet<Vector>();
             foreach (IUnit unit in map.Units)
             {
-                Vector unitScreenPos = ToScreenSpace(unit.Position);
-                int bufferIndex = GetBufferIndex(unitScreenPos);
+                var unitScreenPos = ToScreenSpace(unit.Position);
+                if (unitScreenPos.X < 0 || unitScreenPos.X >= mAvailableSize.X ||
+                    unitScreenPos.Y < 0 || unitScreenPos.Y >= mAvailableSize.Y)
+                {
+                    continue;
+                }
 
-                if (buffer[bufferIndex].Data != ' ')
+                bufferIndex = GetBufferIndex(unitScreenPos);
+                var data = buffer[bufferIndex];
+                if (data.Data != ' ')
                 {
                     throw new ArgumentException("There are two units of the same position!");
                 }
@@ -87,6 +129,7 @@ namespace FEEngine.Cmdline.UI.Views
                         _ => throw new ArgumentException("Invalid weapon type!")
                     };
 
+                    unitPositions.Add(unit.Position);
                     buffer[bufferIndex] = new RenderedCell
                     {
                         Data = character,
@@ -104,7 +147,7 @@ namespace FEEngine.Cmdline.UI.Views
                 for (int x = 0; x < mAvailableSize.X; x++)
                 {
                     Vector screenPos = (x, y);
-                    int bufferIndex = GetBufferIndex(screenPos);
+                    bufferIndex = GetBufferIndex(screenPos);
 
                     var cellData = buffer[bufferIndex];
                     commandList.Push(screenPos, cellData.Data, cellData.Color);
@@ -112,10 +155,16 @@ namespace FEEngine.Cmdline.UI.Views
             }
         }
 
-        private Vector ToScreenSpace(Vector virtualPos) => virtualPos * 2 + 1;
-        private int GetBufferIndex(Vector screenPos) => screenPos.Y * mAvailableSize.X + screenPos.X;
+        private Vector ToScreenSpace(Vector virtualPos, Vector? viewOffset = null)
+        {
+            Vector result = virtualPos * 2 + 1;
+            result -= viewOffset ?? mViewOffset;
 
-        public Vector MinSize => ToScreenSpace(Program.Instance.Map.Size);
+            return result;
+        }
+
+        private int GetBufferIndex(Vector screenPos) => screenPos.Y * mAvailableSize.X + screenPos.X;
+        public Vector MinSize => (10, 10);
 
         public Vector CursorPos
         {
@@ -133,6 +182,7 @@ namespace FEEngine.Cmdline.UI.Views
         }
 
         private Vector mCursorPos;
+        private Vector mViewOffset;
 
         public void SetSize(Vector size) => mAvailableSize = size;
         private Vector mAvailableSize;
