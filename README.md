@@ -8,3 +8,10 @@ Fire Emblem is a tactical role-playing game developed by Intelligent Systems and
 
 ## Building
 Simply install [.NET Core](https://dotnet.microsoft.com/download) and run `dotnet build -c Release` within the root directory of this repository.
+
+In this repository there is an example command line application in `FEEngine.Cmdline`. Once the solution is built, run:
+```bash
+dotnet FEEngine.Cmdline/bin/Release/net6.0/FEEngine.Cmdline.dll
+```
+
+When on Unix, the console does not resize automatically. If the console is too small when the application starts up, resize it and press C. This will clear the console, and re-render the application.

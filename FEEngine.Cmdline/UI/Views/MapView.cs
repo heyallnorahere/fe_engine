@@ -142,6 +142,32 @@ namespace FEEngine.Cmdline.UI.Views
                 }
             }
 
+            for (int y = 0; y < map.Size.Y; y++)
+            {
+                for (int x = 0; x < map.Size.X; x++)
+                {
+                    Vector position = (x, y);
+                    if (unitPositions.Contains(position))
+                    {
+                        continue;
+                    }
+
+                    Vector screenPos = ToScreenSpace(position);
+                    if (screenPos.X < 0 || screenPos.X >= mAvailableSize.X ||
+                        screenPos.Y < 0 || screenPos.Y >= mAvailableSize.Y)
+                    {
+                        continue;
+                    }
+
+                    bufferIndex = GetBufferIndex(screenPos);
+                    buffer[bufferIndex] = new RenderedCell
+                    {
+                        Data = '-',
+                        Color = ConsoleColor.White
+                    };
+                }
+            }
+
             for (int y = 0; y < mAvailableSize.Y; y++)
             {
                 for (int x = 0; x < mAvailableSize.X; x++)
