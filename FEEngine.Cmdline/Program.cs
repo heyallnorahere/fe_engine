@@ -49,7 +49,6 @@ namespace FEEngine.Cmdline
             mItems = null;
             mMap = null;
             mUIRoot = null;
-            mRunning = false;
         }
 
         private void Run(string[] args)
@@ -133,13 +132,16 @@ namespace FEEngine.Cmdline
                             }
                         }
                         break;
+                    case ConsoleKey.C:
+                        Renderer.Clear();
+                        break;
                 }
             };
 
-            mRunning = true;
-            Renderer.OnCtrlC += () => mRunning = false;
+            bool running = true;
+            Renderer.OnCtrlC += () => running = false;
 
-            while (mRunning)
+            while (running)
             {
                 mUIRoot.Render();
                 Renderer.HandleInputs();
@@ -150,12 +152,10 @@ namespace FEEngine.Cmdline
         public ItemDatabase Items => mItems!;
         public IMap Map => mMap!;
         public UIRoot UIRoot => mUIRoot!;
-        public bool Running => mRunning;
 
         private Factory? mFactory;
         private ItemDatabase? mItems;
         private IMap? mMap;
         private UIRoot? mUIRoot;
-        private bool mRunning;
     }
 }

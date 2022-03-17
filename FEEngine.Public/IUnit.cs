@@ -19,6 +19,17 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace FEEngine
 {
+    /// <summary>
+    /// An interface for custom user data attached to a <see cref="IUnit">unit</see>.
+    /// </summary>
+    public interface IUnitUserData
+    {
+        /// <summary>
+        /// Whether this structure is valid.
+        /// </summary>
+        public bool IsValid { get; }
+    }
+
     public struct UnitStats
     {
         public UnitStats()
@@ -95,6 +106,7 @@ namespace FEEngine
             EquippedWeapon = null;
             StartingPosition = (0, 0);
             Stats = new UnitStats();
+            UserData = null;
         }
 
         /// <summary>
@@ -122,12 +134,22 @@ namespace FEEngine
         /// </summary>
         public UnitStats Stats;
 
+        /// <summary>
+        /// Arbitrary data to be set by the user.
+        /// </summary>
+        public IUnitUserData? UserData;
+
         public bool Verify()
         {
             bool valid = true;
             if (EquippedWeapon != null)
             {
                 valid &= EquippedWeapon.WeaponData != null;
+            }
+
+            if (UserData != null)
+            {
+                valid &= UserData.IsValid;
             }
 
             return valid;
@@ -238,5 +260,10 @@ namespace FEEngine
         /// <param name="index">The index of the item in said inventory.</param>
         /// <returns>If the item was successfully used.</returns>
         public bool UseItem(int index);
+
+        /// <summary>
+        /// Data attached to this unit, by the client program.
+        /// </summary>
+        public IUnitUserData? UserData { get; set; }
     }
 }

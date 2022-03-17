@@ -37,6 +37,7 @@ namespace FEEngine.Cmdline
             sColor = null;
             mPrintedCharacters = new Dictionary<Vector, Character>();
 
+            Console.Clear();
             Console.TreatControlCAsInput = true;
             Console.CursorVisible = false;
         }
@@ -95,6 +96,10 @@ namespace FEEngine.Cmdline
                 {
                     return true;
                 }
+            }
+            else if (character == ' ')
+            {
+                return true;
             }
 
             if (OperatingSystem.IsWindows())

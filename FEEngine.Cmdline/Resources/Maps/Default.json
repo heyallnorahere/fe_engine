@@ -27,6 +27,9 @@
                 "Resistance": 5,
                 "Luck": 7,
                 "Charm": 11
+            },
+            "UserData": {
+                "Allegiance": "Player"
             }
         },
         {
@@ -51,6 +54,9 @@
                 "Resistance": 7,
                 "Luck": 10,
                 "Charm": 8
+            },
+            "UserData": {
+                "Allegiance": "Enemy"
             }
         }
     ]

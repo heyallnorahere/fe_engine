@@ -48,6 +48,9 @@ namespace FEEngine.Json
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
         public int HPRemaining { get; set; }
+
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+        public IUnitUserData? UserData { get; set; }
     }
 
     [JsonObject(MissingMemberHandling = MissingMemberHandling.Ignore)]

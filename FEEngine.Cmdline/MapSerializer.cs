@@ -16,6 +16,7 @@
 
 using FEEngine.Json;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,12 +27,22 @@ namespace FEEngine.Cmdline
     {
         public const string ManifestPrefix = "manifest:";
 
+        private class UserDataConverter : CustomCreationConverter<IUnitUserData>
+        {
+            public override IUnitUserData Create(Type objectType) => new UnitUserData();
+        }
+
         static MapSerializer()
         {
-            mSerializer = JsonSerializer.CreateDefault();
-            mSerializer.NullValueHandling = NullValueHandling.Include;
-            mSerializer.MissingMemberHandling = MissingMemberHandling.Error;
-            mSerializer.DefaultValueHandling = DefaultValueHandling.Populate;
+            sSerializer = JsonSerializer.CreateDefault();
+
+            sSerializer.Formatting = Formatting.Indented;
+            sSerializer.NullValueHandling = NullValueHandling.Include;
+            sSerializer.MissingMemberHandling = MissingMemberHandling.Error;
+            sSerializer.DefaultValueHandling = DefaultValueHandling.Populate;
+
+            sSerializer.Converters.Add(new UserDataConverter());
+            sSerializer.Converters.Add(new StringEnumConverter());
         }
 
         private static IItem GetItem(JsonItemDesc desc, ItemDatabase database)
@@ -130,7 +141,7 @@ namespace FEEngine.Cmdline
 
             var streamReader = new StreamReader(stream);
             var jsonReader = new JsonTextReader(streamReader);
-            var jsonMapDesc = mSerializer.Deserialize<JsonMapDesc>(jsonReader);
+            var jsonMapDesc = sSerializer.Deserialize<JsonMapDesc>(jsonReader);
 
             var mapDesc = new MapDesc
             {
@@ -168,7 +179,8 @@ namespace FEEngine.Cmdline
                     InitialInventory = inventory,
                     EquippedWeapon = equippedWeapon,
                     StartingPosition = jsonUnitDesc.Position,
-                    Stats = jsonUnitDesc.Stats
+                    Stats = jsonUnitDesc.Stats,
+                    UserData = jsonUnitDesc.UserData,
                 };
 
                 IUnit? unit = factory.Create<IUnit>(unitDesc);
@@ -188,6 +200,6 @@ namespace FEEngine.Cmdline
             return map;
         }
 
-        private static readonly JsonSerializer mSerializer;
+        private static readonly JsonSerializer sSerializer;
     }
 }
