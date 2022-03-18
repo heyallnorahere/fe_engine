@@ -23,7 +23,7 @@ namespace FEEngine.Cmdline.UI
     /// </summary>
     public sealed class BorderLayout : IView
     {
-        public const char BorderCharacter = '@'; // temp
+        public const char BorderCharacter = '\u001c'; // temp
 
         public enum Alignment
         {
@@ -227,6 +227,49 @@ namespace FEEngine.Cmdline.UI
 
                 return size;
             }
+        }
+
+        /// <summary>
+        /// Finds the first instance of the requested view type in the layout.
+        /// Center is searched first, then edges.
+        /// </summary>
+        /// <typeparam name="T">The type of view to search for.</typeparam>
+        /// <returns>The found view, or null if the function failed.</returns>
+        public T? FindView<T>() where T : IView
+        {
+            if (Center != null)
+            {
+                T? center = GetInternalView<T>(Center);
+                if (center != null)
+                {
+                    return center;
+                }
+            }
+
+            foreach (var child in mChildren)
+            {
+                T? childView = GetInternalView<T>(child.View);
+                if (childView != null)
+                {
+                    return childView;
+                }
+            }
+
+            return default;
+        }
+
+        internal static T? GetInternalView<T>(IView view) where T : IView
+        {
+            if (view is BorderLayout layout)
+            {
+                return layout.FindView<T>();
+            }
+            else if (view is T instance)
+            {
+                return instance;
+            }
+
+            return default;
         }
 
         public void SetSize(Vector size) => mSize = size;

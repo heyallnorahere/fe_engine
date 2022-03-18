@@ -167,6 +167,24 @@ namespace FEEngine.Cmdline.UI
         }
 
         /// <summary>
+        /// Finds the first instance of the requested view type.
+        /// Uses <see cref="BorderLayout.FindView{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of view to search for.</typeparam>
+        /// <returns>The found view, or null if the function failed.</returns>
+        public T? FindView<T>() where T : IView
+        {
+            if (Node != null)
+            {
+                return BorderLayout.GetInternalView<T>(Node);
+            }
+            else
+            {
+                return default;
+            }
+        }
+
+        /// <summary>
         /// Renders the UI.
         /// </summary>
         public void Render()
