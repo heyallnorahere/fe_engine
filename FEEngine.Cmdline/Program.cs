@@ -87,66 +87,11 @@ namespace FEEngine.Cmdline
             // load map
             mMap = MapSerializer.Deserialize(mapDescriptor);
 
-            // temporary cursor pos controller
-            /*Renderer.OnInput += keyData =>
-            {
-                var mapView = mUIRoot.FindView<MapView>();
-                if (mapView == null)
-                {
-                    throw new Exception("Could not find map view!");
-                }
-
-                switch (keyData.Key)
-                {
-                    case ConsoleKey.A:
-                        {
-                            var cursorPos = mapView.CursorPos;
-                            if (cursorPos.X > 0)
-                            {
-                                cursorPos.X--;
-                                mapView.CursorPos = cursorPos;
-                            }
-                        }
-                        break;
-                    case ConsoleKey.D:
-                        {
-                            var cursorPos = mapView.CursorPos;
-                            if (cursorPos.X < mMap.Size.X - 1)
-                            {
-                                cursorPos.X++;
-                                mapView.CursorPos = cursorPos;
-                            }
-                        }
-                        break;
-                    case ConsoleKey.W:
-                        {
-                            var cursorPos = mapView.CursorPos;
-                            if (cursorPos.Y > 0)
-                            {
-                                cursorPos.Y--;
-                                mapView.CursorPos = cursorPos;
-                            }
-                        }
-                        break;
-                    case ConsoleKey.S:
-                        {
-                            var cursorPos = mapView.CursorPos;
-                            if (cursorPos.Y < mMap.Size.Y - 1)
-                            {
-                                cursorPos.Y++;
-                                mapView.CursorPos = cursorPos;
-                            }
-                        }
-                        break;
-                    case ConsoleKey.C:
-                        Renderer.Clear();
-                        break;
-                }
-            };*/
-
+            // add ctrl+c callback
             bool running = true;
             Renderer.OnCtrlC += () => running = false;
 
+            // run!
             while (running)
             {
                 mUIRoot.Render();
