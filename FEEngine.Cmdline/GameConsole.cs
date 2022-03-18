@@ -154,7 +154,7 @@ namespace FEEngine.Cmdline
             }
             else if (currentCommand.Execute == null)
             {
-                return new string[] { $"Cannot run command: {command}" };
+                return new string[] { $"Incomplete command: {command}" };
             }
 
             string[] commandArgs;

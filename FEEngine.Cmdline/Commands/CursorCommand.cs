@@ -27,8 +27,14 @@ namespace FEEngine.Cmdline.Commands
         {
             Subcommands = new Dictionary<string, IConsoleCommand>
             {
-                ["move"] = new GenericSubcommand(Move),
-                ["get"] = new GenericSubcommand(Get)
+                ["move"] = new GenericSubcommand
+                {
+                    Execute = Move
+                },
+                ["get"] = new GenericSubcommand
+                {
+                    Execute = Get
+                }
             };
         }
 

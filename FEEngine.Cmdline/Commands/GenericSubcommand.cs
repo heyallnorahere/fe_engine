@@ -23,19 +23,13 @@ namespace FEEngine.Cmdline.Commands
     /// </summary>
     internal sealed class GenericSubcommand : IConsoleCommand
     {
-        public GenericSubcommand(IReadOnlyDictionary<string, IConsoleCommand> subcommands)
+        public GenericSubcommand()
         {
-            Subcommands = subcommands;
+            Subcommands = new Dictionary<string, IConsoleCommand>();
             Execute = null;
         }
 
-        public GenericSubcommand(ConsoleCommandExecutionCallback executionCallback)
-        {
-            Execute = executionCallback;
-            Subcommands = new Dictionary<string, IConsoleCommand>();
-        }
-
-        public IReadOnlyDictionary<string, IConsoleCommand> Subcommands { get; }
-        public ConsoleCommandExecutionCallback? Execute { get; }
+        public IReadOnlyDictionary<string, IConsoleCommand> Subcommands { get; set; }
+        public ConsoleCommandExecutionCallback? Execute { get; set; }
     }
 }

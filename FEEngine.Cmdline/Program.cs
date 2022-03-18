@@ -84,8 +84,8 @@ namespace FEEngine.Cmdline
                 mapDescriptor = $"{MapSerializer.ManifestPrefix}FEEngine.Cmdline.Resources.Maps.Default.json";
             }
 
-            // load map
-            mMap = MapSerializer.Deserialize(mapDescriptor);
+            // load the map
+            LoadMap(mapDescriptor);
 
             // add ctrl+c callback
             bool running = true;
@@ -98,6 +98,13 @@ namespace FEEngine.Cmdline
                 Renderer.HandleInputs();
             }
         }
+
+        /// <summary>
+        /// Loads a map from a descriptor. To load a map from an assembly,
+        /// use the <see cref="MapSerializer.ManifestPrefix">manifest prefix</see>.
+        /// </summary>
+        /// <param name="descriptor">The string describing the map to load.</param>
+        public void LoadMap(string descriptor) => mMap = MapSerializer.Deserialize(descriptor);
 
         public Factory Factory => mFactory!;
         public ItemDatabase Items => mItems!;
