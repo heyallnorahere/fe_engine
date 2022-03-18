@@ -70,8 +70,8 @@ namespace FEEngine.Cmdline
             var layout = new BorderLayout();
             mUIRoot.Node = layout;
 
-            var mapView = new MapView();
-            layout.Center = mapView;
+            layout.Center = new MapView();
+            layout.AddChild(new GameConsoleView(), BorderLayout.Alignment.Bottom);
 
             // parse arguments
             string mapDescriptor;
@@ -88,8 +88,14 @@ namespace FEEngine.Cmdline
             mMap = MapSerializer.Deserialize(mapDescriptor);
 
             // temporary cursor pos controller
-            Renderer.OnInput += keyData =>
+            /*Renderer.OnInput += keyData =>
             {
+                var mapView = mUIRoot.FindView<MapView>();
+                if (mapView == null)
+                {
+                    throw new Exception("Could not find map view!");
+                }
+
                 switch (keyData.Key)
                 {
                     case ConsoleKey.A:
@@ -136,7 +142,7 @@ namespace FEEngine.Cmdline
                         Renderer.Clear();
                         break;
                 }
-            };
+            };*/
 
             bool running = true;
             Renderer.OnCtrlC += () => running = false;

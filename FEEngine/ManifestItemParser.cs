@@ -154,7 +154,7 @@ namespace FEEngine
                     continue;
                 }
 
-                bool validResource = callbacks?.ResourceQualifier?.Invoke(name) ?? false;
+                bool validResource = callbacks?.ResourceQualifier?.Invoke(name) ?? true;
                 if (!validResource)
                 {
                     continue;
