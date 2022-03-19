@@ -29,13 +29,15 @@ namespace FEEngine.Cmdline
 
         private static Vector sOriginalSize;
         private static ConsoleColor? sColor;
-        private static Dictionary<Vector, Character> mPrintedCharacters;
+        private static Dictionary<Vector, Character> sPrintedCharacters;
+        private static bool sCtrlCSignaled;
 
         static Renderer()
         {
             sOriginalSize = (0, 0);
             sColor = null;
-            mPrintedCharacters = new Dictionary<Vector, Character>();
+            sPrintedCharacters = new Dictionary<Vector, Character>();
+            sCtrlCSignaled = false;
 
             Console.Clear();
             Console.TreatControlCAsInput = true;
@@ -45,6 +47,28 @@ namespace FEEngine.Cmdline
         public static event System.Action? OnCtrlC;
         public static event Action<ConsoleKeyInfo>? OnInput;
 
+        private static void RestoreConsoleState()
+        {
+            Console.CursorVisible = true;
+            Console.CursorTop = 0;
+            Console.CursorLeft = 0;
+
+            Console.ResetColor();
+            Console.Clear();
+            Console.WriteLine("Exiting FEEngine...");
+
+            if (sOriginalSize != (0, 0) && OperatingSystem.IsWindows())
+            {
+                Console.WindowWidth = sOriginalSize.X;
+                Console.WindowHeight = sOriginalSize.Y;
+            }
+        }
+
+        public static void SignalCtrlC()
+        {
+            sCtrlCSignaled = true;
+        }
+
         public static void HandleInputs()
         {
             while (Console.KeyAvailable)
@@ -52,33 +76,28 @@ namespace FEEngine.Cmdline
                 var key = Console.ReadKey(true);
                 if ((key.Modifiers & ConsoleModifiers.Control) != 0 && key.Key == ConsoleKey.C)
                 {
-                    Console.CursorVisible = true;
-                    Console.CursorTop = 0;
-                    Console.CursorLeft = 0;
-
-                    Console.ResetColor();
-                    Console.Clear();
-                    Console.WriteLine("Exiting FEEngine...");
-
-                    if (sOriginalSize != (0, 0) && OperatingSystem.IsWindows())
-                    {
-                        Console.WindowWidth = sOriginalSize.X;
-                        Console.WindowHeight = sOriginalSize.Y;
-                    }
-
-                    OnCtrlC?.Invoke();
+                    sCtrlCSignaled = true;
+                    break;
                 }
                 else
                 {
                     OnInput?.Invoke(key);
                 }
             }
+
+            if (sCtrlCSignaled)
+            {
+                RestoreConsoleState();
+                OnCtrlC?.Invoke();
+
+                sCtrlCSignaled = false;
+            }
         }
 
         public static void Clear()
         {
             Console.Clear();
-            mPrintedCharacters.Clear();
+            sPrintedCharacters.Clear();
         }
 
         public static bool Draw(Vector position, char character, ConsoleColor color = ConsoleColor.White)
@@ -88,10 +107,10 @@ namespace FEEngine.Cmdline
                 return false;
             }
 
-            bool positionPrinted = mPrintedCharacters.ContainsKey(position);
+            bool positionPrinted = sPrintedCharacters.ContainsKey(position);
             if (positionPrinted)
             {
-                var data = mPrintedCharacters[position];
+                var data = sPrintedCharacters[position];
                 if (character == data.Data && color == data.Color)
                 {
                     return true;
@@ -152,11 +171,11 @@ namespace FEEngine.Cmdline
 
             if (positionPrinted)
             {
-                mPrintedCharacters[position] = characterData;
+                sPrintedCharacters[position] = characterData;
             }
             else
             {
-                mPrintedCharacters.Add(position, characterData);
+                sPrintedCharacters.Add(position, characterData);
             }
 
             Console.Write(character);

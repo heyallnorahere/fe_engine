@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+using FEEngine.Cmdline.ClientData;
 using System;
 using System.Collections.Generic;
 
@@ -107,9 +108,9 @@ namespace FEEngine.Cmdline.UI.Views
                     throw new ArgumentException("There are two units of the same position!");
                 }
 
-                if (unit.UserData is UnitUserData userData)
+                if (unit.ClientData is UnitClientData ClientData)
                 {
-                    var color = userData.Allegiance switch
+                    var color = ClientData.Allegiance switch
                     {
                         Allegiance.Player => ConsoleColor.Blue,
                         Allegiance.Enemy => ConsoleColor.Red,

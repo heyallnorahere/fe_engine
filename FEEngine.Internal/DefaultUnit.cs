@@ -27,7 +27,7 @@ namespace FEEngine.Internal
             Position = desc.StartingPosition;
             mMap = null;
             mActionIndices = new List<int>();
-            UserData = desc.UserData;
+            ClientData = desc.ClientData;
 
             mInventory = new List<IItem>();
             if (desc.EquippedWeapon != null)
@@ -170,7 +170,7 @@ namespace FEEngine.Internal
             return true;
         }
 
-        public IUnitUserData? UserData { get; set; }
+        public IUnitClientData? ClientData { get; set; }
 
         private IItem? mEquippedWeapon;
         private readonly List<IItem> mInventory;

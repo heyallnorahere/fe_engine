@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+using FEEngine.Cmdline.ClientData;
 using FEEngine.Json;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -27,9 +28,15 @@ namespace FEEngine.Cmdline
     {
         public const string ManifestPrefix = "manifest:";
 
-        private class UserDataConverter : CustomCreationConverter<IUnitUserData>
+        private class ClientDataConverter<I, T> : CustomCreationConverter<I> where T : I, new()
         {
-            public override IUnitUserData Create(Type objectType) => new UnitUserData();
+            public override I Create(Type objectType) => new T();
+
+            public static void Add(JsonSerializer serializer)
+            {
+                var converter = new ClientDataConverter<I, T>();
+                serializer.Converters.Add(converter);
+            }
         }
 
         static MapSerializer()
@@ -41,7 +48,9 @@ namespace FEEngine.Cmdline
             sSerializer.MissingMemberHandling = MissingMemberHandling.Error;
             sSerializer.DefaultValueHandling = DefaultValueHandling.Populate;
 
-            sSerializer.Converters.Add(new UserDataConverter());
+            ClientDataConverter<IUnitClientData, UnitClientData>.Add(sSerializer);
+            ClientDataConverter<IMapClientData, MapClientData>.Add(sSerializer);
+
             sSerializer.Converters.Add(new StringEnumConverter());
         }
 
@@ -146,7 +155,8 @@ namespace FEEngine.Cmdline
             var mapDesc = new MapDesc
             {
                 Size = jsonMapDesc.Size,
-                Name = jsonMapDesc.Name
+                Name = jsonMapDesc.Name,
+                ClientData = jsonMapDesc.ClientData
             };
 
             var instance = Program.Instance;
@@ -156,6 +166,11 @@ namespace FEEngine.Cmdline
             if (map == null)
             {
                 throw new ArgumentException("Invalid map description!");
+            }
+
+            if (map.ClientData is MapClientData clientData)
+            {
+                clientData.SetMap(map);
             }
 
             foreach (var jsonUnitDesc in jsonMapDesc.Units)
@@ -180,7 +195,7 @@ namespace FEEngine.Cmdline
                     EquippedWeapon = equippedWeapon,
                     StartingPosition = jsonUnitDesc.Position,
                     Stats = jsonUnitDesc.Stats,
-                    UserData = jsonUnitDesc.UserData,
+                    ClientData = jsonUnitDesc.ClientData,
                 };
 
                 IUnit? unit = factory.Create<IUnit>(unitDesc);

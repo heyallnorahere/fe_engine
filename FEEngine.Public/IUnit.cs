@@ -22,7 +22,7 @@ namespace FEEngine
     /// <summary>
     /// An interface for custom user data attached to a <see cref="IUnit">unit</see>.
     /// </summary>
-    public interface IUnitUserData
+    public interface IUnitClientData
     {
         /// <summary>
         /// Whether this structure is valid.
@@ -106,7 +106,7 @@ namespace FEEngine
             EquippedWeapon = null;
             StartingPosition = (0, 0);
             Stats = new UnitStats();
-            UserData = null;
+            ClientData = null;
         }
 
         /// <summary>
@@ -135,9 +135,9 @@ namespace FEEngine
         public UnitStats Stats;
 
         /// <summary>
-        /// Arbitrary data to be set by the user.
+        /// Arbitrary data to be set by the client.
         /// </summary>
-        public IUnitUserData? UserData;
+        public IUnitClientData? ClientData;
 
         public bool Verify()
         {
@@ -147,9 +147,9 @@ namespace FEEngine
                 valid &= EquippedWeapon.WeaponData != null;
             }
 
-            if (UserData != null)
+            if (ClientData != null)
             {
-                valid &= UserData.IsValid;
+                valid &= ClientData.IsValid;
             }
 
             return valid;
@@ -264,6 +264,6 @@ namespace FEEngine
         /// <summary>
         /// Data attached to this unit, by the client program.
         /// </summary>
-        public IUnitUserData? UserData { get; set; }
+        public IUnitClientData? ClientData { get; set; }
     }
 }

@@ -50,7 +50,7 @@ namespace FEEngine.Json
         public int HPRemaining { get; set; }
 
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
-        public IUnitUserData? UserData { get; set; }
+        public IUnitClientData? ClientData { get; set; }
     }
 
     [JsonObject(MissingMemberHandling = MissingMemberHandling.Ignore)]
@@ -64,5 +64,8 @@ namespace FEEngine.Json
 
         [JsonProperty(Required = Required.Always)]
         public List<JsonUnitDesc> Units { get; set; }
+
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+        public IMapClientData? ClientData { get; set; }
     }
 }

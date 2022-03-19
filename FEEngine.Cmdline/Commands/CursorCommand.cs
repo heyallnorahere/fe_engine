@@ -44,10 +44,7 @@ namespace FEEngine.Cmdline.Commands
         private static void Move(string[] args, Stream output)
         {
             Vector newPosition;
-            var writer = new StreamWriter(output)
-            {
-                AutoFlush = true
-            };
+            var writer = output.CreateWriter();
 
             if (args.Length != 2 ||
                 !int.TryParse(args[0], out newPosition.X) ||
@@ -79,11 +76,7 @@ namespace FEEngine.Cmdline.Commands
 
         private static void Get(string[] args, Stream output)
         {
-            var writer = new StreamWriter(output)
-            {
-                AutoFlush = true
-            };
-
+            var writer = output.CreateWriter();
             if (args.Length > 0)
             {
                 writer.WriteLine("Usage: cursor get");

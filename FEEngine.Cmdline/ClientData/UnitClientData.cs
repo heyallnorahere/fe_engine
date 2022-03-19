@@ -16,18 +16,13 @@
 
 using Newtonsoft.Json;
 
-namespace FEEngine.Cmdline
+namespace FEEngine.Cmdline.ClientData
 {
-    public enum Allegiance
-    {
-        Player,
-        Enemy
-    }
-
     [JsonObject(MissingMemberHandling = MissingMemberHandling.Error)]
-    public sealed class UnitUserData : IUnitUserData
+    public sealed class UnitClientData : IUnitClientData
     {
         public Allegiance Allegiance { get; set; }
+        public bool HasMoved { get; set; }
 
         [JsonIgnore]
         public bool IsValid => true;

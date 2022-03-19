@@ -28,8 +28,9 @@
                 "Luck": 7,
                 "Charm": 11
             },
-            "UserData": {
-                "Allegiance": "Player"
+            "ClientData": {
+                "Allegiance": "Player",
+                "HasMoved": false
             }
         },
         {
@@ -55,9 +56,15 @@
                 "Luck": 10,
                 "Charm": 8
             },
-            "UserData": {
-                "Allegiance": "Enemy"
+            "ClientData": {
+                "Allegiance": "Enemy",
+                "HasMoved": false
             }
         }
-    ]
+    ],
+    "ClientData": {
+        "PhaseManager": {
+            "CurrentPhase": "Player"
+        }
+    }
 }

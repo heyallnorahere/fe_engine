@@ -18,12 +18,24 @@ using System.Collections.Generic;
 
 namespace FEEngine
 {
+    /// <summary>
+    /// Data to be held by a <see cref="IMap">map</see>.
+    /// </summary>
+    public interface IMapClientData
+    {
+        /// <summary>
+        /// Whether this structure is valid.
+        /// </summary>
+        public bool IsValid { get; }
+    }
+
     public struct MapDesc : ICreationDesc
     {
         public MapDesc()
         {
             Size = (0, 0);
             Name = null;
+            ClientData = null;
         }
 
         /// <summary>
@@ -35,6 +47,11 @@ namespace FEEngine
         /// The name of this map. Can be null.
         /// </summary>
         public string? Name;
+
+        /// <summary>
+        /// Data of a custom format to be assigned by the client.
+        /// </summary>
+        public IMapClientData? ClientData;
 
         public bool Verify() => Size.X >= 1 && Size.Y >= 1;
         public ICreationDesc Clone() => (ICreationDesc)MemberwiseClone();
@@ -87,5 +104,10 @@ namespace FEEngine
         /// </summary>
         /// <returns>If all actions succeeded. If no actions were pushed, returns true.</returns>
         public bool Flush();
+
+        /// <summary>
+        /// Data of a custom format to be assigned by the user.
+        /// </summary>
+        public IMapClientData? ClientData { get; set; }
     }
 }

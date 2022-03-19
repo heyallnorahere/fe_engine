@@ -32,11 +32,7 @@ namespace FEEngine.Cmdline.Commands
 
         private static void ExecuteImpl(string[] args, Stream output)
         {
-            var writer = new StreamWriter(output)
-            {
-                AutoFlush = true
-            }; 
-
+            var writer = output.CreateWriter();
             if (args.Length > 0)
             {
                 writer.WriteLine("Usage: clear");
@@ -45,6 +41,30 @@ namespace FEEngine.Cmdline.Commands
 
             Renderer.Clear();
             writer.WriteLine("Cleared the screen for redrawing!");
+        }
+    }
+
+    [RegisteredCommand("quit")]
+    public sealed class QuitCommand : IConsoleCommand
+    {
+        public QuitCommand()
+        {
+            Subcommands = new Dictionary<string, IConsoleCommand>();
+        }
+
+        public IReadOnlyDictionary<string, IConsoleCommand> Subcommands { get; }
+        public ConsoleCommandExecutionCallback? Execute => ExecuteImpl;
+
+        private static void ExecuteImpl(string[] args, Stream output)
+        {
+            var writer = output.CreateWriter();
+            if (args.Length > 0)
+            {
+                writer.WriteLine("Usage: quit");
+                return;
+            }
+
+            Renderer.SignalCtrlC();
         }
     }
 }

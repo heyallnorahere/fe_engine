@@ -26,6 +26,7 @@ namespace FEEngine.Internal
             mDesc = desc;
             mUnits = new List<IUnit>();
             mActions = new List<Action>();
+            ClientData = desc.ClientData;
         }
 
         public bool IsOutOfBounds(Vector point)
@@ -71,8 +72,6 @@ namespace FEEngine.Internal
 
         public bool Flush()
         {
-            bool succeeded = true;
-
             var units = new SortedDictionary<int, IUnit>();
             foreach (IUnit unit in mUnits)
             {
@@ -92,7 +91,10 @@ namespace FEEngine.Internal
                 Action action = mActions[index];
                 IUnit unit = units[index];
 
-                succeeded &= action.Invoke(unit);
+                if (!action.Invoke(unit))
+                {
+                    return false;
+                }
             }
 
             mActions.Clear();
@@ -101,10 +103,11 @@ namespace FEEngine.Internal
                 unit.ClearActions();
             }
 
-            return succeeded;
+            return true;
         }
 
         public IReadOnlyList<IUnit> Units => mUnits;
+        public IMapClientData? ClientData { get; set; }
 
         private readonly MapDesc mDesc;
         private readonly List<IUnit> mUnits;
