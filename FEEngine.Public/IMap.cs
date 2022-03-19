@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+using System;
 using System.Collections.Generic;
 
 namespace FEEngine
@@ -104,6 +105,13 @@ namespace FEEngine
         /// </summary>
         /// <returns>If all actions succeeded. If no actions were pushed, returns true.</returns>
         public bool Flush();
+
+        /// <summary>
+        /// Removes a set of actions from the queue.
+        /// </summary>
+        /// <param name="count">How many actions to be removed.</param>
+        /// <returns>A list of actions, in the order they were submitted.</returns>
+        public IReadOnlyList<Tuple<IUnit, Action>> UndoActions(int count = 1);
 
         /// <summary>
         /// Data of a custom format to be assigned by the user.

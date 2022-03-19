@@ -78,6 +78,7 @@ namespace FEEngine.Internal
             return true;
         }
 
+        public bool RemoveActionIndex(int actionIndex) => mActionIndices.Remove(actionIndex);
         public void ClearActions() => mActionIndices.Clear();
         public IReadOnlyList<int> ActionIndices => mActionIndices;
 

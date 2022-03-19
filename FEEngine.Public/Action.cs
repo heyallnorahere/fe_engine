@@ -61,7 +61,7 @@ namespace FEEngine
                     var newPosition = unit.Position + offset;
                     int movement = unit.Stats.Movement;
 
-                    if (unit.Map.IsOutOfBounds(newPosition) || newPosition.TaxicabLength > movement)
+                    if (unit.Map.IsOutOfBounds(newPosition) || offset.TaxicabLength > movement)
                     {
                         return false;
                     }

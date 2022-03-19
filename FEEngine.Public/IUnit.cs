@@ -192,6 +192,14 @@ namespace FEEngine
         public bool AddAction(Action action);
 
         /// <summary>
+        /// Removes an item with the given value from <see cref="ActionIndices"/>.
+        /// To be called from its parent <see cref="IMap"/>.
+        /// </summary>
+        /// <param name="actionIndex">The value to be removed.</param>
+        /// <returns>If the item was successfully removed.</returns>
+        public bool RemoveActionIndex(int actionIndex);
+
+        /// <summary>
         /// Resets <see cref="ActionIndices"/>.
         /// </summary>
         public void ClearActions();

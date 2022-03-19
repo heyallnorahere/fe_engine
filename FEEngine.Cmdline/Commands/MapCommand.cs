@@ -107,6 +107,10 @@ namespace FEEngine.Cmdline.Commands
                 ["flush"] = new GenericSubcommand
                 {
                     Execute = Flush
+                },
+                ["undo"] = new GenericSubcommand
+                {
+                    Execute = Undo
                 }
             };
         }
@@ -154,6 +158,30 @@ namespace FEEngine.Cmdline.Commands
             {
                 writer.WriteLine("Successfully flushed the map!");
             }
+        }
+
+        private static void Undo(string[] args, Stream output)
+        {
+            const string usage = "Usage: map undo [count: int]";
+
+            var writer = output.CreateWriter();
+            if (args.Length > 1)
+            {
+                writer.WriteLine(usage);
+                return;
+            }
+
+            int count = 1;
+            if (args.Length > 0 && !int.TryParse(args[0], out count))
+            {
+                writer.WriteLine(usage);
+                return;
+            }
+
+            var map = Program.Instance.Map;
+            var undoneActions = map.UndoActions(count);
+
+            writer.WriteLine($"Undid {undoneActions.Count} action(s)");
         }
     }
 }

@@ -72,20 +72,7 @@ namespace FEEngine.Internal
 
         public bool Flush()
         {
-            var units = new SortedDictionary<int, IUnit>();
-            foreach (IUnit unit in mUnits)
-            {
-                foreach (int index in unit.ActionIndices)
-                {
-                    if (units.ContainsKey(index))
-                    {
-                        throw new ArgumentException("An index appeared more than once!");
-                    }
-
-                    units.Add(index, unit);
-                }
-            }
-
+            var units = FindActionSubmitters();
             foreach (int index in units.Keys)
             {
                 Action action = mActions[index];
@@ -104,6 +91,52 @@ namespace FEEngine.Internal
             }
 
             return true;
+        }
+
+        public IReadOnlyList<Tuple<IUnit, Action>> UndoActions(int count)
+        {
+            var unitActionPairs = new List<Tuple<IUnit, Action>>();
+
+            var units = FindActionSubmitters();
+            foreach (int index in units.Keys)
+            {
+                Action action = mActions[index];
+                IUnit unit = units[index];
+
+                unitActionPairs.Add(new Tuple<IUnit, Action>(unit, action));
+            }
+            
+            var pairArray = unitActionPairs.ToArray();
+            int startIndex = count > unitActionPairs.Count ? 0 : unitActionPairs.Count - count;
+            var removedActions = pairArray[startIndex..];
+
+            for (int i = 0; i < removedActions.Length; i++)
+            {
+                var pair = removedActions[i];
+                pair.Item1.RemoveActionIndex(startIndex + i);
+            }
+
+            mActions.RemoveRange(startIndex, removedActions.Length);
+            return removedActions;
+        }
+
+        private SortedDictionary<int, IUnit> FindActionSubmitters()
+        {
+            var units = new SortedDictionary<int, IUnit>();
+            foreach (IUnit unit in mUnits)
+            {
+                foreach (int index in unit.ActionIndices)
+                {
+                    if (units.ContainsKey(index))
+                    {
+                        throw new ArgumentException("An index appeared more than once!");
+                    }
+
+                    units.Add(index, unit);
+                }
+            }
+
+            return units;
         }
 
         public IReadOnlyList<IUnit> Units => mUnits;
