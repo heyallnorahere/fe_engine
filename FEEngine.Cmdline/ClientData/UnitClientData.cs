@@ -15,14 +15,29 @@
 */
 
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace FEEngine.Cmdline.ClientData
 {
+    public enum ClientActionID
+    {
+        Move,
+        Item,
+        Wait,
+
+    }
+
     [JsonObject(MissingMemberHandling = MissingMemberHandling.Error)]
     public sealed class UnitClientData : IUnitClientData
     {
+        public UnitClientData()
+        {
+            PhaseActions = new List<ClientActionID>();
+        }
+
         public Allegiance Allegiance { get; set; }
         public bool HasMoved { get; set; }
+        public List<ClientActionID> PhaseActions { get; set; }
 
         [JsonIgnore]
         public bool IsValid => true;

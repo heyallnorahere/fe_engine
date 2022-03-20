@@ -30,6 +30,7 @@ namespace FEEngine.Cmdline.UI.Views
 
         public MapView()
         {
+            mSelectedUnit = null;
             mCursorPos = (0, 0);
             mViewOffset = (0, 0);
             mAvailableSize = (0, 0);
@@ -208,8 +209,26 @@ namespace FEEngine.Cmdline.UI.Views
             }
         }
 
-        private Vector mCursorPos;
-        private Vector mViewOffset;
+        public IUnit? SelectedUnit
+        {
+            get => mSelectedUnit;
+            set
+            {
+                if (value != null)
+                {
+                    var map = Program.Instance.Map;
+                    if (value.Map != map)
+                    {
+                        throw new ArgumentException("The given unit does not belong to the loaded map!");
+                    }
+                }
+
+                mSelectedUnit = value;
+            }
+        }
+
+        private IUnit? mSelectedUnit = null;
+        private Vector mCursorPos, mViewOffset;
 
         public void SetSize(Vector size) => mAvailableSize = size;
         private Vector mAvailableSize;

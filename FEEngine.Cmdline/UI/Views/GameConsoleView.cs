@@ -28,6 +28,8 @@ namespace FEEngine.Cmdline.UI.Views
             mCurrentCommand = string.Empty;
             mSubmittedCommand = string.Empty;
             mLines = new Queue<string>();
+            mVerticalPosition = -1;
+            mHorizontalPosition = 0;
 
             mSize = (0, 0);
         }
@@ -36,6 +38,32 @@ namespace FEEngine.Cmdline.UI.Views
         {
             switch (keyInfo.Key)
             {
+                case ConsoleKey.UpArrow:
+                    if (mVerticalPosition < 0)
+                    {
+                        mVerticalPosition = 0;
+                    }
+
+                    mVerticalPosition++;
+                    break;
+                case ConsoleKey.DownArrow:
+                    if (mVerticalPosition > 0)
+                    {
+                        mVerticalPosition--;
+                    }
+                    break;
+                case ConsoleKey.LeftArrow:
+                    if (mHorizontalPosition > 0)
+                    {
+                        mHorizontalPosition--;
+                    }
+                    break;
+                case ConsoleKey.RightArrow:
+                    if (mHorizontalPosition < mCurrentCommand.Length)
+                    {
+                        mHorizontalPosition++;
+                    }
+                    break;
                 case ConsoleKey.Enter:
                     if (mCurrentCommand.Length > 0)
                     {
@@ -46,16 +74,30 @@ namespace FEEngine.Cmdline.UI.Views
 
                         mSubmittedCommand = mCurrentCommand;
                         mCurrentCommand = string.Empty;
+                        mVerticalPosition = -1;
+                        mHorizontalPosition = 0;
                     }
                     break;
                 case ConsoleKey.Backspace:
-                    if (mCurrentCommand.Length > 0)
+                    if (mHorizontalPosition > 0)
                     {
-                        mCurrentCommand = mCurrentCommand[..^1];
+                        mCurrentCommand = mCurrentCommand.Remove(--mHorizontalPosition, 1);
                     }
                     break;
                 default:
-                    mCurrentCommand += keyInfo.KeyChar;
+                    // i don't want to deal with unicode
+                    char keyChar = keyInfo.KeyChar;
+                    if (keyChar < ' ' || keyChar > '~')
+                    {
+                        return;
+                    }
+
+                    if (mVerticalPosition >= 0)
+                    {
+                        mVerticalPosition = -1;
+                    }
+
+                    mCurrentCommand = mCurrentCommand.Insert(mHorizontalPosition++, $"{keyChar}");
                     break;
             }
         }
@@ -95,6 +137,7 @@ namespace FEEngine.Cmdline.UI.Views
             int spaceAvailable = mSize.Y - 1;
             string[] wrappedLinesArray = wrappedLines.ToArray();
 
+            // todo: use mVerticalPosition
             string[] renderedLines;
             if (wrappedLinesArray.Length > spaceAvailable)
             {
@@ -123,6 +166,7 @@ namespace FEEngine.Cmdline.UI.Views
             int commandPromptIndex = getBufferIndex(commandPromptPos);
             buffer[commandPromptIndex] = '>';
 
+            // todo: use mHorizontalPosition
             spaceAvailable = mSize.X - 3;
             string displayedCommand;
 
@@ -193,5 +237,6 @@ namespace FEEngine.Cmdline.UI.Views
 
         private readonly Queue<string> mLines;
         private string mSubmittedCommand, mCurrentCommand;
+        private int mVerticalPosition, mHorizontalPosition;
     }
 }

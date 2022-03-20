@@ -104,7 +104,20 @@ namespace FEEngine.Cmdline
         /// use the <see cref="MapSerializer.ManifestPrefix">manifest prefix</see>.
         /// </summary>
         /// <param name="descriptor">The string describing the map to load.</param>
-        public void LoadMap(string descriptor) => mMap = MapSerializer.Deserialize(descriptor);
+        public void LoadMap(string descriptor)
+        {
+            mMap = MapSerializer.Deserialize(descriptor);
+
+            if (mUIRoot != null)
+            {
+                var mapView = mUIRoot.FindView<MapView>();
+                if (mapView != null)
+                {
+                    mapView.SelectedUnit = null;
+                    mapView.CursorPos = (0, 0);
+                }
+            }
+        }
 
         public Factory Factory => mFactory!;
         public ItemDatabase Items => mItems!;

@@ -15,6 +15,7 @@
 */
 
 using FEEngine.Cmdline.ClientData;
+using System.Collections.Generic;
 using System.IO;
 
 namespace FEEngine.Cmdline
@@ -51,6 +52,24 @@ namespace FEEngine.Cmdline
             return false;
         }
 
+        public static void SetHasMoved(this IUnit unit, bool hasMoved)
+        {
+            if (unit.ClientData is UnitClientData clientData)
+            {
+                clientData.HasMoved = hasMoved;
+            }
+        }
+
+        public static List<ClientActionID>? GetPhaseActions(this IUnit unit)
+        {
+            if (unit.ClientData is UnitClientData clientData)
+            {
+                return clientData.PhaseActions;
+            }
+
+            return null;
+        }
+
         public static TextWriter CreateWriter(this Stream stream)
         {
             if (!stream.CanWrite)
@@ -62,6 +81,19 @@ namespace FEEngine.Cmdline
             {
                 AutoFlush = true
             };
+        }
+
+        public static IUnit? UnitAt(this IMap map, Vector position)
+        {
+            foreach (IUnit unit in map.Units)
+            {
+                if (unit.Position == position)
+                {
+                    return unit;
+                }
+            }
+
+            return null;
         }
     }
 }
