@@ -19,6 +19,55 @@ using System.IO;
 
 namespace FEEngine.Cmdline.Commands
 {
+    [RegisteredCommand("help")]
+    public sealed class HelpCommand : IConsoleCommand
+    {
+        public HelpCommand()
+        {
+            Subcommands = new Dictionary<string, IConsoleCommand>();
+        }
+
+        public IReadOnlyDictionary<string, IConsoleCommand> Subcommands { get; }
+        public ConsoleCommandExecutionCallback? Execute => ExecuteImpl;
+
+        private static void ExecuteImpl(string[] args, Stream output)
+        {
+            const int baseSpacing = 15;
+
+            var writer = output.CreateWriter();
+            if (args.Length > 0)
+            {
+                writer.WriteLine("Usage: help");
+                return;
+            }
+
+            var commands = new List<string>(GameConsole.RegisteredCommands);
+            commands.Sort();
+
+            writer.WriteLine("Commands:");
+            for (int i = 0; i < commands.Count; i += 2)
+            {
+                string line = commands[i];
+
+                int nextIndex = i + 1;
+                if (nextIndex < commands.Count)
+                {
+                    string nextCommand = commands[nextIndex];
+
+                    int spacing = baseSpacing - line.Length;
+                    for (int j = 0; j < spacing; j++)
+                    {
+                        line += ' ';
+                    }
+
+                    line += nextCommand;
+                }
+
+                writer.WriteLine(line);
+            }
+        }
+    }
+
     [RegisteredCommand("clear")]
     public sealed class ClearCommand : IConsoleCommand
     {

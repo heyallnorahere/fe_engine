@@ -41,28 +41,34 @@ namespace FEEngine.Cmdline.UI.Views
                 case ConsoleKey.UpArrow:
                     if (mVerticalPosition < 0)
                     {
-                        mVerticalPosition = 0;
+                        mVerticalPosition = 1;
+                    }
+                    else if (mVerticalPosition < mLines.Count - 3)
+                    {
+                        mVerticalPosition++;
                     }
 
-                    mVerticalPosition++;
                     break;
                 case ConsoleKey.DownArrow:
                     if (mVerticalPosition > 0)
                     {
                         mVerticalPosition--;
                     }
+
                     break;
                 case ConsoleKey.LeftArrow:
                     if (mHorizontalPosition > 0)
                     {
                         mHorizontalPosition--;
                     }
+
                     break;
                 case ConsoleKey.RightArrow:
                     if (mHorizontalPosition < mCurrentCommand.Length)
                     {
                         mHorizontalPosition++;
                     }
+
                     break;
                 case ConsoleKey.Enter:
                     if (mCurrentCommand.Length > 0)
@@ -77,27 +83,24 @@ namespace FEEngine.Cmdline.UI.Views
                         mVerticalPosition = -1;
                         mHorizontalPosition = 0;
                     }
+
                     break;
                 case ConsoleKey.Backspace:
                     if (mHorizontalPosition > 0)
                     {
                         mCurrentCommand = mCurrentCommand.Remove(--mHorizontalPosition, 1);
                     }
+
                     break;
                 default:
-                    // i don't want to deal with unicode
-                    char keyChar = keyInfo.KeyChar;
-                    if (keyChar < ' ' || keyChar > '~')
-                    {
-                        return;
-                    }
-
                     if (mVerticalPosition >= 0)
                     {
                         mVerticalPosition = -1;
                     }
 
+                    char keyChar = keyInfo.KeyChar;
                     mCurrentCommand = mCurrentCommand.Insert(mHorizontalPosition++, $"{keyChar}");
+
                     break;
             }
         }
@@ -108,24 +111,25 @@ namespace FEEngine.Cmdline.UI.Views
             {
                 mLines.Enqueue($"> {mSubmittedCommand}");
 
-                var lines = GameConsole.Execute(mSubmittedCommand);
-                foreach (var line in lines)
+                var output = GameConsole.Execute(mSubmittedCommand);
+                foreach (var line in output)
                 {
-                    mLines.Enqueue(line);
+                    var wrappedLines = Wrap(line);
+                    foreach (var wrappedLine in wrappedLines)
+                    {
+                        mLines.Enqueue(wrappedLine);
+                    }
+
+                    if (mVerticalPosition >= 0)
+                    {
+                        mVerticalPosition += wrappedLines.Count;
+                    }
                 }
 
                 mSubmittedCommand = string.Empty;
             }
 
-            var lineArray = mLines.ToArray();
-            var wrappedLines = new List<string>();
-
-            foreach (string line in lineArray)
-            {
-                var wrapped = Wrap(line);
-                wrappedLines.AddRange(wrapped);
-            }
-
+            var lines = mLines.ToArray();
             int bufferSize = mSize.X * mSize.Y;
             var buffer = new char[bufferSize];
 
@@ -134,27 +138,41 @@ namespace FEEngine.Cmdline.UI.Views
                 buffer[i] = ' ';
             }
 
-            int spaceAvailable = mSize.Y - 1;
-            string[] wrappedLinesArray = wrappedLines.ToArray();
 
-            // todo: use mVerticalPosition
-            string[] renderedLines;
-            if (wrappedLinesArray.Length > spaceAvailable)
+            int spaceAvailable = mSize.Y - 1;
+            int verticalPos = mVerticalPosition;
+
+            if (verticalPos < 0)
             {
-                renderedLines = wrappedLinesArray[^4..];
+                verticalPos = 0;
+            }
+
+            string[] renderedLines;
+            if (lines.Length > spaceAvailable)
+            {
+                int end = verticalPos + 1;
+                int start = end + spaceAvailable;
+
+                if (start >= lines.Length)
+                {
+                    start = lines.Length - 1;
+                }
+
+                renderedLines = lines[^start..^end];
             }
             else
             {
-                renderedLines = wrappedLinesArray;
+                renderedLines = lines;
             }
 
             var getBufferIndex = (Vector pos) => pos.Y * mSize.X + pos.X;
+            int yOffset = spaceAvailable - renderedLines.Length;
             for (int y = 0; y < renderedLines.Length; y++)
             {
                 string line = renderedLines[y];
                 for (int x = 0; x < line.Length; x++)
                 {
-                    Vector pos = (x, y);
+                    Vector pos = (x, y + yOffset);
                     char character = line[x];
 
                     int bufferIndex = getBufferIndex(pos);
@@ -230,7 +248,7 @@ namespace FEEngine.Cmdline.UI.Views
             return lines;
         }
 
-        public Vector MinSize => (15, 5);
+        public Vector MinSize => (15, 8);
 
         public void SetSize(Vector size) => mSize = size;
         private Vector mSize;

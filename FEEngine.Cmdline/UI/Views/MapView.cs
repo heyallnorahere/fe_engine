@@ -38,9 +38,11 @@ namespace FEEngine.Cmdline.UI.Views
         
         private void InvalidateViewOffset()
         {
-            Vector currentCursorRenderPos = ToScreenSpace(mCursorPos);
-            if (currentCursorRenderPos.X >= 0 && currentCursorRenderPos.X < mAvailableSize.X &&
-                currentCursorRenderPos.Y >= 0 && currentCursorRenderPos.Y < mAvailableSize.Y)
+            Vector hoveredUnitRenderPos = ToScreenSpace(mCursorPos);
+            Vector currentCursorRenderPos = hoveredUnitRenderPos - (0, 1);
+
+            if (currentCursorRenderPos.X >= 0 && hoveredUnitRenderPos.X < mAvailableSize.X &&
+                currentCursorRenderPos.Y >= 0 && hoveredUnitRenderPos.Y < mAvailableSize.Y)
             {
                 return;
             }
@@ -56,12 +58,12 @@ namespace FEEngine.Cmdline.UI.Views
                 mViewOffset.Y = absRenderPos.Y - 1;
             }
 
-            if (currentCursorRenderPos.X >= mAvailableSize.X)
+            if (hoveredUnitRenderPos.X >= mAvailableSize.X)
             {
                 mViewOffset.X = absRenderPos.X + 1 - mAvailableSize.X;
             }
 
-            if (currentCursorRenderPos.Y >= mAvailableSize.Y)
+            if (hoveredUnitRenderPos.Y >= mAvailableSize.Y)
             {
                 mViewOffset.Y = absRenderPos.Y + 1 - mAvailableSize.Y;
             }

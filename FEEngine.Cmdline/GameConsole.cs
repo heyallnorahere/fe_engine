@@ -67,6 +67,7 @@ namespace FEEngine.Cmdline
     public static class GameConsole
     {
         private static readonly Dictionary<string, IConsoleCommand> sBaseCommands;
+        public static IEnumerable<string> RegisteredCommands => sBaseCommands.Keys;
 
         static GameConsole()
         {
