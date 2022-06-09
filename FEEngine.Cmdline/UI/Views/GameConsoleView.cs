@@ -43,7 +43,7 @@ namespace FEEngine.Cmdline.UI.Views
                     {
                         mVerticalPosition = 1;
                     }
-                    else if (mVerticalPosition < mLines.Count - 3)
+                    else if (mVerticalPosition < mLines.Count - 2)
                     {
                         mVerticalPosition++;
                     }
@@ -150,7 +150,7 @@ namespace FEEngine.Cmdline.UI.Views
             string[] renderedLines;
             if (lines.Length > spaceAvailable)
             {
-                int end = verticalPos + 1;
+                int end = verticalPos;
                 int start = end + spaceAvailable;
 
                 if (start >= lines.Length)
