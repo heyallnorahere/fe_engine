@@ -39,17 +39,16 @@ namespace FEEngine.Cmdline.Commands
         public IReadOnlyDictionary<string, IConsoleCommand> Subcommands { get; }
         public ConsoleCommandExecutionCallback? Execute => null;
 
-        private static void Get(string[] args, Stream output)
+        private static void Get(string[] args, TextWriter output)
         {
             const string usage = 
                 "Usage: unit get <x: int> <y: int> OR\n" +
                 "       unit get selected OR\n" +
                 "       unit get hovered";
 
-            var writer = output.CreateWriter();
             if (args.Length > 2 || args.Length == 0)
             {
-                writer.WriteLine(usage);
+                output.WriteLine(usage);
                 return;
             }
 
@@ -59,7 +58,7 @@ namespace FEEngine.Cmdline.Commands
                 IUnit? found = map.UnitAt(position);
                 if (found == null)
                 {
-                    writer?.WriteLine($"No unit found at: ({position.X}, {position.Y})");
+                    output?.WriteLine($"No unit found at: ({position.X}, {position.Y})");
                 }
 
                 return found;
@@ -72,7 +71,7 @@ namespace FEEngine.Cmdline.Commands
                 if (!int.TryParse(args[0], out position.X) ||
                     !int.TryParse(args[1], out position.Y))
                 {
-                    writer.WriteLine(usage);
+                    output.WriteLine(usage);
                     return;
                 }
 
@@ -110,25 +109,25 @@ namespace FEEngine.Cmdline.Commands
                         }
                         else
                         {
-                            writer.WriteLine("No unit is selected!");
+                            output.WriteLine("No unit is selected!");
                             return;
                         }
                     default:
-                        writer.WriteLine(usage);
+                        output.WriteLine(usage);
                         return;
                 }
             }
 
             var unitPosition = unit.Position;
-            writer.WriteLine($"Unit at ({unitPosition.X}, {unitPosition.Y}):");
+            output.WriteLine($"Unit at ({unitPosition.X}, {unitPosition.Y}):");
 
             var stats = unit.Stats;
-            writer.WriteLine($"  Name: {unit.Name ?? "null"}");
-            writer.WriteLine($"  HP: {unit.HP}/{stats.HP}");
-            writer.WriteLine($"  Level: {stats.Level}");
-            writer.WriteLine($"  Movement: {stats.Movement}");
+            output.WriteLine($"  Name: {unit.Name ?? "null"}");
+            output.WriteLine($"  HP: {unit.HP}/{stats.HP}");
+            output.WriteLine($"  Level: {stats.Level}");
+            output.WriteLine($"  Movement: {stats.Movement}");
 
-            writer.WriteLine("  Stats:\n" +
+            output.WriteLine("  Stats:\n" +
                 $"    Strength: {stats.Strength}\n" +
                 $"    Magic: {stats.Magic}\n" +
                 $"    Speed: {stats.Speed}\n" +

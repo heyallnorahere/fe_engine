@@ -70,19 +70,6 @@ namespace FEEngine.Cmdline
             return null;
         }
 
-        public static TextWriter CreateWriter(this Stream stream)
-        {
-            if (!stream.CanWrite)
-            {
-                throw new IOException("Cannot write to the passed stream!");
-            }
-
-            return new StreamWriter(stream)
-            {
-                AutoFlush = true
-            };
-        }
-
         public static IUnit? UnitAt(this IMap map, Vector position)
         {
             foreach (IUnit unit in map.Units)

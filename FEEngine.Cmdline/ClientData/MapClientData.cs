@@ -26,10 +26,7 @@ namespace FEEngine.Cmdline.ClientData
             PhaseManager = new PhaseManager();
         }
 
-        internal void SetMap(IMap map)
-        {
-            PhaseManager.SetMap(map);
-        }
+        internal void SetMap(IMap map) => PhaseManager.SetMap(map);
 
         public PhaseManager PhaseManager { get; set; }
 

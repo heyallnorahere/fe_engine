@@ -154,6 +154,7 @@ namespace FEEngine
 
             return valid;
         }
+
         public ICreationDesc Clone() => (ICreationDesc)MemberwiseClone();
     }
 

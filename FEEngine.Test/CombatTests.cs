@@ -33,6 +33,8 @@ namespace FEEngine.Test
             public bool HitChance(int displayedPercentage) => true;
             public bool CritChance(int displayedPercentage) => mCrit;
 
+            public TrueHitFlags TrueHit => 0;
+
             private readonly bool mCrit;
         }
 

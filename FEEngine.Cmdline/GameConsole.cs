@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace FEEngine.Cmdline
@@ -26,7 +27,7 @@ namespace FEEngine.Cmdline
     /// Used as a delegate in <see cref="IConsoleCommand"/>.
     /// </summary>
     /// <param name="args">The arguments that were passed.</param>
-    public delegate void ConsoleCommandExecutionCallback(string[] args, Stream output);
+    public delegate void ConsoleCommandExecutionCallback(string[] args, TextWriter output);
 
     /// <summary>
     /// A command to be invoked via <see cref="GameConsole"/>.
@@ -113,6 +114,45 @@ namespace FEEngine.Cmdline
             }
         }
 
+        private class ConsoleWriter : TextWriter
+        {
+            public ConsoleWriter()
+            {
+                mLines = new List<string>();
+                mCurrentLine = string.Empty;
+            }
+
+            public override Encoding Encoding => Encoding.UTF8;
+
+            public override void Write(char value)
+            {
+                if (value == '\r')
+                {
+                    return;
+                }
+
+                if (value != '\n')
+                {
+                    mCurrentLine += value;
+                }
+                else
+                {
+                    Flush();
+                }
+            }
+
+            public override void Flush()
+            {
+                mLines.Add(mCurrentLine);
+                mCurrentLine = string.Empty;
+            }
+
+            public IReadOnlyList<string> Lines => mLines;
+
+            private readonly List<string> mLines;
+            private string mCurrentLine;
+        }
+
         /// <summary>
         /// Executes a command.
         /// </summary>
@@ -168,21 +208,11 @@ namespace FEEngine.Cmdline
                 commandArgs = args[unusedArgsStart..];
             }
 
-            var stream = new MemoryStream();
-            currentCommand.Execute(commandArgs, stream);
+            using var writer = new ConsoleWriter();
+            currentCommand.Execute(commandArgs, writer);
 
-            stream.Seek(0, SeekOrigin.Begin);
-            var reader = new StreamReader(stream);
-
-            var lines = new List<string>();
-            string? line;
-
-            while ((line = reader.ReadLine()) != null)
-            {
-                lines.Add(line);
-            }
-
-            return lines;
+            writer.Flush();
+            return writer.Lines;
         }
     }
 }

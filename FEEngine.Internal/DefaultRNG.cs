@@ -15,6 +15,8 @@
 */
 
 using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace FEEngine.Internal
 {
@@ -25,33 +27,51 @@ namespace FEEngine.Internal
 
         public DefaultRNG(RandomNumberGeneratorDesc desc)
         {
-            if (desc.Seed >= 0)
+            mTrueHit = desc.TrueHit;
+            if (desc.Seed != 0)
             {
-                mRandom = new Random(desc.Seed);
+                mGenerator = new Random(desc.Seed);
             }
             else
             {
-                mRandom = new Random();
+                mGenerator = new Random();
             }
         }
 
-        public bool HitChance(int displayedPercentage)
-        {
-            int rn1 = Generate();
-            int rn2 = Generate();
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public bool HitChance(int displayedPercentage) => ProcessCall(displayedPercentage);
 
-            int avg = (rn1 + rn2) / 2;
-            return avg < displayedPercentage;
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public bool CritChance(int displayedPercentage) => ProcessCall(displayedPercentage);
+
+        public TrueHitFlags TrueHit => mTrueHit;
+
+        private bool ProcessCall(int displayedPercentage)
+        {
+            var stackframe = new StackFrame(1);
+            var method = stackframe.GetMethod();
+
+            string name = method!.Name;
+            var flag = Enum.Parse<TrueHitFlags>(name);
+
+            if (mTrueHit.HasFlag(flag))
+            {
+                int rn1 = Generate();
+                int rn2 = Generate();
+
+                int avg = (rn1 + rn2) / 2;
+                return avg < displayedPercentage;
+            }
+            else
+            {
+                return Generate() < displayedPercentage;
+            }
         }
 
-        public bool CritChance(int displayedPercentage)
-        {
-            int result = Generate();
-            return result < displayedPercentage;
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int Generate() => mGenerator.Next(Min, Max);
 
-        private int Generate() => mRandom.Next(Min, Max);
-
-        private readonly Random mRandom;
+        private readonly Random mGenerator;
+        private readonly TrueHitFlags mTrueHit;
     }
 }

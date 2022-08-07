@@ -117,6 +117,8 @@ namespace FEEngine.Cmdline.UI.Views
                     {
                         Allegiance.Player => ConsoleColor.Blue,
                         Allegiance.Enemy => ConsoleColor.Red,
+                        Allegiance.OtherEnemy => ConsoleColor.Yellow,
+                        Allegiance.Ally => ConsoleColor.Green,
                         _ => throw new ArgumentException("Invalid allegiance!")
                     };
 

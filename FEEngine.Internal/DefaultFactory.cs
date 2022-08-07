@@ -14,9 +14,6 @@
    limitations under the License.
 */
 
-using System.Runtime.CompilerServices;
-[assembly: InternalsVisibleTo("FEEngine")]
-
 namespace FEEngine.Internal
 {
     internal class DefaultFactory : Factory

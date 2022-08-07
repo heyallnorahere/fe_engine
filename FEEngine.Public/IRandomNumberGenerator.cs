@@ -14,16 +14,27 @@
    limitations under the License.
 */
 
+using System;
+
 namespace FEEngine
 {
+    [Flags]
+    public enum TrueHitFlags
+    {
+        HitChance,
+        CritChance
+    }
+
     public struct RandomNumberGeneratorDesc : ICreationDesc
     {
         public RandomNumberGeneratorDesc()
         {
-            Seed = -1;
+            Seed = 0;
+            TrueHit = TrueHitFlags.HitChance;
         }
 
         public int Seed;
+        public TrueHitFlags TrueHit;
 
         public bool Verify() => true;
         public ICreationDesc Clone() => (ICreationDesc)MemberwiseClone();
@@ -48,5 +59,10 @@ namespace FEEngine
         /// <param name="displayedPercentage">The displayed crit chance.</param>
         /// <returns>If the attack was a crit.</returns>
         public bool CritChance(int displayedPercentage);
+
+        /// <summary>
+        /// Describes the calculations in which this generator uses True Hit.
+        /// </summary>
+        public TrueHitFlags TrueHit { get; }
     }
 }

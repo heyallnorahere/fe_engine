@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FEEngine.Public\FEEngine.Public.csproj" />
+    <InternalsVisibleTo Include="FEEngine" />
   </ItemGroup>
 
 </Project>

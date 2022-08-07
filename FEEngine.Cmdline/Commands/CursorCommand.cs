@@ -41,23 +41,21 @@ namespace FEEngine.Cmdline.Commands
         public IReadOnlyDictionary<string, IConsoleCommand> Subcommands { get; }
         public ConsoleCommandExecutionCallback? Execute => null;
 
-        private static void Move(string[] args, Stream output)
+        private static void Move(string[] args, TextWriter output)
         {
             Vector newPosition;
-            var writer = output.CreateWriter();
-
             if (args.Length != 2 ||
                 !int.TryParse(args[0], out newPosition.X) ||
                 !int.TryParse(args[1], out newPosition.Y))
             {
-                writer.WriteLine("Usage: cursor move <x: int> <y: int>");
+                output.WriteLine("Usage: cursor move <x: int> <y: int>");
                 return;
             }
 
             var map = Program.Instance.Map;
             if (map.IsOutOfBounds(newPosition))
             {
-                writer.WriteLine($"Invalid cursor position: ({newPosition.X}, {newPosition.Y})");
+                output.WriteLine($"Invalid cursor position: ({newPosition.X}, {newPosition.Y})");
                 return;
             }
 
@@ -66,20 +64,19 @@ namespace FEEngine.Cmdline.Commands
 
             if (mapView == null)
             {
-                writer.WriteLine("Could not find the map view!");
+                output.WriteLine("Could not find the map view!");
                 return;
             }
 
             mapView.CursorPos = newPosition;
-            writer.WriteLine($"Cursor moved to: ({newPosition.X}, {newPosition.Y})");
+            output.WriteLine($"Cursor moved to: ({newPosition.X}, {newPosition.Y})");
         }
 
-        private static void Get(string[] args, Stream output)
+        private static void Get(string[] args, TextWriter output)
         {
-            var writer = output.CreateWriter();
             if (args.Length > 0)
             {
-                writer.WriteLine("Usage: cursor get");
+                output.WriteLine("Usage: cursor get");
                 return;
             }
 
@@ -88,12 +85,12 @@ namespace FEEngine.Cmdline.Commands
 
             if (mapView == null)
             {
-                writer.WriteLine("Could not find the map view!");
+                output.WriteLine("Could not find the map view!");
                 return;
             }
 
             var cursorPos = mapView.CursorPos;
-            writer.WriteLine($"The cursor is currently at: ({cursorPos.X}, {cursorPos.Y})");
+            output.WriteLine($"The cursor is currently at: ({cursorPos.X}, {cursorPos.Y})");
         }
     }
 }

@@ -157,7 +157,6 @@ namespace FEEngine
         }
 
         private readonly Dictionary<Type, Delegate> mCreationFunctions;
-        protected delegate T? CreateDelegate<T, D>(D desc) where T : class where D : struct, ICreationDesc;
 
         /// <summary>
         /// A function called on creation. Should call
@@ -174,7 +173,7 @@ namespace FEEngine
         /// <typeparam name="D">The type of data to be passed.</typeparam>
         /// <param name="func">The callback to be registered.</param>
         /// <returns>Whether the function succeeded.</returns>
-        protected bool RegisterFactoryType<T, D>(CreateDelegate<T, D> func) where T : class where D : struct, ICreationDesc
+        protected bool RegisterFactoryType<T, D>(Func<D, T?> func) where T : class where D : struct, ICreationDesc
         {
             Type keyType = typeof(T);
             if (mCreationFunctions.ContainsKey(keyType) || !keyType.IsInterface)

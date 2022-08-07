@@ -23,7 +23,9 @@ namespace FEEngine.Cmdline
     public enum Allegiance
     {
         Player,
-        Enemy
+        Enemy,
+        OtherEnemy,
+        Ally
     }
 
     /// <summary>

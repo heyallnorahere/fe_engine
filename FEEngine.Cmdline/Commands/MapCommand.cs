@@ -43,12 +43,11 @@ namespace FEEngine.Cmdline.Commands
             public IReadOnlyDictionary<string, IConsoleCommand> Subcommands { get; }
             public ConsoleCommandExecutionCallback? Execute => null;
 
-            private static void Get(string[] args, Stream output)
+            private static void Get(string[] args, TextWriter output)
             {
-                var writer = output.CreateWriter();
                 if (args.Length > 0)
                 {
-                    writer.WriteLine("Usage: map phase get");
+                    output.WriteLine("Usage: map phase get");
                     return;
                 }
 
@@ -56,20 +55,19 @@ namespace FEEngine.Cmdline.Commands
                 var phaseManager = map.GetPhaseManager();
                 if (phaseManager == null)
                 {
-                    writer.WriteLine("Could not get the current map's phase manager!");
+                    output.WriteLine("Could not get the current map's phase manager!");
                     return;
                 }
 
                 var currentPhase = phaseManager.CurrentPhase;
-                writer.WriteLine($"Current phase: {currentPhase}");
+                output.WriteLine($"Current phase: {currentPhase}");
             }
 
-            private static void End(string[] args, Stream output)
+            private static void End(string[] args, TextWriter output)
             {
-                var writer = output.CreateWriter();
                 if (args.Length > 0)
                 {
-                    writer.WriteLine("Usage: map phase end");
+                    output.WriteLine("Usage: map phase end");
                     return;
                 }
 
@@ -77,7 +75,7 @@ namespace FEEngine.Cmdline.Commands
                 var phaseManager = map.GetPhaseManager();
                 if (phaseManager == null)
                 {
-                    writer.WriteLine("Could not get the current map's phase manager!");
+                    output.WriteLine("Could not get the current map's phase manager!");
                     return;
                 }
 
@@ -85,12 +83,12 @@ namespace FEEngine.Cmdline.Commands
                 {
                     phaseManager.EndPhase();
                     var currentPhase = phaseManager.CurrentPhase;
-                    writer.WriteLine($"Advanced to phase: {currentPhase}");
+                    output.WriteLine($"Advanced to phase: {currentPhase}");
                 }
                 catch (Exception ex)
                 {
                     Type type = ex.GetType();
-                    writer.WriteLine($"{type.Name} caught: {ex.Message}");
+                    output.WriteLine($"{type.Name} caught: {ex.Message}");
                 }
             }
         }
@@ -111,6 +109,10 @@ namespace FEEngine.Cmdline.Commands
                 ["undo"] = new GenericSubcommand
                 {
                     Execute = Undo
+                },
+                ["size"] = new GenericSubcommand
+                {
+                    Execute = GetSize
                 }
             };
         }
@@ -118,12 +120,11 @@ namespace FEEngine.Cmdline.Commands
         public IReadOnlyDictionary<string, IConsoleCommand> Subcommands { get; }
         public ConsoleCommandExecutionCallback? Execute => null;
 
-        private static void Load(string[] args, Stream output)
+        private static void Load(string[] args, TextWriter output)
         {
-            var writer = output.CreateWriter();
             if (args.Length != 1)
             {
-                writer.WriteLine("Usage: map load <descriptor: string>");
+                output.WriteLine("Usage: map load <descriptor: string>");
                 return;
             }
 
@@ -131,57 +132,67 @@ namespace FEEngine.Cmdline.Commands
             {
                 string mapDescriptor = args[0];
                 Program.Instance.LoadMap(mapDescriptor);
-                writer.WriteLine($"Successfully loaded map: {mapDescriptor}");
+                output.WriteLine($"Successfully loaded map: {mapDescriptor}");
             }
             catch (Exception ex)
             {
                 Type type = ex.GetType();
-                writer.WriteLine($"{type.Name} caught: {ex.Message}");
+                output.WriteLine($"{type.Name} caught: {ex.Message}");
             }
         }
 
-        private static void Flush(string[] args, Stream output)
+        private static void Flush(string[] args, TextWriter output)
         {
-            var writer = output.CreateWriter();
             if (args.Length > 0)
             {
-                writer.WriteLine("Usage: map flush");
+                output.WriteLine("Usage: map flush");
                 return;
             }
 
             var map = Program.Instance.Map;
             if (!map.Flush())
             {
-                writer.WriteLine("One or more actions failed!");
+                output.WriteLine("One or more actions failed!");
             }
             else
             {
-                writer.WriteLine("Successfully flushed the map!");
+                output.WriteLine("Successfully flushed the map!");
             }
         }
 
-        private static void Undo(string[] args, Stream output)
+        private static void Undo(string[] args, TextWriter output)
         {
             const string usage = "Usage: map undo [count: int]";
-
-            var writer = output.CreateWriter();
             if (args.Length > 1)
             {
-                writer.WriteLine(usage);
+                output.WriteLine(usage);
                 return;
             }
 
             int count = 1;
             if (args.Length > 0 && !int.TryParse(args[0], out count))
             {
-                writer.WriteLine(usage);
+                output.WriteLine(usage);
                 return;
             }
 
             var map = Program.Instance.Map;
             var undoneActions = map.UndoActions(count);
 
-            writer.WriteLine($"Undid {undoneActions.Count} action(s)");
+            output.WriteLine($"Undid {undoneActions.Count} action(s)");
+        }
+
+        private static void GetSize(string[] args, TextWriter output)
+        {
+            if (args.Length != 0)
+            {
+                output.WriteLine("Usage: map size");
+            }
+
+            var map = Program.Instance.Map;
+            var size = map.Size;
+
+            output.WriteLine($"Map size: ({size.X}, {size.Y})");
         }
     }
 }

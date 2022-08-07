@@ -24,7 +24,7 @@ namespace FEEngine.Cmdline.ClientData
         Move,
         Item,
         Wait,
-
+        Attack
     }
 
     [JsonObject(MissingMemberHandling = MissingMemberHandling.Error)]

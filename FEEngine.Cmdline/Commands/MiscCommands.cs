@@ -30,21 +30,19 @@ namespace FEEngine.Cmdline.Commands
         public IReadOnlyDictionary<string, IConsoleCommand> Subcommands { get; }
         public ConsoleCommandExecutionCallback? Execute => ExecuteImpl;
 
-        private static void ExecuteImpl(string[] args, Stream output)
+        private static void ExecuteImpl(string[] args, TextWriter output)
         {
             const int baseSpacing = 15;
-
-            var writer = output.CreateWriter();
             if (args.Length > 0)
             {
-                writer.WriteLine("Usage: help");
+                output.WriteLine("Usage: help");
                 return;
             }
 
             var commands = new List<string>(GameConsole.RegisteredCommands);
             commands.Sort();
 
-            writer.WriteLine("Commands:");
+            output.WriteLine("Commands:");
             for (int i = 0; i < commands.Count; i += 2)
             {
                 string line = commands[i];
@@ -63,7 +61,7 @@ namespace FEEngine.Cmdline.Commands
                     line += nextCommand;
                 }
 
-                writer.WriteLine(line);
+                output.WriteLine(line);
             }
         }
     }
@@ -79,17 +77,16 @@ namespace FEEngine.Cmdline.Commands
         public IReadOnlyDictionary<string, IConsoleCommand> Subcommands { get; }
         public ConsoleCommandExecutionCallback? Execute => ExecuteImpl;
 
-        private static void ExecuteImpl(string[] args, Stream output)
+        private static void ExecuteImpl(string[] args, TextWriter output)
         {
-            var writer = output.CreateWriter();
             if (args.Length > 0)
             {
-                writer.WriteLine("Usage: clear");
+                output.WriteLine("Usage: clear");
                 return;
             }
 
             Renderer.Clear();
-            writer.WriteLine("Cleared the screen for redrawing!");
+            output.WriteLine("Cleared the screen for redrawing!");
         }
     }
 
@@ -104,12 +101,11 @@ namespace FEEngine.Cmdline.Commands
         public IReadOnlyDictionary<string, IConsoleCommand> Subcommands { get; }
         public ConsoleCommandExecutionCallback? Execute => ExecuteImpl;
 
-        private static void ExecuteImpl(string[] args, Stream output)
+        private static void ExecuteImpl(string[] args, TextWriter output)
         {
-            var writer = output.CreateWriter();
             if (args.Length > 0)
             {
-                writer.WriteLine("Usage: quit");
+                output.WriteLine("Usage: quit");
                 return;
             }
 
