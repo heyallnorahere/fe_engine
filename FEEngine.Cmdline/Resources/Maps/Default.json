@@ -1,0 +1,70 @@
+{
+    "Name": "Test Map",
+    "Size": {
+        "X": 30,
+        "Y": 15
+    },
+    "Units": [
+        {
+            "Name": "Soldier #1",
+            "Inventory": [],
+            "EquippedWeapon": {
+                "DatabaseID": "Weapons/IronSword"
+            },
+            "Position": {
+                "X": 0,
+                "Y": 0
+            },
+            "Stats": {
+                "Movement": 5,
+                "Level": 3,
+                "HP": 20,
+                "Strength": 10,
+                "Magic": 0,
+                "Speed": 9,
+                "Dexterity": 7,
+                "Defense": 8,
+                "Resistance": 5,
+                "Luck": 7,
+                "Charm": 11
+            },
+            "ClientData": {
+                "Allegiance": "Player",
+                "HasMoved": false
+            }
+        },
+        {
+            "Name": "Soldier #2",
+            "Inventory": [],
+            "EquippedWeapon": {
+                "DatabaseID": "Weapons/IronBow"
+            },
+            "Position": {
+                "X": 1,
+                "Y": 1
+            },
+            "Stats": {
+                "Movement": 5,
+                "Level": 3,
+                "HP": 18,
+                "Strength": 8,
+                "Magic": 0,
+                "Speed": 12,
+                "Dexterity": 10,
+                "Defense": 6,
+                "Resistance": 7,
+                "Luck": 10,
+                "Charm": 8
+            },
+            "ClientData": {
+                "Allegiance": "Enemy",
+                "HasMoved": false
+            }
+        }
+    ],
+    "ClientData": {
+        "PhaseManager": {
+            "CurrentPhase": "Player"
+        }
+    }
+}

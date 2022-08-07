@@ -1,0 +1,16 @@
+{
+    "Name": "Iron Bow",
+    "ItemBehavior": null,
+    "WeaponData": {
+        "Might": 6,
+        "Weight": 6,
+        "Hit": 85,
+        "Crit": 0,
+        "Range": {
+            "Min": 2,
+            "Max": 2
+        },
+        "Type": "Bow"
+    },
+    "MaxUses": 40
+}

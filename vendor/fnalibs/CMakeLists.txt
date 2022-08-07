@@ -1,5 +1,0 @@
-cmake_minimum_required(VERSION 3.10)
-project(fnalibs)
-add_subdirectory("SDL")
-add_subdirectory("FAudio")
-add_subdirectory("FNA3D")

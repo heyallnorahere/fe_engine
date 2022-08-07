@@ -1,0 +1,6 @@
+{
+    "Name": "Vulnerary",
+    "ItemBehavior": "FEEngine.Cmdline.Resources.Items.Behaviors, FEEngine.Cmdline;HealingItem",
+    "WeaponData": null,
+    "MaxUses": 3
+}

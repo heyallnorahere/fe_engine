@@ -372,10 +372,10 @@ FodyWeavers.xsd
 
 # VS Code files for those working on multiple tools
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+#!.vscode/settings.json
+#!.vscode/tasks.json
+#!.vscode/launch.json
+#!.vscode/extensions.json
 *.code-workspace
 
 # Local History for Visual Studio Code
@@ -586,17 +586,3 @@ obj/
 # Additional files built by Visual Studio
 
 # End of https://www.toptal.com/developers/gitignore/api/csharp,dotnetcore,visualstudiocode,visualstudio
-
-# key bindings
-bindings.json
-
-# generated schemas
-schemas/
-
-# copied game binaries
-Games/
-
-# fnalibs
-fnalibs-build/
-*.dylib
-*.dll
